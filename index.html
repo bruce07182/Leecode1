@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Building Blocks</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+<style>
+body{font-family:system-ui;margin:0;background:#f6f7fb;color:#172033}.wrap{max-width:900px;margin:auto;padding:20px}.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 12px #0001}textarea{width:100%;height:260px;font:15px monospace;padding:12px;box-sizing:border-box}button,select{padding:10px 15px;margin:6px 6px 6px 0}pre{white-space:pre-wrap;background:#101827;color:#eee;padding:14px;border-radius:10px}.muted{color:#687386}
+</style></head>
+<body><div class="wrap">
+<h1>Python Building Blocks</h1>
+<p class="muted">Small skills → combinations → LeetCode-style problems.</p>
+<div class="card"><select id="q"></select><h2 id="title"></h2><p id="desc"></p><pre id="sig"></pre></div>
+<div class="card"><textarea id="code" spellcheck="false"></textarea><br><button id="runBtn">Run tests</button><button id="hintBtn">Hint</button><pre id="out">Loading Python…</pre></div>
+</div>
+<script>
+const qs=[
+{title:"1. Count positives",desc:"Return how many values in nums are greater than 0.",sig:"def count_positive(nums):",starter:"def count_positive(nums):\n    # your code\n    pass",fn:"count_positive",tests:[[[1,-2,3,0],2],[[-1,-2],0],[[1,2,3],3]],hint:"Use a counter and a for loop."},
+{title:"2. Frequency map",desc:"Return a dictionary mapping each value to how many times it occurs.",sig:"def frequency(nums):",starter:"def frequency(nums):\n    # your code\n    pass",fn:"frequency",tests:[[[1,2,2],{1:1,2:2}],[[],{}],[[3,3,3],{3:3}]],hint:"Start with {}. For every value, increase its count."},
+{title:"3. Contains duplicate",desc:"Return True if any value appears more than once.",sig:"def contains_duplicate(nums):",starter:"def contains_duplicate(nums):\n    # your code\n    pass",fn:"contains_duplicate",tests:[[[1,2,3],false],[[1,2,1],true],[[],false]],hint:"A set can remember values you have already seen."}
+];
+let py,idx=0;
+const sel=document.getElementById("q"),code=document.getElementById("code"),out=document.getElementById("out");
+const titleEl=document.getElementById("title"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
+qs.forEach((x,i)=>{const o=document.createElement("option");o.value=i;o.textContent=x.title;sel.appendChild(o)});
+function load(){idx=+sel.value;const x=qs[idx];titleEl.textContent=x.title;descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=localStorage.getItem("bb"+idx)||x.starter}
+sel.onchange=load;code.oninput=()=>localStorage.setItem("bb"+idx,code.value);load();
+loadPyodide().then(x=>{py=x;out.textContent="Ready."}).catch(e=>out.textContent="Could not load Python: "+e);
+document.getElementById("hintBtn").onclick=()=>{out.textContent=qs[idx].hint};
+document.getElementById("runBtn").onclick=run;
+async function run(){
+ if(!py){out.textContent="Python is still loading…";return}
+ const x=qs[idx];out.textContent="Running…";
+ try{
+   py.runPython("globals().clear()");
+   await py.runPythonAsync(code.value);
+   const exists=py.runPython("globals().__contains__('"+x.fn+"')");
+   if(!exists){out.textContent="❌ Function not found.\n\nExpected: "+x.sig+"\nCheck the function name in your def statement.";return}
+   const lines=[];
+   for(let i=0;i<x.tests.length;i++){
+     const [arg,exp]=x.tests[i];
+     py.globals.set("_test_arg",arg);
+     const got=py.runPython(x.fn+"(_test_arg)");
+     let js=got&&got.toJs?got.toJs({dict_converter:Object.fromEntries}):got;
+     if(got&&got.destroy)got.destroy();
+     const ok=JSON.stringify(js)===JSON.stringify(exp);
+     lines.push("Test "+(i+1)+": "+(ok?"✅":"❌")+"  expected "+JSON.stringify(exp)+", got "+JSON.stringify(js));
+   }
+   out.textContent=lines.join("\n");
+ }catch(e){
+   const s=String(e);out.textContent="❌ "+s.split("\n").slice(-3).join("\n");
+ }
+}
+</script></body></html>

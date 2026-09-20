@@ -5,11 +5,11 @@
 <title>Python Building Blocks</title>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
 <style>
-body{font-family:system-ui;margin:0;background:#f6f7fb;color:#172033}.wrap{max-width:900px;margin:auto;padding:20px}.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 12px #0001}textarea{width:100%;height:300px;font:15px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.45;padding:12px;box-sizing:border-box;tab-size:4}button,select{padding:10px 15px;margin:6px 6px 6px 0}pre{white-space:pre-wrap;background:#101827;color:#eee;padding:14px;border-radius:10px}.muted{color:#687386}.status{font-size:13px;color:#687386}
+body{font-family:system-ui;margin:0;background:#f6f7fb;color:#172033}.wrap{max-width:900px;margin:auto;padding:20px}.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 12px #0001}textarea{width:100%;height:300px;font:15px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.45;padding:12px;box-sizing:border-box;tab-size:4}button,select{padding:10px 15px;margin:6px 6px 6px 0}pre{white-space:pre-wrap;background:#101827;color:#eee;padding:14px;border-radius:10px}.muted{color:#687386}.status{font-size:13px;color:#687386}.passed{color:#16803a;font-weight:700}.review{display:none;background:#eef8f0;color:#172033;border:1px solid #b9dfc3}.history{font-size:14px;line-height:1.5}
 </style></head>
 <body><div class="wrap"><h1>Python Building Blocks</h1><p class="muted">Small skills → combinations → LeetCode-style problems.</p>
 <div class="card"><select id="q"></select><h2 id="title"></h2><p id="desc"></p><pre id="sig"></pre></div>
-<div class="card"><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><div class="status">Enter auto-indents • Tab inserts 4 spaces • Shift+Tab unindents</div><button id="runBtn">Run tests</button><button id="hintBtn">Hint</button><button id="resetBtn">Reset code</button><pre id="out">Loading Python…</pre></div></div>
+<div class="card"><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><div class="status">Enter auto-indents • Tab inserts 4 spaces • Shift+Tab unindents</div><button id="runBtn">Run tests</button><button id="hintBtn">Hint</button><button id="resetBtn">Reset code</button><button id="reviewBtn" class="review">Prepare AI Review</button><pre id="out">Loading Python…</pre><div id="progress" class="status"></div><div id="history" class="history"></div></div></div>
 <script>
 const qs=[
 {title:"1. Count positives",desc:"Return how many values in nums are greater than 0.",sig:"def count_positive(nums):",starter:"def count_positive(nums):\n    # your code\n    pass",fn:"count_positive",tests:[[[1,-2,3,0],2],[[-1,-2],0],[[1,2,3],3]],hint:"Use a counter and a for loop."},
@@ -23,7 +23,10 @@ const qs=[
 let py,idx=0;
 const sel=document.getElementById("q"),code=document.getElementById("code"),out=document.getElementById("out"),titleEl=document.getElementById("title"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
 qs.forEach((x,i)=>{const o=document.createElement("option");o.value=i;o.textContent=x.title;sel.appendChild(o)});
-function load(){idx=+sel.value;const x=qs[idx];titleEl.textContent=x.title;descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=localStorage.getItem("bb"+idx)||x.starter}
+function load(){idx=+sel.value;const x=qs[idx];titleEl.textContent=x.title;descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=localStorage.getItem("bb"+idx)||x.starter;renderProgress()}
+function getHistory(i){try{return JSON.parse(localStorage.getItem("bb_history_"+i)||"[]")}catch{return[]}}
+function renderProgress(){const h=getHistory(idx),passed=h.filter(x=>x.passed);document.getElementById("progress").innerHTML=passed.length?'<span class="passed">✓ Completed</span> • '+passed.length+' passing run'+(passed.length>1?'s':''):'Not completed yet';document.getElementById("reviewBtn").style.display=passed.length?"inline-block":"none";document.getElementById("history").innerHTML=h.length?'<b>Recent attempts</b><br>'+h.slice(-5).reverse().map(a=>(a.passed?'✅':'❌')+' '+new Date(a.time).toLocaleString()).join('<br>'):''}
+function saveAttempt(passed){const h=getHistory(idx);h.push({time:new Date().toISOString(),passed,code:code.value});localStorage.setItem("bb_history_"+idx,JSON.stringify(h.slice(-20)));renderProgress()}
 sel.onchange=load;code.oninput=()=>localStorage.setItem("bb"+idx,code.value);load();
 code.addEventListener("keydown",e=>{
  const start=code.selectionStart,end=code.selectionEnd,v=code.value;
@@ -34,11 +37,12 @@ loadPyodide().then(x=>{py=x;out.textContent="Ready."}).catch(e=>out.textContent=
 document.getElementById("hintBtn").onclick=()=>out.textContent=qs[idx].hint;
 document.getElementById("resetBtn").onclick=()=>{localStorage.removeItem("bb"+idx);code.value=qs[idx].starter;out.textContent="Code reset.";};
 document.getElementById("runBtn").onclick=run;
+document.getElementById("reviewBtn").onclick=()=>{const x=qs[idx];const prompt="Review this Python LeetCode practice solution. Do not just rewrite it. Explain correctness, time/space complexity, Python style, edge cases, the DS&A building block demonstrated, and one concrete improvement or next practice step.\n\nProblem: "+x.desc+"\nSignature: "+x.sig+"\n\nSolution:\n"+code.value;navigator.clipboard.writeText(prompt).then(()=>out.textContent="AI review prompt copied. Paste it into ChatGPT for review.").catch(()=>out.textContent=prompt)};
 function pyLiteral(x){return JSON.stringify(x).replace(/true/g,"True").replace(/false/g,"False").replace(/null/g,"None")}
 async function run(){if(!py){out.textContent="Python is still loading…";return}const x=qs[idx];out.textContent="Running…";try{
  await py.runPythonAsync(code.value);
  if(!py.runPython("globals().__contains__('"+x.fn+"')")){out.textContent="❌ Function not found.\n\nExpected: "+x.sig+"\nCheck the function name in your def statement.";return}
  const lines=[];for(let i=0;i<x.tests.length;i++){const [input,exp]=x.tests[i];const call=x.args?x.fn+"("+input.map(pyLiteral).join(",")+")":x.fn+"("+pyLiteral(input)+")";const got=py.runPython(call);let js=got&&got.toJs?got.toJs({dict_converter:Object.fromEntries}):got;if(got&&got.destroy)got.destroy();const ok=JSON.stringify(js)===JSON.stringify(exp);lines.push("Test "+(i+1)+": "+(ok?"✅":"❌")+"  expected "+JSON.stringify(exp)+", got "+JSON.stringify(js))}
- out.textContent=lines.join("\n");
+ const passed=lines.every(x=>x.includes("✅"));out.textContent=lines.join("\n")+(passed?"\n\n🎉 All tests passed. AI Review is now available.":"");saveAttempt(passed);
 }catch(e){const s=String(e);out.textContent="❌ "+s.split("\n").slice(-4).join("\n")}}
 </script></body></html>

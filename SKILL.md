@@ -23,6 +23,21 @@ Examples:
 
 Do not ban normal Python built-ins or idioms merely to force an algorithm. If LeetCode normally allows `max()`, slicing, `sorted()`, `set()`, `Counter`, etc., the trainer should accept them. The lesson should explain the underlying pattern and when a more algorithmic approach matters.
 
+## Pythonic shortcut + interview-understanding rule
+LeetCode-valid Python shortcuts are first-class solutions, but the curriculum must also teach what they do underneath well enough for a technical interview.
+
+For an important shortcut or library operation, “Teach me basics” should cover four things when relevant:
+1. **Pythonic solution** — the concise code the learner may actually use on LeetCode.
+2. **Underlying mechanics** — the loop, indexes, pointers, stack/queue behavior, hashing, sorting, or other algorithmic idea that the shortcut hides.
+3. **Complexity** — expected time and auxiliary/output space, including hidden allocation. Do not imply that a concise built-in is O(1) merely because it is one line.
+4. **Interview version** — show the manual implementation or reasoning an interviewer may ask for, without forbidding the Pythonic version.
+
+Example: for reversing a string, teach that `s[::-1]` is valid and concise, but also explain backward indexing/two-pointer mechanics and that slicing creates a new O(n)-size string. For an in-place mutable-array reversal, teach the O(1)-auxiliary-space two-pointer swap.
+
+For standard-library structures such as `collections.deque`, teach and use the library rather than reimplementing it, while explaining FIFO behavior and why `popleft()` is the appropriate queue operation.
+
+The goal is **two levels of fluency**: write effective Python on LeetCode, and explain/implement the underlying algorithm when an interviewer removes the shortcut.
+
 Avoid repeating the same concept in a separate artificial Basic exercise when the next LeetCode-style exercise already provides a clear, small use of that exact code. A Basic should be a bridge, not an obstacle.
 
 ## Core learning rule

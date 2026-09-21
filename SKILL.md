@@ -1,38 +1,55 @@
 # LeetCode Foundations — Curriculum & Product Skill
 
 ## Purpose
-Build coding fluency before LeetCode problem solving.
+Bridge basic Python coding directly into the code patterns used in real LeetCode solutions.
 
 The learning order is:
-1. **Basics** — atomic coding/data-structure operations.
-2. **Combinations** — combine mastered basics into common problem-solving patterns.
-3. **LeetCode-style problems** — intentionally out of scope for now.
+1. **Python pieces used on LeetCode** — small, reusable code operations that appear directly inside solutions.
+2. **LeetCode patterns** — combine those pieces into common solution structures.
+3. **LeetCode-style problems** — practice recognizing and applying the pattern.
 
-The app should help a learner who recognizes concepts but cannot reliably turn them into working code.
+The app is not a general computer-science course. Prefer code the learner will actually type on LeetCode.
 
-## Core learning rule
-A **Basic** exercise teaches one primary operation or mental model. It should not require a second algorithmic pattern to solve it.
+## LeetCode bridge rule
+Every Basic exercise must answer: **"Will this code or operation reappear almost unchanged in a real LeetCode solution?"**
 
-A **Combination** exercise requires two or more already-learned basics, or applies a basic data structure in a problem-solving pattern.
+If not, remove, merge, or redesign the exercise. Do not create artificial command-processing or data-structure demonstrations merely to teach terminology.
 
 Examples:
-- Basic: move two indexes inward.
-- Combination: use two pointers to find a target pair.
-- Basic: enqueue/dequeue values.
-- Combination: BFS.
-- Basic: compute/update one fixed window.
-- Combination: solve a sliding-window optimization problem.
+- Teach `seen = set()`, `x in seen`, `seen.add(x)` because those lines appear directly in duplicate detection and graph traversal.
+- Teach `q = deque(...)`, `q.popleft()`, and `q.append(...)` because those lines appear directly in BFS.
+- Teach `stack.append(x)`, `stack.pop()`, and `stack[-1]` because those lines appear directly in stack problems.
+- Teach indexing, slicing, `enumerate`, `sorted(key=...)`, and `heapq` as Python tools used naturally in LeetCode solutions.
 
-Do not classify an exercise as Basic merely because it is Easy.
+Do not ban normal Python built-ins or idioms merely to force an algorithm. If LeetCode normally allows `max()`, slicing, `sorted()`, `set()`, `Counter`, etc., the trainer should accept them. The lesson should explain the underlying pattern and when a more algorithmic approach matters.
 
-## Dependency rule
+Avoid repeating the same concept in a separate artificial Basic exercise when the next LeetCode-style exercise already provides a clear, small use of that exact code. A Basic should be a bridge, not an obstacle.
+
+## Core learning rule
+A **Basic** exercise teaches one small Python operation or code pattern that is directly reusable on LeetCode.
+
+A **Combination** exercise combines already-seen code pieces into a recognizable LeetCode pattern or problem.
+
+Prefer short bridges:
+- dictionary get/update → frequency counting → Two Sum / counting problems
+- set membership/add → duplicate detection → visited set
+- deque append/popleft → BFS
+- list append/pop/peek → stack problems
+- left/right indexes → palindrome / two pointers
+- running total → prefix sums / sliding window
+- sorted/key → intervals / greedy
+- recursion base/call → tree DFS / backtracking
+
+Do not classify an exercise as Basic merely because it is Easy. Do not add a Basic whose only purpose is terminology if its code is not useful later.
+
+## Dependency and ordering rule
 Dependencies are curriculum prerequisites, not arbitrary earlier questions.
 
-A question is available only when all of its prerequisite skills are completed.
+Order the question list in a near-topological learning sequence: whenever practical, a prerequisite should appear shortly before the problem that uses it. Do not scatter a Basic skill far away from the LeetCode pattern it prepares.
+
+A question is available only when all prerequisites are completed. Prefer the smallest true prerequisite set.
 
 **Single source of truth:** Concept Map arrows and question unlocking must represent the same dependency model. Never manually draw an arrow that is not reflected in actual prerequisites.
-
-If A → B appears on the map, B must depend on A (directly or through an explicitly represented intermediate skill).
 
 ## Concept Map
 The Concept Map is the main view of the learning structure.
@@ -309,19 +326,17 @@ Review these whenever changing curriculum:
 14. Avoid using LeetCode difficulty as a proxy for curriculum level.
 
 ## Definition of “foundation complete”
-Do not call the Basic layer complete merely because every category exists.
+The foundation is complete when the learner can recognize and write the small Python pieces that recur across common LeetCode solutions, then combine them into standard patterns without needing an artificial intermediate exercise.
 
-A concept is adequately covered when the learner can:
-1. explain the data structure/operation,
-2. trace it by hand,
-3. code the primitive operation without a template,
-4. pass multiple small exercises without hints,
-5. recognize when that primitive is useful.
-
-Only then should the learner be pushed into combinations.
+The target is transfer: code learned in Basics should visibly reappear in later solutions.
 
 ## Change checklist
 For every curriculum change:
+1. Does this code actually appear in normal LeetCode Python solutions?
+2. Is this the shortest useful bridge from Python syntax to a LeetCode pattern?
+3. Are normal LeetCode-legal Python built-ins/idioms allowed?
+4. Is this concept already taught elsewhere, making this exercise unnecessary repetition?
+5. Is the question placed near the problems that depend on it?
 1. Is this Basic or Combination according to the atomic-skill rule?
 2. Are prerequisites conceptually correct?
 3. Does the Concept Map show the same dependency?

@@ -345,7 +345,7 @@ The UI should keep the coding task as the primary surface. Before adding a contr
 - Group settings hierarchically: Mode is one submenu with the selected mode checked; account actions stay together, including password reset.
 - Do not show nickname, cloud-sync text, or account identity in the main header. Sync may operate silently; surface an error only when action is needed.
 - Do not create a separate Review Due destination. Spaced review is scheduling logic, not a primary feature: fold a due review into Progress / Next when appropriate.
-- Keep per-problem metadata beside the problem: concept/category, Basic vs Combination, prerequisite, and completion/mastery only when useful.
+- Do not repeat category, Basic/Combination mode, or dependency/prerequisite labels under each question when those are already represented by navigation, ordering, locking, or the concept map. Show per-problem metadata only when it adds information the learner cannot already infer.
 - Do not duplicate the same state in multiple places. In particular, avoid a separate Problem Status panel when the question header and progress view already communicate it.
 - Attempts/history is secondary detail and should be collapsed by default.
 - Prefer short action labels: Run, Hint, Learn basics, Reset, Sample answer, AI review.
@@ -357,16 +357,14 @@ The UI should keep the coding task as the primary surface. Before adding a contr
 The app should teach a repeatable LeetCode workflow without forcing extra form fields or gates before coding:
 
 1. **Understand** — read the problem, inputs, output, constraints/examples, and restate what must be returned.
-2. **Choose the tools** — identify the likely data structure and/or pattern from the problem shape.
-3. **Plan** — trace a small example and state the algorithm in steps before implementation.
+2. **Choose the tools** — identify the likely data structure and/or pattern from the problem shape. If the concept or Python operation is unclear, use **Learn basics** as part of this step.
+3. **Plan** — trace a small example and state the algorithm in steps before implementation. If the learner understands the concept but is stuck applying it, use **Hint** as part of this step.
 4. **Code** — implement the simplest correct approach the learner understands.
 5. **Analyze** — identify **Time: O(...)** and **Space: O(...)**, then consider whether another correct solution is simpler, more Pythonic, or asymptotically better.
 6. **Run and debug** — run tests; when a test fails, trace that concrete case rather than guessing.
 7. **Review after passing** — compare with the sample answer, its complexity, and useful alternative/under-the-hood solution.
 
 Help should be progressive rather than intrusive:
-- **Learn basics** is for “I do not understand or remember the concept/code operation.”
-- **Hint** is for “I understand the concept but I am stuck applying it to this problem.”
 - **Sample answer** remains post-pass so the learner attempts the problem first.
 - The workflow itself should be available as concise Help/How-to guidance, not repeated as a large block on every question.
 

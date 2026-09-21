@@ -352,6 +352,7 @@ The UI should keep the coding task as the primary surface. Before adding a contr
 - Reveal Sample answer, interview complexity reflection, alternatives, and AI review only after a passing solution when possible.
 - Remove LeetCode difficulty from the primary UI unless it materially helps learning; curriculum level (Basic/Combination) is more important.
 - Every UI addition should justify its screen space, especially on mobile. Prefer progressive disclosure over permanently visible controls.
+- Resume the learner at the last question they were working on when the app reopens or reloads, as long as that question is still available in the selected mode. Do not automatically return to question 1.
 
 ## Problem-solving workflow
 The app should teach a repeatable LeetCode workflow without forcing extra form fields or gates before coding:
@@ -366,6 +367,7 @@ The app should teach a repeatable LeetCode workflow without forcing extra form f
 
 Help should be progressive rather than intrusive:
 - **Sample answer** remains post-pass so the learner attempts the problem first.
+- After passing, first **ask** the learner to identify Time O(...), Space O(...), and another correct solution. Do not reveal the complexity, alternative, or a problem-specific suggestion in the reflection prompt; the learner should work it out before comparing with the sample answer.
 - The workflow itself should be available as concise Help/How-to guidance, not repeated as a large block on every question.
 
 ## Product behavior

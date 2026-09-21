@@ -40,6 +40,46 @@ The goal is **two levels of fluency**: write effective Python on LeetCode, and e
 
 Avoid repeating the same concept in a separate artificial Basic exercise when the next LeetCode-style exercise already provides a clear, small use of that exact code. A Basic should be a bridge, not an obstacle.
 
+## Multiple-correct-solutions rule
+A LeetCode problem often has more than one correct Python solution. The trainer must support that rather than implying there is one required implementation.
+
+When multiple approaches are reasonable, teach them as complementary levels:
+1. **Practical / Pythonic solution** — concise, readable code a strong Python user would normally submit on LeetCode.
+2. **Underlying / interview solution** — code or reasoning that exposes the data structure or algorithm underneath the shortcut.
+3. **Better algorithm when applicable** — if another approach has meaningfully better asymptotic time or space, explain why and when it matters.
+
+Tests should judge observable correctness, not enforce one implementation style. Do not reject a valid solution because it uses a LeetCode-legal built-in such as `max`, `set`, slicing, `Counter`, `sorted`, `deque`, or `heapq`. Do not inspect source text to police which technique the learner used.
+
+The sample/lesson may show multiple correct approaches when that teaches something useful. Clearly identify the tradeoff instead of calling a longer manual version universally “better.” “Better” should mean a concrete advantage such as clearer code, earlier exit, lower asymptotic cost, lower auxiliary space, or better fit for the problem constraints.
+
+## Complexity rule
+For every algorithm or meaningful alternative taught, explicitly call out:
+- **Time: O(...)**
+- **Space: O(...)**
+
+Use the most relevant space definition and label it when needed:
+- **Auxiliary space** — extra working memory beyond the input/output.
+- **Output space** — memory required for the returned result.
+- **Hidden allocation** — memory created by a Python convenience operation such as slicing, `set(nums)`, `sorted(...)`, or string construction.
+
+Do not compare solutions only by line count. One line can still be O(n), O(n log n), or allocate O(n) memory. Explain expected/amortized complexity when appropriate, for example expected O(1) hash lookup and amortized O(1) list append.
+
+When two correct versions differ, put their complexities next to the versions so the learner can see the tradeoff directly.
+
+## Teach-me-basics visual rule
+“Teach me basics” should teach with **visual → code → explanation → complexity → interview/under-the-hood view**, using fewer words when the diagram can carry the idea.
+
+Use professional diagrams rather than character/ASCII art:
+- Use HTML/CSS cells and markers when exact positions matter: arrays/lists, zero-based indexes, strings, two pointers, sliding windows, binary-search boundaries, stacks, queues, hash tables, prefix sums, and DP tables.
+- Use Mermaid when relationships matter: linked lists, recursion/call flow, trees, graphs, and other node/edge structures.
+- Prefer the simpler renderer when either would work; the diagram exists to clarify the code, not decorate the lesson.
+
+**Diagram consistency is mandatory.** The diagram, prose, code snippet, variable names, indexes, and example values must describe the same example. If the lesson says `s = "hello"`, the diagram must show `hello`, not `cat`. If a list is indexed, visibly use Python's zero-based indexing. If the diagram shows `left = 0` and `right = 3`, the accompanying example must have those exact boundaries.
+
+A visual should demonstrate the operation the learner is about to type. For example, `left += 1` should visibly move the left pointer; `q.popleft()` should visibly remove the front item; `node = node.next` should visibly follow the next edge. Avoid unrelated examples inside one lesson.
+
+Visuals must remain readable on mobile and must fail gracefully: lesson text/code should still teach the concept if Mermaid cannot load.
+
 ## Core learning rule
 A **Basic** exercise teaches one small Python operation or code pattern that is directly reusable on LeetCode.
 
@@ -111,7 +151,7 @@ Every exercise must have:
 
 Sample answer is revealed only after the learner passes.
 
-For Basic exercises, also provide useful “Teach me basics” guidance where appropriate.
+For Basic exercises, also provide useful “Teach me basics” guidance where appropriate. Every substantive lesson must call out time and space complexity for the taught operation/solution, and when multiple correct approaches are educational, show both the practical Pythonic version and the underlying/interview mechanics.
 
 ## Curriculum coverage checklist
 Before adding more combination problems, ensure the Basic layer teaches the mechanics below with enough small exercises to build coding fluency.
@@ -346,19 +386,22 @@ The foundation is complete when the learner can recognize and write the small Py
 The target is transfer: code learned in Basics should visibly reappear in later solutions.
 
 ## Change checklist
-For every curriculum change:
+For every curriculum or lesson change:
 1. Does this code actually appear in normal LeetCode Python solutions?
 2. Is this the shortest useful bridge from Python syntax to a LeetCode pattern?
-3. Are normal LeetCode-legal Python built-ins/idioms allowed?
-4. Is this concept already taught elsewhere, making this exercise unnecessary repetition?
-5. Is the question placed near the problems that depend on it?
-1. Is this Basic or Combination according to the atomic-skill rule?
-2. Are prerequisites conceptually correct?
-3. Does the Concept Map show the same dependency?
-4. Does the selected mode show/hide it correctly?
-5. Does it have tests, hint, starter code, and sample answer?
-6. Can the tests handle all valid solution forms?
-7. Does completion unlock exactly the intended next skill?
-8. Is the status color consistent everywhere?
-9. Does local and cloud progress still work?
-10. Did this reveal a missing prerequisite skill? If yes, add that Basic skill before the combination.
+3. Are normal LeetCode-legal Python built-ins and idioms accepted?
+4. If multiple correct solutions exist, do tests accept them based on behavior rather than implementation style?
+5. Does the lesson show a practical/Pythonic version and, when useful, an underlying/interview version?
+6. Are **Time: O(...)** and **Space: O(...)** explicit for each meaningful approach, including hidden allocations?
+7. If one approach is described as better, is the concrete reason stated (time, space, clarity, early exit, or constraints)?
+8. Is this Basic or Combination according to the atomic-skill rule, without unnecessary repetition?
+9. Are prerequisites conceptually correct and ordered before dependents?
+10. Does the Concept Map reflect the same dependency model?
+11. Does every diagram exactly match its lesson's values, variable names, code, and zero-based indexes?
+12. Is the visualization type appropriate: precise HTML/CSS for indexed/state layouts, Mermaid for relationships?
+13. Does the lesson remain understandable if the visual renderer fails?
+14. Does the exercise have tests, hint, starter code, sample answer, and valid dependencies?
+15. Can tests handle logically equivalent outputs when output ordering is irrelevant?
+16. Does completion unlock exactly the intended next skill?
+17. Do selected mode, progress, mastery colors, local storage, and cloud sync still behave correctly?
+18. Did the change reveal a missing prerequisite? If yes, add or reposition the smallest useful Basic bridge.

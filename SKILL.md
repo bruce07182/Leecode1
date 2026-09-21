@@ -367,7 +367,8 @@ The app should teach a repeatable LeetCode workflow without forcing extra form f
 
 Help should be progressive rather than intrusive:
 - **Sample answer** remains post-pass so the learner attempts the problem first.
-- After passing, first **ask** the learner to identify Time O(...), Space O(...), and another correct solution. Do not reveal the complexity, alternative, or a problem-specific suggestion in the reflection prompt; the learner should work it out before comparing with the sample answer.
+- After passing, make the interview check an **active exercise**, not passive text. Let the learner choose the expected **Time O(...)** and **Space O(...)** from concise options and check the answer. Give only correct/try-again feedback before the sample is opened; do not reveal the answer in the prompt.
+- Give the learner a second code editor for **Another solution** and let them run that implementation against the same behavioral tests. This should feel like a small follow-up question, not a prose reflection. Accept any alternative implementation that passes the tests; do not police source style.
 - The workflow itself should be available as concise Help/How-to guidance, not repeated as a large block on every question.
 
 ## Product behavior

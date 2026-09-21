@@ -353,6 +353,23 @@ The UI should keep the coding task as the primary surface. Before adding a contr
 - Remove LeetCode difficulty from the primary UI unless it materially helps learning; curriculum level (Basic/Combination) is more important.
 - Every UI addition should justify its screen space, especially on mobile. Prefer progressive disclosure over permanently visible controls.
 
+## Problem-solving workflow
+The app should teach a repeatable LeetCode workflow without forcing extra form fields or gates before coding:
+
+1. **Understand** — read the problem, inputs, output, constraints/examples, and restate what must be returned.
+2. **Choose the tools** — identify the likely data structure and/or pattern from the problem shape.
+3. **Plan** — trace a small example and state the algorithm in steps before implementation.
+4. **Code** — implement the simplest correct approach the learner understands.
+5. **Analyze** — identify **Time: O(...)** and **Space: O(...)**, then consider whether another correct solution is simpler, more Pythonic, or asymptotically better.
+6. **Run and debug** — run tests; when a test fails, trace that concrete case rather than guessing.
+7. **Review after passing** — compare with the sample answer, its complexity, and useful alternative/under-the-hood solution.
+
+Help should be progressive rather than intrusive:
+- **Learn basics** is for “I do not understand or remember the concept/code operation.”
+- **Hint** is for “I understand the concept but I am stuck applying it to this problem.”
+- **Sample answer** remains post-pass so the learner attempts the problem first.
+- The workflow itself should be available as concise Help/How-to guidance, not repeated as a large block on every question.
+
 ## Product behavior
 - Mobile-friendly browser app.
 - Python runs in browser through Pyodide.

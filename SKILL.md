@@ -338,6 +338,21 @@ Only unlock after their underlying mechanics:
 - coin change / DP
 - grid paths / 2-D DP
 
+## UI simplification rule
+The UI should keep the coding task as the primary surface. Before adding a control, label, status, or menu item, ask whether the learner needs it at that moment. Prefer combining related information over adding another surface.
+
+- Keep the first row compact: product title + one symbol menu.
+- Group settings hierarchically: Mode is one submenu with the selected mode checked; account actions stay together, including password reset.
+- Do not show nickname, cloud-sync text, or account identity in the main header. Sync may operate silently; surface an error only when action is needed.
+- Do not create a separate Review Due destination. Spaced review is scheduling logic, not a primary feature: fold a due review into Progress / Next when appropriate.
+- Keep per-problem metadata beside the problem: concept/category, Basic vs Combination, prerequisite, and completion/mastery only when useful.
+- Do not duplicate the same state in multiple places. In particular, avoid a separate Problem Status panel when the question header and progress view already communicate it.
+- Attempts/history is secondary detail and should be collapsed by default.
+- Prefer short action labels: Run, Hint, Learn basics, Reset, Sample answer, AI review.
+- Reveal Sample answer, interview complexity reflection, alternatives, and AI review only after a passing solution when possible.
+- Remove LeetCode difficulty from the primary UI unless it materially helps learning; curriculum level (Basic/Combination) is more important.
+- Every UI addition should justify its screen space, especially on mobile. Prefer progressive disclosure over permanently visible controls.
+
 ## Product behavior
 - Mobile-friendly browser app.
 - Python runs in browser through Pyodide.
@@ -350,16 +365,16 @@ Only unlock after their underlying mechanics:
 - Public publishable key is acceptable in browser when RLS is correct.
 - RLS must restrict users to their own rows.
 - First-time browser should show sign-in/create-account; local use remains possible.
-- Account, progress, review, mode, and concept map live in the menu.
+- Account, progress, mode, and concept map live in the menu. Review scheduling is folded into Progress / Next rather than exposed as a separate destination.
 
 ## Progress and help
-Track:
-- attempts
-- passing attempts
-- hints
-- basic-help usage
-- review due
+Track internally as useful:
+- attempts and passing attempts
+- hints/basic-help usage when needed for learning analytics
+- review timing
 - mastery
+
+Do not expose every tracked metric on every problem. Show only information that helps the learner decide what to do next.
 
 Longer term, hint/help usage should be stored per attempt in history so mastery and cloud sync are accurate across devices.
 
@@ -373,8 +388,8 @@ Review these whenever changing curriculum:
 6. Mastery currently uses lifetime hint count; this can permanently prevent Mastered after one early hint.
 7. Basic-help count is local-only rather than fully represented in cloud history.
 8. Cloud sync imports cloud rows but local-only rows may need reconciliation.
-9. Sync status and nickname should be separate UI fields.
-10. Signed-out password recovery should remain accessible.
+9. Sync status and nickname should not occupy the main learning UI; show actionable sync errors only when necessary.
+10. Signed-out password recovery should remain accessible under Account.
 11. Tests should accept logically equivalent valid outputs when ordering is irrelevant (for example subsets).
 12. Every new question must be checked for a sample answer.
 13. Progress/dashboard should respect the selected Basic/Combination view.
@@ -405,3 +420,6 @@ For every curriculum or lesson change:
 16. Does completion unlock exactly the intended next skill?
 17. Do selected mode, progress, mastery colors, local storage, and cloud sync still behave correctly?
 18. Did the change reveal a missing prerequisite? If yes, add or reposition the smallest useful Basic bridge.
+19. Does every visible control/status help the learner now, or can it be removed, combined, or progressively disclosed?
+20. Is the same state shown twice? Keep one clear source instead.
+21. Does the first row remain compact and mobile-friendly?

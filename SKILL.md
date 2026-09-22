@@ -441,3 +441,9 @@ For every curriculum or lesson change:
 19. Does every visible control/status help the learner now, or can it be removed, combined, or progressively disclosed?
 20. Is the same state shown twice? Keep one clear source instead.
 21. Does the first row remain compact and mobile-friendly?
+## Mutually exclusive UI actions
+- When actions represent opposite or mutually exclusive states, show only the action that is currently applicable. Do not display contradictory actions at the same time.
+- Example: when signed out, show **Sign in** (and recovery if needed) but not **Sign out**; when signed in, show **Sign out** but not **Sign in** or password recovery.
+- Apply this principle generally to stateful controls: prefer one clear current action over simultaneous inverse/redundant controls.
+- This is a UI-state rule, not a single-session restriction: the same account may remain signed in on multiple devices unless the authentication system explicitly requires otherwise.
+

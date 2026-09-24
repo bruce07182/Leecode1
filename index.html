@@ -91,7 +91,7 @@ async function loadAdminProgress(){
  const {data,error}=await db.rpc("admin_progress");
  if(error){status.textContent="Admin data is not enabled in Supabase yet: "+error.message;return}
  const by={};
- for(const row of data||[]){const key=row.email||row.user_id||"Unknown user";if(!by[key])by[key]={rows:0,passed:new Set(),attempts:0,last:null};const x=by[key];x.rows++;const h=Array.isArray(row.history)?row.history:[];x.attempts+=h.length;if(h.some(a=>a&&a.passed))x.passed.add(Number(row.problem_id));if(row.updated_at&&(!x.last||row.updated_at>x.last))x.last=row.updated_at}
+ for(const row of data||[]){const key=row.email||row.user_id||"Unknown user";if(!by[key])by[key]={rows:0,passed:new Set(),attempts:0,last:null,complexities:[]};const x=by[key];x.rows++;const h=Array.isArray(row.history)?row.history:[];x.attempts+=h.length;if(h.some(a=>a&&a.passed))x.passed.add(Number(row.problem_id));if(row.complexity)x.complexities.push({problem_id:Number(row.problem_id),time:row.complexity.time,space:row.complexity.space});if(row.updated_at&&(!x.last||row.updated_at>x.last))x.last=row.updated_at}
  const entries=Object.entries(by);
  status.textContent=entries.length?entries.length+" user"+(entries.length===1?"":"s"):"No synced user progress yet.";
  host.innerHTML=entries.map(([email,x])=>'<div class="skill" style="margin:8px 0"><b>'+escapeHtml(email)+'</b><div>'+x.passed.size+'/'+qs.length+' problems passed · '+x.attempts+' synced attempts</div><div class="status">'+(x.last?'Last sync: '+new Date(x.last).toLocaleString():'No sync time')+'</div></div>').join("");

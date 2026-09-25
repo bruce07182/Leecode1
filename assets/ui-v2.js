@@ -2,11 +2,15 @@
 (() => {
   const traversalIntro = '<b>Traversal</b><br>Traversal means visiting the elements of a data structure. For an array/list, this usually means going through the elements one by one. In Python, you normally implement traversal with a <code>for</code> loop or sometimes a <code>while</code> loop.<br><br><b>Array vs Python list</b><br>DS&A and LeetCode often say <i>array</i>. In Python, that input is usually represented by a <code>list</code>, such as <code>nums = [3, -1, 5]</code>. A Python list is a dynamic-array-like structure, so for these problems you can usually read “array” as “Python list.”<br><br>';
 
-  // Keep LeetCode questions concise; put Python terminology in Learn basics.
   [0,1,2].forEach(i => { if (qs[i]) qs[i].category = 'Traversal'; });
   if (qs[0]) qs[0].lesson = traversalIntro + qs[0].lesson.replace('<b>Lists and loops</b><br>', '');
   if (qs[1]) qs[1].lesson = traversalIntro + qs[1].lesson;
   if (qs[2]) qs[2].lesson = traversalIntro + qs[2].lesson.replace('<b>Scanning a list</b><br>A scan visits every value once.', '<b>Keeping state while traversing</b><br>Traversal visits every value once.');
+
+  // app.js rendered the map before this file renamed the first categories. Re-render it now.
+  const mapCard=document.getElementById('mapCard'),progressCard=document.getElementById('progressCard');
+  if(mapCard&&!mapCard.classList.contains('hidden')) setTimeout(()=>renderConceptMap(),0);
+  renderDashboard();
 
   // Complexity controls read vertically.
   window.oPicker = function(){
@@ -34,20 +38,27 @@
   answerBtn.onclick=()=>{
     if(answerBox.classList.contains('show')){answerBox.classList.remove('show');answerBox.innerHTML='';return;}
     const x=qs[idx],notes=sampleNotes(x);
-    answerBox.classList.add('show');
-    answerBox.innerHTML='<pre>'+escapeHtml(x.sample)+'</pre>'+(notes?'<div class="answerNotes">'+escapeHtml(notes).replace(/\n/g,'<br>')+'</div>':'');
+    answerBox.classList.add('show');answerBox.innerHTML='<pre>'+escapeHtml(x.sample)+'</pre>'+(notes?'<div class="answerNotes">'+escapeHtml(notes).replace(/\n/g,'<br>')+'</div>':'');
   };
 
-  // Reset optional panels when moving to another problem.
   const previousLoad=window.load;
   window.load=function(){previousLoad();[learnBox,hintBox,answerBox].forEach(el=>{el.classList.remove('show');el.innerHTML='';});};
 
-  // Persist collapse state for the two main overview sections.
+  // Overview cards stay visible but can collapse to one compact header row.
   document.querySelectorAll('[data-collapse]').forEach(btn=>{
     const card=document.getElementById(btn.dataset.collapse),key='bb_collapsed_'+btn.dataset.collapse;
     if(localStorage.getItem(key)==='1')card.classList.add('collapsed');
-    btn.onclick=()=>{card.classList.toggle('collapsed');localStorage.setItem(key,card.classList.contains('collapsed')?'1':'0');};
+    btn.onclick=()=>{
+      const was=card.classList.contains('collapsed');card.classList.toggle('collapsed');
+      localStorage.setItem(key,card.classList.contains('collapsed')?'1':'0');
+      if(was&&card.id==='mapCard') setTimeout(()=>renderConceptMap(),0);
+    };
   });
+
+  // Fix map sizing when Mermaid loaded while its card had no usable width.
+  const redrawMap=()=>{if(mapCard&&!mapCard.classList.contains('hidden')&&!mapCard.classList.contains('collapsed')) renderConceptMap();};
+  window.addEventListener('resize',()=>{clearTimeout(window.__mapResize);window.__mapResize=setTimeout(redrawMap,180)});
+  setTimeout(redrawMap,250);
 
   refreshOptions();
 })();

@@ -1,5 +1,5 @@
-const SUPABASE_URL='https://fivnfnlsaqpknwatmzzv.supabase.co';
-const SUPABASE_KEY='sb_publishable_nZSM3Vc3q8QzR-yEWqvVgQ_qO_QIAsS';
+const SUPABASE_URL='https://eylaymrbyjjbvkgebvzv.supabase.co';
+const SUPABASE_KEY='sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9';
 const pydb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const lessons=[
  {t:'Values & variables',why:'Store numbers, text and true/false values.',learn:'<b>Most used:</b> <code>int</code>, <code>str</code>, <code>bool</code>, and <code>None</code>. Python figures out the type from the value.',ex:'age = 20\nname = "Amy"\nready = True',task:'Set <code>x = 7</code> and print <code>x</code>.',start:'# Set x to 7, then print it\n',test:o=>o.trim()==='7'},

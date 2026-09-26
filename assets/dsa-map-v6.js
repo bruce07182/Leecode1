@@ -1,61 +1,27 @@
-// DSA-focused concept map: Data Structures on the left, Algorithms on the right.
+// DSA-focused map: data structures on the left, algorithms/patterns on the right.
 (() => {
-  const DS = ['List / Array','String','Hash Map','Hash Set','Stack','Queue','Linked List','Tree','Heap','Graph'];
-  const ALG = ['Traversal','Two Pointers','Sorting','Sliding Window','Prefix Sum','Binary Search','DFS / Recursion','BFS','Greedy','Backtracking','Dynamic Programming'];
-  const aliases = {
-    'Traversal':'Traversal','Lists':'List / Array','Strings':'String','Hash Map':'Hash Map','Hash Set':'Hash Set','Stack':'Stack','Queue':'Queue','Linked List':'Linked List','Heap':'Heap','Graphs':'Graph','Trees / DFS':'Tree','Two Pointers':'Two Pointers','Sorting':'Sorting','Sliding Window':'Sliding Window','Prefix Sum':'Prefix Sum','Binary Search':'Binary Search','Recursion':'DFS / Recursion','1-D DP':'Dynamic Programming'
-  };
-  const related = [
+  const DS=['List / Array','String','Hash Map','Hash Set','Stack','Queue','Linked List','Tree','Heap','Graph'];
+  const ALG=['Traversal','Two Pointers','Sorting','Sliding Window','Prefix Sum','Binary Search','DFS / Recursion','BFS','Greedy','Backtracking','Dynamic Programming'];
+  const aliases={'Traversal':'Traversal','Lists':'List / Array','Strings':'String','Hash Map':'Hash Map','Hash Set':'Hash Set','Stack':'Stack','Queue':'Queue','Linked List':'Linked List','Heap':'Heap','Graphs':'Graph','Trees / DFS':'Tree','Two Pointers':'Two Pointers','Sorting':'Sorting','Sliding Window':'Sliding Window','Prefix Sum':'Prefix Sum','Binary Search':'Binary Search','Recursion':'DFS / Recursion','1-D DP':'Dynamic Programming'};
+  // Lines mean "this algorithm/pattern is commonly applied to this data structure".
+  // Keep this map high-signal rather than connecting every technically possible combination.
+  const related=[
     ['List / Array','Traversal'],['List / Array','Two Pointers'],['List / Array','Sorting'],['List / Array','Sliding Window'],['List / Array','Prefix Sum'],['List / Array','Binary Search'],['List / Array','Dynamic Programming'],
-    ['String','Traversal'],['String','Two Pointers'],['String','Sliding Window'],['String','Hash Map'],
-    ['Hash Map','Traversal'],['Hash Map','BFS'],['Hash Map','DFS / Recursion'],
+    ['String','Traversal'],['String','Two Pointers'],['String','Sliding Window'],
+    ['Hash Map','Traversal'],
     ['Hash Set','Traversal'],['Hash Set','BFS'],['Hash Set','DFS / Recursion'],
-    ['Stack','DFS / Recursion'],['Stack','Traversal'],
+    ['Stack','DFS / Recursion'],
     ['Queue','BFS'],
-    ['Linked List','Traversal'],['Linked List','Two Pointers'],['Linked List','DFS / Recursion'],
+    ['Linked List','Traversal'],['Linked List','Two Pointers'],
     ['Tree','DFS / Recursion'],['Tree','BFS'],['Tree','Dynamic Programming'],
-    ['Heap','Greedy'],['Heap','Sorting'],
-    ['Graph','BFS'],['Graph','DFS / Recursion'],['Graph','Backtracking'],
-    ['Sorting','Two Pointers'],['Sorting','Greedy'],['DFS / Recursion','Backtracking'],['DFS / Recursion','Dynamic Programming']
+    ['Heap','Greedy'],
+    ['Graph','BFS'],['Graph','DFS / Recursion'],['Graph','Backtracking']
   ];
-  const active = () => new Set(qs.map((q,i)=>modeAllows(i)?aliases[q.category]:null).filter(Boolean));
-  const state = name => {
-    const cats=[...new Set(qs.filter((q,i)=>modeAllows(i)&&aliases[q.category]===name).map(q=>q.category))];
-    if(!cats.length) return 'lockedConcept';
-    const ids=qs.map((q,i)=>cats.includes(q.category)&&modeAllows(i)?i:-1).filter(i=>i>=0);
-    if(ids.length&&ids.every(i=>masteryOf(i)==='Mastered')) return 'mastered';
-    if(ids.some(i=>completed(i))) return 'learning';
-    if(ids.some(i=>unlocked(i))) return 'available';
-    return 'lockedConcept';
-  };
+  const active=()=>new Set(qs.map((q,i)=>modeAllows(i)?aliases[q.category]:null).filter(Boolean));
+  const state=name=>{const cats=[...new Set(qs.filter((q,i)=>modeAllows(i)&&aliases[q.category]===name).map(q=>q.category))];if(!cats.length)return'lockedConcept';const ids=qs.map((q,i)=>cats.includes(q.category)&&modeAllows(i)?i:-1).filter(i=>i>=0);if(ids.length&&ids.every(i=>masteryOf(i)==='Mastered'))return'mastered';if(ids.some(i=>completed(i)))return'learning';if(ids.some(i=>unlocked(i)))return'available';return'lockedConcept'};
   const safe=s=>s.replace(/[^A-Za-z0-9]/g,'_');
   const oldShow=window.showConcept;
-  window.showDsaConcept = name => {
-    const cats=[...new Set(qs.filter(q=>aliases[q.category]===name).map(q=>q.category))];
-    if(cats.length===1) return oldShow(cats[0]);
-    const items=qs.map((x,i)=>({x,i})).filter(o=>cats.includes(o.x.category)&&modeAllows(o.i));
-    const host=document.getElementById('conceptQuestions');
-    host.innerHTML='<b>'+name+'</b><br>'+items.map(o=>'<button data-q="'+o.i+'" '+(unlocked(o.i)?'':'disabled')+'>'+(completed(o.i)?'✓ ':'')+o.x.title+(unlocked(o.i)?'':' 🔒')+'</button>').join('');
-    host.querySelectorAll('button[data-q]').forEach(b=>b.onclick=()=>{sel.value=b.dataset.q;load();loadCloud();document.getElementById('mapCard').classList.add('hidden');['questionCard','workCard'].forEach(id=>document.getElementById(id).classList.remove('hidden'));});
-  };
-  window.renderConceptMap = async function(){
-    const host=document.getElementById('conceptMap'); if(!host) return;
-    document.getElementById('mapModeLabel').textContent='Data structures ↔ algorithms · lines show common relationships';
-    const a=active();
-    const ds=DS.filter(x=>a.has(x)), alg=ALG.filter(x=>a.has(x));
-    // Include important DSA concepts in full mode even when represented by combination questions.
-    if(mode.value==='all') ['BFS','Greedy','Backtracking'].forEach(x=>{if(!alg.includes(x))alg.push(x)});
-    const all=[...ds,...alg];
-    const lines=['flowchart LR','classDef mastered fill:#dcfce7,stroke:#70c98a,color:#172033','classDef learning fill:#fff4cc,stroke:#dfbd49,color:#172033','classDef available fill:#e8f1ff,stroke:#84aee9,color:#172033','classDef lockedConcept fill:#f1f3f5,stroke:#d8dde3,color:#7a8491'];
-    lines.push('subgraph DS["DATA STRUCTURES"]','direction TB'); ds.forEach(x=>lines.push('n'+safe(x)+'["'+x+'"]:::'+state(x))); lines.push('end');
-    lines.push('subgraph AL["ALGORITHMS / PATTERNS"]','direction TB'); alg.forEach(x=>lines.push('n'+safe(x)+'["'+x+'"]:::'+state(x))); lines.push('end');
-    related.filter(([x,y])=>all.includes(x)&&all.includes(y)).forEach(([x,y])=>lines.push('n'+safe(x)+' --- n'+safe(y)));
-    host.innerHTML='<div class="status">Drawing DSA map…</div>'; if(!window.mermaid){setTimeout(renderConceptMap,150);return}
-    try{
-      const r=await window.mermaid.render('dsaGraph'+Date.now(),lines.join('\n'));
-      host.innerHTML='<div class="mermaidGraph dsaGraph">'+r.svg+'</div><div class="statusline"><span class="pill mastered">Mastered</span><span class="pill learning">Learning</span><span class="pill available">Available</span><span class="pill lockedConcept">Locked</span></div>';
-      const svg=host.querySelector('svg'); all.forEach(name=>{const key='n'+safe(name);const node=svg&&[...svg.querySelectorAll('.node')].find(n=>n.id&&n.id.includes(key));if(node){node.style.cursor='pointer';node.onclick=()=>showDsaConcept(name)}});
-    }catch(e){host.innerHTML='<div class="status">Could not draw DSA map. '+String(e)+'</div>'}
-  };
-  setTimeout(()=>{const c=document.getElementById('mapCard');if(c&&!c.classList.contains('hidden')&&!c.classList.contains('collapsed'))renderConceptMap()},350);
+  window.showDsaConcept=name=>{const cats=[...new Set(qs.filter(q=>aliases[q.category]===name).map(q=>q.category))];if(cats.length===1)return oldShow(cats[0]);const items=qs.map((x,i)=>({x,i})).filter(o=>cats.includes(o.x.category)&&modeAllows(o.i));const host=document.getElementById('conceptQuestions');host.innerHTML='<b>'+name+'</b><br>'+items.map(o=>'<button data-q="'+o.i+'" '+(unlocked(o.i)?'':'disabled')+'>'+(completed(o.i)?'✓ ':'')+o.x.title+(unlocked(o.i)?'':' 🔒')+'</button>').join('');host.querySelectorAll('button[data-q]').forEach(b=>b.onclick=()=>{sel.value=b.dataset.q;load();loadCloud();['questionCard','workCard'].forEach(id=>document.getElementById(id).classList.remove('hidden'))})};
+  window.renderConceptMap=async function(){const host=document.getElementById('conceptMap');if(!host)return;document.getElementById('mapModeLabel').textContent='Data structures ↔ algorithms / patterns · a line means the pattern is commonly used with that structure';const a=active();const ds=DS.filter(x=>a.has(x)),alg=ALG.filter(x=>a.has(x));if(mode.value==='all')['BFS','Greedy','Backtracking'].forEach(x=>{if(!alg.includes(x))alg.push(x)});const all=[...ds,...alg];const lines=['flowchart LR','classDef mastered fill:#dcfce7,stroke:#70c98a,color:#172033','classDef learning fill:#fff4cc,stroke:#dfbd49,color:#172033','classDef available fill:#e8f1ff,stroke:#84aee9,color:#172033','classDef lockedConcept fill:#f1f3f5,stroke:#d8dde3,color:#7a8491'];lines.push('subgraph DS["DATA STRUCTURES"]','direction TB');ds.forEach(x=>lines.push('n'+safe(x)+'["'+x+'"]:::'+state(x)));lines.push('end');lines.push('subgraph AL["ALGORITHMS / PATTERNS"]','direction TB');alg.forEach(x=>lines.push('n'+safe(x)+'["'+x+'"]:::'+state(x)));lines.push('end');related.filter(([x,y])=>all.includes(x)&&all.includes(y)).forEach(([x,y])=>lines.push('n'+safe(x)+' --- n'+safe(y)));host.innerHTML='<div class="status">Drawing DSA map…</div>';if(!window.mermaid){setTimeout(renderConceptMap,150);return}try{const r=await window.mermaid.render('dsaGraph'+Date.now(),lines.join('\n'));host.innerHTML='<div class="mermaidGraph dsaGraph">'+r.svg+'</div><div class="statusline"><span class="pill mastered">Mastered</span><span class="pill learning">Learning</span><span class="pill available">Available</span><span class="pill lockedConcept">Locked</span></div>';const svg=host.querySelector('svg');all.forEach(name=>{const key='n'+safe(name);const node=svg&&[...svg.querySelectorAll('.node')].find(n=>n.id&&n.id.includes(key));if(node){node.style.cursor='pointer';node.onclick=()=>showDsaConcept(name)}})}catch(e){host.innerHTML='<div class="status">Could not draw DSA map. '+String(e)+'</div>'}};
+  const ensureMap=()=>{const c=document.getElementById('mapCard');if(c&&!c.classList.contains('collapsed'))renderConceptMap()};setTimeout(ensureMap,350);setTimeout(ensureMap,900);
 })();

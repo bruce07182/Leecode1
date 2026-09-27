@@ -1,4 +1,5 @@
 // DSA map read-only view of the SAME Level 3 curriculum used by Python Training.
+// When a shared lesson exists, it replaces the old quick ASCII/code panel to avoid duplicate/conflicting teaching.
 (() => {
   const mapToLevel3={
     'Array':'Array patterns','Hashing':'Hash map & set','Stack':'Stack','Queue':'Queue',
@@ -8,26 +9,16 @@
     'Backtracking':'Recursion & backtracking','Dynamic Programming':'Dynamic programming'
   };
   const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  function sharedLesson(name){
-    const wanted=mapToLevel3[name];
-    return wanted && window.DSA_LEVEL3 && window.DSA_LEVEL3.find(x=>x.t===wanted);
-  }
+  function sharedLesson(name){const wanted=mapToLevel3[name];return wanted&&window.DSA_LEVEL3&&window.DSA_LEVEL3.find(x=>x.t===wanted)}
   function enrich(name){
-    const d=sharedLesson(name);
-    const popup=document.getElementById('dsaFocusPopup');
-    const inner=popup&&popup.querySelector('.dsaFocusInner');
+    const d=sharedLesson(name),popup=document.getElementById('dsaFocusPopup'),inner=popup&&popup.querySelector('.dsaFocusInner');
     if(!d||!inner||inner.querySelector('.dsaSharedLevel3'))return;
-    const grid=inner.querySelector('.dsTeachGrid');
-    if(!grid)return;
-    const oldCode=grid.querySelector('.dsCode');
-    if(oldCode) oldCode.style.display='none';
-    const box=document.createElement('div');
-    box.className='dsaSharedLevel3';
-    box.innerHTML='<div class="dsaCombinedLesson"><b>Python · Level 3</b><div class="dsTeachOne">'+d.tip+'</div></div><pre class="dsCode">'+esc(d.ex)+'</pre>';
+    const grid=inner.querySelector('.dsTeachGrid');if(!grid)return;
+    inner.classList.add('hasSharedLesson');
+    const box=document.createElement('div');box.className='dsaSharedLevel3';
+    box.innerHTML='<div class="dsaCombinedLesson"><div class="tag">LEVEL 3 · SHARED LESSON</div><div class="dsTeachOne">'+d.tip+'</div></div><pre class="dsCode">'+esc(d.ex)+'</pre>';
     grid.appendChild(box);
+    if(window.renderDsaVisuals)window.renderDsaVisuals(inner);
   }
-  document.addEventListener('click',e=>{
-    const b=e.target.closest&&e.target.closest('#conceptMap [data-concept], #dsaFocusPopup [data-concept]');
-    if(b)setTimeout(()=>enrich(b.dataset.concept),0);
-  },true);
+  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#conceptMap [data-concept], #dsaFocusPopup [data-concept]');if(b)setTimeout(()=>enrich(b.dataset.concept),0)},true);
 })();

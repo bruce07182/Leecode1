@@ -1,4 +1,5 @@
 // DSA map read-only view of the SAME Level 3 curriculum used by Python Training.
+// When a shared lesson exists it replaces the legacy quick diagram/code presentation.
 (() => {
   const mapToLevel3={
     'Array':'Array patterns','Hashing':'Hash map & set','Stack':'Stack','Queue':'Queue',
@@ -19,12 +20,15 @@
     if(!d||!inner||inner.querySelector('.dsaSharedLevel3'))return;
     const grid=inner.querySelector('.dsTeachGrid');
     if(!grid)return;
-    const oldCode=grid.querySelector('.dsCode');
-    if(oldCode) oldCode.style.display='none';
+
+    // Shared Level 3 is authoritative: remove the old ASCII diagram and quick code.
+    grid.querySelectorAll('.dsDiagram,.dsCode').forEach(el=>el.remove());
+
     const box=document.createElement('div');
     box.className='dsaSharedLevel3';
-    box.innerHTML='<div class="dsaCombinedLesson"><b>Python · Level 3</b><div class="dsTeachOne">'+d.tip+'</div></div><pre class="dsCode">'+esc(d.ex)+'</pre>';
+    box.innerHTML='<div class="dsaCombinedLesson"><div class="dsTeachOne">'+d.tip+'</div></div><pre class="dsCode">'+esc(d.ex)+'</pre>';
     grid.appendChild(box);
+    if(window.renderDsaVisuals)window.renderDsaVisuals(inner);
   }
   document.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('#conceptMap [data-concept], #dsaFocusPopup [data-concept]');

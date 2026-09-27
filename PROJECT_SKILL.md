@@ -2,153 +2,106 @@
 
 Updated: 2026-09-27
 
-Use this file as the project handoff/source of context when continuing development in another ChatGPT conversation.
-
 ## Project
+- Repo: `bruce07182/Leecode1`; public site is Cloudflare Pages (`leecode1.pages.dev`).
+- Goal: teach the minimum Python + DSA foundations needed for LeetCode, then combinations/patterns.
+- Audience may know programming but not DSA terminology. Prefer concise explanation, executable Python, accurate visuals, and mobile-first UI.
 
-- Repository: `bruce07182/Leecode1` (project/site is referred to as **dsa / LeetCode Foundations**).
-- Public Cloudflare Pages site has been used for deployment (`leecode1.pages.dev`; user has also referred to the site as `dsa`).
-- Main goal: teach the **small set of Python + DSA fundamentals actually needed for LeetCode**, then teach combinations/patterns. Do not turn it into a comprehensive Python course.
-- Audience may know basic programming but not DSA terminology. Explain unfamiliar terms at the point they are first needed.
-- Prefer less wording, real executable code, diagrams/state sequences where they materially improve understanding, and mobile-first presentation.
+## Critical recovery / deployment note
+- `3a687bc600d7d484fe01c7efd5eff789fb6abd3d` is the confirmed known-good web baseline after a blank-screen regression.
+- A batch UI/accessibility audit after that commit caused both Cloudflare Pages and GitHub Pages to show a blank/hanging page. Rolling `main` back to `3a687bc` restored Cloudflare immediately.
+- The reverted UI work is preserved on branch `ui-audit-backup-20260927`.
+- Do NOT reintroduce that batch wholesale. UI improvements must be small, isolated commits and must not alter the critical startup/auth path unless necessary.
+- Never let cosmetic/accessibility enhancements block app initialization or leave `auth-locked` as a permanent blank screen if startup fails.
+- After startup/auth changes, verify the deployed page loads before continuing.
 
-## Core teaching philosophy
+## Teaching architecture: ONE Level 3, TWO views
+There is one shared Level 3 curriculum/source of truth: `assets/python-dsa.js` (`window.DSA_LEVEL3`).
 
-1. Foundations first, then combinations, then LeetCode-style problems.
-2. Teach the minimum Python needed for DSA. Python Basics is not itself a LeetCode question bank.
-3. Prefer code to prose. Put useful explanation in/next to real code rather than writing long paragraphs.
-4. First introduction of a concept should explain it. Later lessons should focus only on what is new; do not repeatedly reteach traversal/loops/etc.
-5. `Traversal` is the general DSA term for visiting items. For a Python array/list this usually means a loop. Traversal applies to every data structure, so avoid messy map edges from Traversal to everything.
-6. Python `list` is normally the practical array for these lessons. Explain the distinction only when useful: Python list is dynamic; DSA “array” is the conceptual indexed sequence.
-7. For hashing, teach the **hash concept first**, then hash set vs hash map/dict.
-8. Math/pattern material should include useful basics such as odd/even and later search, divide & conquer, bitwise, backtracking, greedy, DP, etc. Only include what helps DSA/LeetCode.
-9. Answers should show the simplest readable correct form first. If that hides the algorithm (for example a Python shortcut), provide a deeper/algorithmic version too.
-10. Explain non-obvious Python syntax/functions where they actually appear, e.g. `s[::-1]`, `dict.get`, `append`; do not explain an API in an unrelated answer.
-11. Time and Space complexity should be visually separated/easy to scan.
-12. External or internal links to prerequisite teaching are useful for advanced topics when prior material is needed.
+It feeds:
+1. Python Training Level 3 — lesson + runnable practice/editor.
+2. DSA Map — same teaching content read-only, plus map context/related questions; no second practice editor.
 
-## Main LeetCode page UX
+`assets/dsa-python-link-v7.js` is an adapter/renderer, not a second curriculum. Do not duplicate Level 3 explanations there.
 
-- Require login before showing app content. Do not expose questions/map/progress before authentication.
-- Supabase is used for authentication/cloud progress.
-- User progress should sync across devices. Existing local progress may need the user to sign in on the original device/account once so it can be associated/synced.
-- The main screen has collapsible top cards rather than putting everything in the menu:
-  - **How to solve a problem**
-  - **DSA map**
-  - **Progress**
-- These cards may default visible but must be collapsible to save mobile space.
-- `How to solve a problem` was intentionally moved out of the menu.
-- Keep the Run button visually part of the code editor; it is a primary action and should be easy to find.
-- Running result should appear immediately after the code area.
-- Learn basics / Hint / Answer panels should toggle closed when clicked again.
-- Remove unnecessary answer wording such as “sample answer” / “Other correct solutions are welcome.”
-- Question wording should call out unfamiliar basic terms or link to Learn basics.
-- Preserve detailed useful content; solve mobile density with expand/collapse/scroll rather than deleting important teaching.
+## Current Level 3
+Level 3 now has real lessons/practice for:
+- Array patterns
+- Linked list
+- Stack
+- Queue
+- Hash map & set
+- Binary tree
+- Heap / priority queue
+- Graph representation
+- DFS
+- BFS
+- Binary search
+- Two pointers
+- Sliding window
+- Recursion & backtracking
+- Dynamic programming
 
-## DSA map design
+Recent curriculum commit: `00ccbc25c974cbb728b7b1308fb68a2fdea73f4b`.
 
-- The map focuses on DSA, with **Data Structures** on one side and **Algorithms / Patterns** on the other.
-- Data structures should be ordered roughly simple → complex. Array belongs at/near the top, then String (array-like sequence), Hashing, Stack/Queue, Linked List, Heap, Tree, Graph, etc.
-- Pattern side includes traversal, two pointers, sorting, sliding window, prefix sum, binary search/search, DFS/recursion, BFS, divide & conquer, greedy, backtracking, dynamic programming, bitwise, math where appropriate.
-- Default map should be clean and show **no connection lines**; persistent all-to-all lines became too messy.
-- Clicking a concept should focus/pop up only the concept and its useful related items/questions rather than showing a web of every connection.
-- Clicking a related question may hide the map/focus view and navigate to that question.
-- The map itself should stay compact/mobile-friendly.
-- Clicking a DSA item opens a read-only quick lesson. Do **not** add a separate practice editor inside the map.
-- Visuals should be purposeful: structure diagrams and step/state sequences are more useful than generic statistical charts. Strong visual candidates: linked list, stack/queue, heap, tree, graph, two pointers, sliding window, binary search, DFS/BFS, backtracking, DP.
-- Mobile DSA detail uses a full-screen vertically scrollable sheet; close control remains available. Desktop can use a centered popup.
+## Professional visual system
+- `assets/dsa-visuals.js` upgrades Level 3 `pre.dsDiagram` placeholders into responsive SVG teaching visuals.
+- Current professional visuals cover all 15 Level 3 topics.
+- Latest visual commit: `b70818c7c31a32b4556517b92d811ced1315ed89`.
+- Visuals are presentation only; curriculum stays in `python-dsa.js`.
 
-## Critical curriculum architecture: ONE Level 3, TWO views
+### Visual semantics — important
+- Array: contiguous adjacent indexed cells. **Never draw pointer/edge lines between array elements.** Adjacency is enough.
+- Linked list: explicit links/pointers between nodes.
+- Tree/graph: edges represent actual structural relationships.
+- Stack/queue: show ordering and operation direction, not fake pointers.
+- Two pointers: pointers/index markers may move over an array; they are indexes, not links between cells.
+- Sliding window: highlight one contiguous range; show entering/leaving movement.
+- Binary search: show active search range/middle and discarded half.
+- DFS/BFS/backtracking: edges are structural/search relationships; use state highlighting to explain traversal.
+- DP: show stored states and recurrence/dependency without implying linked-list pointers.
+- Prefer clean SVG/state diagrams over ASCII art.
 
-This is the most recent important design decision.
+## Main UX requirements
+- Login is required before exposing main app content; Supabase handles auth/cloud progress.
+- Preserve cross-device progress and complexity/O() persistence.
+- Main cards: How to solve a problem, DSA map, Progress; keep collapsible/mobile-friendly.
+- Run belongs with the editor and result should be immediately visible.
+- Learn basics / Hint / Answer should toggle.
+- DSA map should stay compact, default without a web of connection lines; click a concept to focus details.
+- DSA detail is read-only teaching; no duplicate editor.
+- Mobile DSA detail should be vertically scrollable with an accessible close control.
+- Admin access only for `bruce0421@gmail.com`; inspect current Supabase RPC/schema before changing admin.
 
-**There must be one shared Level 3 DSA curriculum/data source, not an old DSA lesson plus a separate new copy.**
+## Curriculum principles
+1. Foundations → combinations → LeetCode-style problems.
+2. Teach only Python useful for DSA.
+3. Prefer code to prose.
+4. Explain a concept when first introduced; later lessons focus on what is new.
+5. Python list is the practical array; clarify conceptual array vs dynamic list only when useful.
+6. Hash concept first, then set vs map/dict.
+7. Built-ins are allowed, but teach the underlying algorithm when a shortcut hides it.
+8. Keep Time/Space complexity easy to scan.
+9. Use diagrams when they materially improve understanding.
+10. Practice should be runnable with meaningful validation, not placeholder answers/tests.
 
-Two presentations consume it:
+## Important files
+- `index.html` — main app/script loading/auth visibility.
+- `python.html` — Python Training.
+- `assets/app.js`, `assets/ui-v2.js` — core/UI behavior.
+- `assets/app.css`, `assets/dsa-visuals.css` — shared/visual styling.
+- `assets/python-basics.js` — Python curriculum below Level 3.
+- `assets/python-dsa.js` — shared Level 3 source of truth.
+- `assets/dsa-map-v6.js` — map/focus UI.
+- `assets/dsa-python-link-v7.js` — shared-Level-3 map adapter.
+- `assets/dsa-visuals.js` — professional SVG rendering.
 
-1. **Python Training → Level 3**: shows the Level 3 lesson and runnable practice/editor.
-2. **DSA Map**: shows the **same Level 3 teaching content** read-only, with map/visual context and related questions, but **no practice editor**.
-
-Future changes to Level 3 teaching should therefore automatically feed both views. Avoid maintaining duplicate explanatory/code content in `dsa-python-link-v7.js`.
-
-Current implementation direction (2026-09-27):
-- `assets/python-dsa.js` exposes `window.DSA_LEVEL3` and is intended as the shared source of truth.
-- `assets/dsa-python-link-v7.js` maps DSA-map concept names to the corresponding Level 3 lesson and renders `tip` + example code read-only.
-- `index.html` loads the shared Level 3 data before the DSA-map renderer.
-- Latest commit completing this wiring: `796880d738c014a7cd781e4ea7eed21ca5ef39e5`.
-- Earlier related commits: `75ec836` (mobile DSA detail scrolling/full-screen), `792e90b` (combined DSA quick view direction).
-
-When modifying this area, first inspect the current repository because multiple edits happened rapidly. Preserve the one-source/two-view architecture.
-
-## Python Basics / Python Training
-
-- Python Basics is a separate page/link from the main LeetCode page.
-- It should be usable as learning/training material and organized by levels rather than trying to teach all Python.
-- Level 0: extremely small/basic essentials.
-- Level 1+: progressively more topics/deeper usage, only as useful for DSA.
-- Level 2: Python used for DSA/problem-solving patterns.
-- Level 3: implement/use core DSA in Python and practice the exact patterns.
-- Level 3 topics currently include: Array patterns, Linked list, Stack, Queue, Hash map & set, Binary tree, Heap/priority queue, Graph representation, DFS, BFS, Binary search, Two pointers, Sliding window, Recursion & backtracking, Dynamic programming.
-- The Python editor should feel similar/consistent with the main LeetCode editor.
-
-## Questions / progression
-
-- Questions are ordered around dependencies/fundamentals rather than random LeetCode order.
-- Basic-only vs Basics + combinations modes have existed; dependency/category/status should be easy to understand.
-- Concept map/progress should help navigation, not dominate the screen.
-- User should return to their last question/progress where appropriate.
-- Require Time O(...) and Space O(...) analysis as part of solving; save complexity selections/results in the database as part of progress.
-- Tests should run reliably and all test cases should be checked.
-- Python built-ins are allowed, but when a built-in hides the algorithm, teach the manual/algorithmic version too.
-
-## Supabase / account / admin
-
-- Authentication is Supabase-based. Sign-in, sign-out, forgot/reset password are under account/menu UI.
-- App content is hidden unless authenticated.
-- Cloud progress is intended to work across devices.
-- Admin access must only be enabled for `bruce0421@gmail.com`.
-- Admin is for viewing other users’ progress. Preferred UX is to select/switch a user and inspect that user’s details rather than only seeing a flat aggregate list.
-- An earlier admin implementation expected a Supabase RPC named `public.admin_progress`; if missing, Supabase reported schema-cache/function-not-found. Inspect current SQL/RPC implementation before changing admin.
-- Progress persistence should include complexity/O() data as well as question/progress state.
-- Do not expose nickname/email unnecessarily in normal learner UI.
-
-## UI/style principles
-
-- Professional, compact, readable, not wordy.
-- Use bold/color/diagram/sequence selectively to improve comprehension.
-- Mobile is a first-class target. Avoid horizontal overflow and screens that cannot fit/scroll their content.
-- Do not make the concept map visually busy. Default no lines; show relationships on demand.
-- Prefer expandable sections over removing valuable explanation.
-- Real code examples are preferred over half-code/pseudocode whenever practical.
-
-## Deployment / repository workflow
-
-- Work directly against `bruce07182/Leecode1` main unless the user asks otherwise.
-- Cloudflare Pages has been used for public deployment; commits to the configured branch should be allowed to deploy through the existing setup.
-- A prior public-release/GitHub Pages workflow existed earlier in the project, but Cloudflare Pages became the preferred deployment path.
-- The project was called stable enough to mark **version 1.0** before Python Basics/Level 3 expansion. Preserve tags/history; do not rewrite history.
-- Before writing a frequently edited file, fetch its latest SHA; repository conflicts occurred when another edit landed between fetch and update.
-
-## Important implementation files seen recently
-
-- `index.html` — main LeetCode Foundations page and script loading/auth visibility.
-- `assets/app.css` — shared UI/mobile styles.
-- `assets/app.js` — core app behavior/data.
-- `assets/ui-v2.js` — UI behavior.
-- `assets/learning-v3.js` — learning content used by main questions.
-- `assets/answer-explain-v4.js` — answer explanation layer.
-- `assets/lesson-links-v5.js` — links/prerequisite lesson behavior.
-- `assets/dsa-map-v6.js` — DSA map and concept focus UI.
-- `assets/dsa-python-link-v7.js` — should be a renderer/adapter to shared Level 3, NOT a second curriculum.
-- `assets/python-basics.js` — Python Basics curriculum.
-- `assets/python-dsa.js` — shared Level 3 DSA curriculum/source of truth.
-- `python.html` — Python Training page.
-
-## How another chat should continue
-
+## Safe workflow for future changes
 1. Read this file first.
-2. Fetch current repo files before editing; do not assume the code is unchanged from a prior chat.
-3. Preserve login gating, Supabase progress, mobile behavior, and the one-Level-3/two-view design.
-4. For teaching changes, optimize for **fast understanding with minimal wording**: real code + a small visual/state sequence when useful.
-5. Avoid duplicating curriculum. If DSA Map needs richer display, add rendering/visual metadata or derive a visual from the shared lesson rather than copying lesson text/code into another object.
-6. When a change is complete, state the commit SHA so the next chat can anchor itself to the repository state.
+2. Inspect current repo and fetch latest SHA before every edited file.
+3. Preserve one-Level-3/two-view architecture.
+4. Make small commits, especially for startup/auth/UI changes.
+5. Do not mix unrelated UI/auth/deployment changes with curriculum changes.
+6. Treat `3a687bc` as the recovery anchor for the confirmed-working deployment, while later curriculum/visual commits build on it.
+7. After any change that touches page loading, auth gating, script order, or global observers, verify the public deployment before stacking more changes.
+8. State commit SHA(s) after changes so the next chat can anchor to exact repo state.

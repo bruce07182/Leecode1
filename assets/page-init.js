@@ -1,4 +1,4 @@
-// Page bootstrap only. Keep feature/UI behavior in its owning asset file.
+// Page bootstrap only. Feature/UI behavior belongs in its owning asset file.
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
 mermaid.initialize({
@@ -8,12 +8,7 @@ mermaid.initialize({
 });
 window.mermaid=mermaid;
 
-// Shared Level 3 data uses this minimal factory when loaded from the DSA page.
-window.L=window.L||((level,t,tip,ex,task,start,answer,test)=>({level,t,tip,ex,task,start,answer,test}));
-window.lessons=window.lessons||[];
-window.levelInfo=window.levelInfo||{};
-
-// Auth visibility is deliberately small and isolated so presentation changes cannot own startup.
+// Auth visibility is isolated so presentation changes cannot own startup.
 const applyAuthVisibility=user=>document.body.classList.toggle('auth-locked',!user);
 try{
   const {data}=await db.auth.getSession();
@@ -21,6 +16,6 @@ try{
   db.auth.onAuthStateChange((event,session)=>applyAuthVisibility(session?.user||null));
 }catch(error){
   console.error('Auth initialization failed',error);
-  // Fail visibly instead of leaving the entire application permanently blank.
+  // Fail visibly instead of leaving the application permanently blank.
   document.body.classList.remove('auth-locked');
 }

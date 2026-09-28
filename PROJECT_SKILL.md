@@ -205,3 +205,14 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - After complexity is confirmed for the current code, replace the controls with one compact line: `✓ Time O(...) · Space O(...)`.
 - Do not restore the verbose `Your solution · complexity` heading or disabled selectors after confirmation.
 - Changing the code invalidates the saved display naturally because complexity is keyed to the exact code text.
+
+### Stable question grouping
+- The question picker is grouped at the UI layer only: `Basics` and `Combinations / LeetCode`.
+- Never reorder, splice, or rebuild the canonical `qs[]` array to implement grouping. Existing numeric indexes are persistent problem IDs used by local code/history/hints/complexity and Supabase `problem_id`.
+- Question `<option>` values must always be the original `qs[]` index. Filtering changes visibility only, never identity.
+- DSA-map navigation and restored last-question state must first select the appropriate group, then select the unchanged original question index.
+
+### Admin behavior
+- Admin access is restricted by `ADMIN_EMAIL` and Supabase/RPC authorization remains authoritative.
+- The Admin menu action must call `toggleAdmin()` so opening the card also runs `loadAdminProgress()`; merely removing the `hidden` class produces an empty Admin view.
+- `assets/admin-readonly.js` enhances loaded admin data with the read-only per-user workspace; it must never write user data or switch auth identity.

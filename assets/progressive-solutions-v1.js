@@ -3,8 +3,8 @@
 (() => {
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const qSelect = document.getElementById('q'), answerBox = document.getElementById('answerBox');
-  const answerBtn = document.getElementById('sampleBtn'), codeBox = document.getElementById('code');
-  if (!qSelect || !answerBox || !answerBtn || !codeBox) return;
+  const answerBtn = document.getElementById('sampleBtn');
+  if (!qSelect || !answerBox || !answerBtn) return;
 
   function solved(i) {
     const opt = Array.from(qSelect.options).find(o => Number(o.value) === i) || qSelect.options[i];
@@ -13,10 +13,6 @@
     return opt.dataset.solved === 'true' || opt.dataset.mastered === 'true' || opt.classList.contains('solved') || opt.classList.contains('mastered') || /[✓✔]/.test(text);
   }
   const available = x => !x.requires || x.requires.every(solved);
-  const starterFrom = code => {
-    const first = String(code).split('\n').find(line => /^def\s+/.test(line.trim()));
-    return first ? first.trim() + '\n    # try this approach\n    pass' : '# try this approach\n';
-  };
 
   const libraries = {
     2:[{name:'Python max()',time:'O(n)',space:'O(1)',lesson:'Python built-in',tag:'Pythonic',code:'def find_max(nums):\n    return max(nums)'},{name:'Manual scan',time:'O(n)',space:'O(1)',lesson:'Best-so-far pattern',recommend:true,code:'def find_max(nums):\n    best = nums[0]\n    for x in nums[1:]:\n        if x > best:\n            best = x\n    return best'}],
@@ -35,14 +31,13 @@
     const rows = all.filter(available); if (rows.length < 2) return;
     const hasRecommended = rows.some(r => r.recommend);
     const currentFallback = !hasRecommended ? (rows.find(r => r.fallback) || rows[0]) : null;
-    const labelFor = r => { const a=[]; if(r.recommend)a.push('★ Recommended · DSA'); else if(r===currentFallback)a.push('★ Recommended for now'); if(r.tag)a.push(r.tag); return a.length?` <span class="status">${a.map(esc).join(' · ')}</span>`:''; };
+    const labelFor = r => { const a=[]; if(r.recommend)a.push('★ Recommended · DSA'); else if(r===currentFallback)a.push('★ Recommended for now'); if(r.tag)a.push('Pythonic'); return a.length?` <span class="status">${a.map(esc).join(' · ')}</span>`:''; };
 
     answerBox.innerHTML=''; const wrap=document.createElement('div'); wrap.className='progressiveSolutions';
-    wrap.innerHTML='<b>Solutions</b><div class="status">Tap a row to show its code. After solving the problem, use Try this approach to practice another unlocked method.</div><div style="overflow-x:auto"><table class="solutionCompare"><thead><tr><th>Approach</th><th>Time</th><th>Space</th><th>Main lesson</th></tr></thead><tbody>'+rows.map((r,i)=>`<tr class="solutionRow" data-solution="${i}" style="cursor:pointer"><td>› ${esc(r.name)}${labelFor(r)}</td><td>${esc(r.time)}</td><td>${esc(r.space)}</td><td>${esc(r.lesson)}</td></tr><tr class="solutionDetail" data-detail="${i}" style="display:none"><td colspan="4"><pre class="lessonCode"><code>${esc(r.code)}</code></pre>${r.note?`<div class="status">${esc(r.note)}</div>`:''}<button type="button" class="tryApproach" data-try="${i}">Try this approach</button></td></tr>`).join('')+'</tbody></table></div>';
+    wrap.innerHTML='<b>Solutions</b><div class="status">Tap a row to show its code. More approaches appear as you learn their prerequisite concepts.</div><div style="overflow-x:auto"><table class="solutionCompare"><thead><tr><th>Approach</th><th>Time</th><th>Space</th><th>Main lesson</th></tr></thead><tbody>'+rows.map((r,i)=>`<tr class="solutionRow" data-solution="${i}" style="cursor:pointer"><td>› ${esc(r.name)}${labelFor(r)}</td><td>${esc(r.time)}</td><td>${esc(r.space)}</td><td>${esc(r.lesson)}</td></tr><tr class="solutionDetail" data-detail="${i}" style="display:none"><td colspan="4"><pre class="lessonCode"><code>${esc(r.code)}</code></pre>${r.note?`<div class="status">${esc(r.note)}</div>`:''}</td></tr>`).join('')+'</tbody></table></div><div class="status" style="margin-top:10px"><b>Practice another approach:</b> compare the solutions → choose one you want to practice → use <b>Reset code</b> below → implement it yourself → <b>Run</b> the same tests.</div>';
     answerBox.appendChild(wrap);
     const setCell=(row,open=false)=>{const r=rows[Number(row.dataset.solution)];row.cells[0].innerHTML=`${open?'⌄':'›'} ${esc(r.name)}${labelFor(r)}`;};
     wrap.querySelectorAll('.solutionRow').forEach(row=>row.addEventListener('click',()=>{const i=row.dataset.solution,detail=wrap.querySelector(`[data-detail="${i}"]`),opening=detail.style.display==='none';wrap.querySelectorAll('.solutionDetail').forEach(d=>d.style.display='none');wrap.querySelectorAll('.solutionRow').forEach(r=>setCell(r,false));if(opening){detail.style.display='table-row';setCell(row,true);}}));
-    wrap.querySelectorAll('.tryApproach').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const r=rows[Number(btn.dataset.try)];const old=codeBox.value;const changed=old.trim() && !/^def\s+\w+\([^)]*\):\s*\n\s*(#.*\n\s*)?pass\s*$/.test(old.trim());if(changed&&!confirm(`Replace the current editor code to try “${r.name}”?`))return;codeBox.value=starterFrom(r.code);codeBox.dispatchEvent(new Event('input',{bubbles:true}));answerBox.innerHTML='';codeBox.focus();codeBox.scrollIntoView({behavior:'smooth',block:'center'});const out=document.getElementById('out');if(out)out.textContent=`Trying another approach: ${r.name}. Implement it yourself, then Run the same tests.`;}));
   }
   answerBtn.addEventListener('click',()=>setTimeout(render,0)); qSelect.addEventListener('change',()=>setTimeout(render,0));
 })();

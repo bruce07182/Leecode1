@@ -193,7 +193,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Removed the deleted Reset-button binding from `app.js`; Run now binds directly in core, so `assets/run-binding-fix.js` was deleted.
 - Removed old menu event ownership from `app.js`; `assets/menu-controller.js` is the single menu owner.
 - Deleted `assets/progress-compat.js` and removed the old `assets/lesson-links-v5.js` observer. Learn basics should stay a tiny shared concept lesson, not accumulate question-specific references.
-- The obsolete Mode control was removed. The foundation question picker directly exposes Basics and Combinations.
+- The obsolete Mode control and all Mode-dependent filtering were removed. The foundation question picker directly exposes Basics and Combinations; DSA-map navigation must switch the visible group before selecting the unchanged original question ID.
 - Supabase session state is authoritative for signed-in/signed-out UI. Do not infer login state from local progress.
 - Single-topic teaching should come from the shared curriculum (`window.DSA_LEVEL3` / Python curriculum). Grouped top-level DSA topics exist to compare related concepts, not to create duplicate single-topic lessons.
 - Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.
@@ -224,4 +224,5 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - The LeetCode page may reuse the same Supabase auth/session and `solutions` schema, but its localStorage keys use an `lc_` prefix.
 - Foundation Admin totals/viewer must filter to foundation IDs. A dedicated LeetCode admin view can be added later without mixing denominators or question catalogs.
 - The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.
+- Each LeetCode practice problem includes its official `leetcode.com/problems/<slug>/` link for opening the original online problem.
 - LeetCode question behavior should mirror Foundations: show all test inputs/expected outputs as read-only locked tests; Run executes all tests and records Attempts; after the first pass lock the editor and turn Run into Edit; reveal Answer and the problem's difficulty/pattern/category only after a pass; complexity appears after passing and a confirmed value is bound to the exact saved code.

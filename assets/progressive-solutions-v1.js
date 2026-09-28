@@ -23,12 +23,12 @@
     ],
     3: [
       {name:'Python slicing',time:'O(n)',space:'O(n)',lesson:'Python slicing',code:'def reverse_string(s):\n    return s[::-1]'},
-      {name:'Build a string',time:'O(n²)*',space:'O(n)',lesson:'String immutability',code:'def reverse_string(s):\n    result = ""\n    for ch in s:\n        result = ch + result\n    return result',note:'*Repeated immutable-string construction can copy growing strings.'},
+      {name:'Build a string',time:'O(n²)',space:'O(n)',lesson:'String immutability',code:'def reverse_string(s):\n    result = ""\n    for ch in s:\n        result = ch + result\n    return result',note:'Why O(n²): strings are immutable, so each prepend creates and copies a growing new string. The total copied work is about 1 + 2 + ... + n.'},
       {name:'List + join',time:'O(n)',space:'O(n)',lesson:'Efficient construction',requires:[1],code:'def reverse_string(s):\n    chars = []\n    for i in range(len(s) - 1, -1, -1):\n        chars.append(s[i])\n    return "".join(chars)'},
-      {name:'Two pointers',time:'O(n)',space:'O(n)**',lesson:'Two-pointer pattern',requires:[4],code:'def reverse_string(s):\n    chars = list(s)\n    left, right = 0, len(chars) - 1\n    while left < right:\n        chars[left], chars[right] = chars[right], chars[left]\n        left += 1\n        right -= 1\n    return "".join(chars)',note:'**O(1) auxiliary space when the input itself is already a mutable character array.'},
+      {name:'Two pointers',time:'O(n)',space:'O(n)',lesson:'Two-pointer pattern',requires:[4],code:'def reverse_string(s):\n    chars = list(s)\n    left, right = 0, len(chars) - 1\n    while left < right:\n        chars[left], chars[right] = chars[right], chars[left]\n        left += 1\n        right -= 1\n    return "".join(chars)',note:'This function starts with an immutable Python string, so list(s) creates O(n) extra storage. If the problem gives a mutable character array directly, the two-pointer swaps themselves use O(1) auxiliary space.'},
       {name:'reversed() + join',time:'O(n)',space:'O(n)',lesson:'Iterator + join',requires:[4],code:'def reverse_string(s):\n    return "".join(reversed(s))'},
       {name:'Stack',time:'O(n)',space:'O(n)',lesson:'LIFO',requires:[7],code:'def reverse_string(s):\n    stack = list(s)\n    out = []\n    while stack:\n        out.append(stack.pop())\n    return "".join(out)'},
-      {name:'Recursion',time:'O(n²)*',space:'O(n)+',lesson:'Recursive thinking',requires:[15],code:'def reverse_string(s):\n    if len(s) <= 1:\n        return s\n    return reverse_string(s[1:]) + s[0]',note:'Educational in Python, not the preferred production solution.'}
+      {name:'Recursion',time:'O(n²)',space:'O(n²)',lesson:'Recursive thinking',requires:[15],code:'def reverse_string(s):\n    if len(s) <= 1:\n        return s\n    return reverse_string(s[1:]) + s[0]',note:'Educational rather than preferred Python. Slicing and concatenation create strings across recursive calls, so this simple version can use O(n²) total temporary string storage; the call stack itself is O(n).'}
     ],
     5: [
       {name:'Counter',time:'O(n)',space:'O(n)',lesson:'Python library',code:'def frequency(nums):\n    from collections import Counter\n    return dict(Counter(nums))'},
@@ -66,17 +66,27 @@
     const rows = all.filter(available);
     if (rows.length < 2) return;
 
-    // For questions with a solution library, replace the legacy single-answer rendering.
-    // This keeps every solution in one comparison area instead of showing one duplicate above it.
     answerBox.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 'progressiveSolutions';
-    wrap.innerHTML = '<b>Solutions</b><div class="status">Compare the approaches below. More approaches appear as their prerequisite concepts are mastered.</div>' +
+    wrap.innerHTML = '<b>Solutions</b><div class="status">Tap a row to show its code. More approaches appear as their prerequisite concepts are mastered.</div>' +
       '<div style="overflow-x:auto"><table class="solutionCompare"><thead><tr><th>Approach</th><th>Time</th><th>Space</th><th>Main lesson</th></tr></thead><tbody>' +
-      rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.time)}</td><td>${esc(r.space)}</td><td>${esc(r.lesson)}</td></tr>`).join('') +
-      '</tbody></table></div>' +
-      rows.map((r,i) => `<details${i===0?' open':''}><summary>${esc(r.name)}</summary><pre class="lessonCode"><code>${esc(r.code)}</code></pre>${r.note?`<div class="status">${esc(r.note)}</div>`:''}</details>`).join('');
+      rows.map((r,i) => `<tr class="solutionRow" data-solution="${i}" style="cursor:pointer"><td>› ${esc(r.name)}</td><td>${esc(r.time)}</td><td>${esc(r.space)}</td><td>${esc(r.lesson)}</td></tr><tr class="solutionDetail" data-detail="${i}" style="display:none"><td colspan="4"><pre class="lessonCode"><code>${esc(r.code)}</code></pre>${r.note?`<div class="status">${esc(r.note)}</div>`:''}</td></tr>`).join('') +
+      '</tbody></table></div>';
     answerBox.appendChild(wrap);
+
+    wrap.querySelectorAll('.solutionRow').forEach(row => row.addEventListener('click', () => {
+      const i = row.dataset.solution;
+      const detail = wrap.querySelector(`[data-detail="${i}"]`);
+      const first = row.cells[0];
+      const opening = detail.style.display === 'none';
+      wrap.querySelectorAll('.solutionDetail').forEach(d => d.style.display = 'none');
+      wrap.querySelectorAll('.solutionRow').forEach(r => { r.cells[0].textContent = '› ' + rows[Number(r.dataset.solution)].name; });
+      if (opening) {
+        detail.style.display = 'table-row';
+        first.textContent = '⌄ ' + rows[Number(i)].name;
+      }
+    }));
   }
 
   answerBtn.addEventListener('click', () => setTimeout(render, 0));

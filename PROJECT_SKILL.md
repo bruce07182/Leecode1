@@ -224,3 +224,4 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - The LeetCode page may reuse the same Supabase auth/session and `solutions` schema, but its localStorage keys use an `lc_` prefix.
 - Foundation Admin totals/viewer must filter to foundation IDs. A dedicated LeetCode admin view can be added later without mixing denominators or question catalogs.
 - The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.
+- LeetCode question behavior should mirror Foundations: show all test inputs/expected outputs as read-only locked tests; Run executes all tests and records Attempts; after the first pass lock the editor and turn Run into Edit; reveal Answer and the problem's difficulty/pattern/category only after a pass; complexity appears after passing and a confirmed value is bound to the exact saved code.

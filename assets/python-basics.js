@@ -36,6 +36,7 @@ function registerSharedDSA(){
   levelInfo[3]=shared.levelInfo;
 }
 registerSharedDSA();
+window.addEventListener('dsa-training-ready',()=>{registerSharedDSA();render()});
 const visible=()=>lessons.filter(x=>x.level===level);
 const doneKey=(l,i)=>`py_done_${l}_${i}`;
 function renderTopics(){const a=visible();$('pyTopics').innerHTML=a.map((x,i)=>`<button data-i="${i}" class="${i===current?'active ':''}${localStorage.getItem(doneKey(level,i))?'done':''}">${i+1}. ${x.t}</button>`).join('');$('pyTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});document.querySelectorAll('#levelBar button').forEach(b=>b.classList.toggle('active',+b.dataset.level===level));$('levelDesc').textContent=levelInfo[level]||'Implement core data structures and algorithms in Python.';}

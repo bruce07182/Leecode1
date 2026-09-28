@@ -159,7 +159,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `index.html` — main shell/script loading; behavior should stay out of inline code.
 - `python.html` — Python Training shell.
 - `assets/app.js` — core questions, tests, auth/cloud sync, attempts, complexity, and question selection. Obsolete Reset, old Progress dashboard, and menu ownership were removed in the 2026-09-28 cleanup.
-- `assets/editor-lock.js` — read-only-after-pass / Run↔Edit behavior.
+- `assets/python-editor.js` — single owner of Python-friendly textarea editing on Foundations, Python Training, and LeetCode Practice: indentation-preserving Enter, extra 4 spaces after `:`, Tab = 4 spaces, Shift+Tab = unindent.
+- `assets/editor-lock.js` — read-only-after-pass / Run↔Edit behavior on Foundations; LeetCode mirrors the same lock/Edit behavior in its practice controller.
 - `assets/ui-v2.js` — UI behavior.
 - `assets/python-basics.js` — shared Python curriculum below Level 3.
 - `assets/python-dsa.js` — shared Level 3 source of truth.
@@ -226,3 +227,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.
 - Each LeetCode practice problem includes its official `leetcode.com/problems/<slug>/` link for opening the original online problem.
 - LeetCode question behavior should mirror Foundations: show all test inputs/expected outputs as read-only locked tests; Run executes all tests and records Attempts; after the first pass lock the editor and turn Run into Edit; reveal Answer and the problem's difficulty/pattern/category only after a pass; complexity appears after passing and a confirmed value is bound to the exact saved code.
+
+### Shared Python editor invariant
+- All runnable Python textareas must use `assets/python-editor.js`; do not copy keydown/indentation logic into individual screens.
+- Keep Python editing consistent across Foundations, Python Training, and LeetCode Practice. Tab inserts four spaces; Shift+Tab unindents; Enter preserves current indentation and adds one level after a line ending in `:`.
+- Disable mobile autocorrect/autocapitalize where practical so code is not silently rewritten.

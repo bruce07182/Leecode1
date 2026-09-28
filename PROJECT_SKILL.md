@@ -14,13 +14,16 @@ Updated: 2026-09-28
 - Keep behavior in separate JS/CSS modules rather than growing inline code in `index.html`.
 - After startup/auth/script-order changes, verify the deployed page before stacking more changes.
 
-## Teaching architecture: ONE Level 3, THREE views
-There is one shared Level 3 curriculum/source of truth: `assets/python-dsa.js` (`window.DSA_LEVEL3`). It feeds:
-1. Python Training Level 3 — lesson + runnable practice/editor.
-2. DSA Map — same content read-only plus map context/related questions.
-3. Main-question Learn basics — reuse the same relevant Level 3 teaching.
+## Teaching architecture: shared curriculum, different depth
+Python Training, DSA Map, and main-question Learn basics should share concepts rather than maintain independent teaching curricula.
 
-Adapters/renderers must not become second curricula. `assets/curriculum-clarity-v9.js` may make narrow refinements; fold stable content back into the source of truth when safe.
+1. **Python Training** — full runnable Python/DSA learning and practice.
+2. **DSA Map** — shared DSA teaching in read-only map context.
+3. **Learn basics** — intentionally tiny concept preview only: what the prerequisite concept is plus one neutral example.
+
+`Learn basics` must NOT become a mini-solution or question hint. It should answer things like “What is a stack?”, “What are two pointers?”, or “What is a string slice?” without showing how that concept solves the current exercise. Question-specific help belongs in **Hint**; completed implementations belong in **Answer**.
+
+Adapters/renderers must not become second curricula. Shared concepts should remain consistent with `assets/python-basics.js` and `assets/python-dsa.js` (`window.DSA_LEVEL3`). `assets/shared-learning-v8.js` owns the intentionally shallow Learn-basics presentation.
 
 ## Core teaching rule: CONCRETE FIRST
 Preferred sequence:
@@ -33,6 +36,17 @@ Preferred sequence:
 - Questions test the concept, not vocabulary decoding.
 - Tests include boundary/non-default cases.
 - Built-ins are allowed, but when a shortcut hides an important DSA pattern, teach both.
+
+### Learn basics depth rule
+Keep Learn basics **very, very basic**. Its purpose is recognition/orientation, not assistance solving the active question.
+- One short plain-language definition.
+- One tiny neutral example when useful.
+- No current-question walkthrough.
+- No algorithm steps tailored to the current problem.
+- No answer-shaped pseudocode.
+- No complexity optimization advice unless complexity itself is the concept being introduced.
+- Prefer generic examples unrelated to the current question.
+- A learner who opens Learn basics should still need to reason through the problem themselves.
 
 ### DP standard
 For first DP exposure, start with the staircase problem and concrete sequences. Explain that reaching step `i` comes from `i-1` or `i-2`, then derive `ways[i] = ways[i-1] + ways[i-2]`. Only afterward name dynamic programming and explain `dp` as a conventional variable name.
@@ -140,6 +154,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 13. Python binary search teaches `(left + right) // 2` first; fixed-width overflow alternatives are secondary.
 14. Prefer fewer clear controls over redundant workflow buttons.
 15. Protect completed work from accidental editing without making intentional revision difficult.
+16. Learn basics is concept orientation, not problem-solving assistance.
 
 ## Important files
 - `index.html` — main shell/script loading; behavior should stay out of inline code.
@@ -148,13 +163,14 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/run-binding-fix.js` — compatibility Run binding after Reset removal.
 - `assets/editor-lock.js` — read-only-after-pass / Run↔Edit behavior.
 - `assets/ui-v2.js` — UI behavior.
-- `assets/python-basics.js` — curriculum below Level 3.
+- `assets/python-basics.js` — shared Python curriculum below Level 3.
 - `assets/python-dsa.js` — shared Level 3 source of truth.
 - `assets/curriculum-clarity-v9.js` — narrow concrete-first refinements.
 - `assets/progressive-solutions-v1.js` — progressive multi-solution tables/recommendations.
 - `assets/progressive-solutions-extra.js` — additional multi-solution questions.
-- `assets/dsa-teaching-details.js` — supplemental teaching details; avoid curriculum duplication.
-- `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js`, `assets/shared-learning-v8.js` — shared Level 3 adapters/views.
+- `assets/dsa-teaching-details.js` — supplemental full teaching details; Learn basics should not dump these detailed lessons into a question.
+- `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js` — shared DSA views/adapters.
+- `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
 - `assets/progress-ui-v8.js` — complexity/completion presentation.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
 - `assets/page-init.js` — startup/auth initialization.
@@ -162,11 +178,12 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 ## Safe workflow for future changes
 1. Read this file first.
 2. Inspect current repo and fetch latest SHA before editing.
-3. Preserve one-Level-3/three-view architecture.
+3. Preserve shared-curriculum architecture and intentionally different presentation depth.
 4. Make small commits, especially startup/auth/UI changes.
 5. Do not mix unrelated UI/auth/deployment changes with curriculum changes.
 6. Treat `3a687bc` as the recovery anchor while later verified commits build on it.
 7. After changes touching page loading, auth gating, script order, or global observers, verify public deployment before stacking more changes.
 8. Prefer modifying the owning module instead of adding observers/patch layers; compatibility patches should eventually be folded into the owner when safe.
 9. For solution UI, avoid duplicate answers, duplicate instructions, or redundant controls.
-10. State commit SHA(s) after changes so the next chat can anchor to exact repo state.
+10. Learn basics must remain generic enough that opening it does not materially reveal the active problem's solution.
+11. State commit SHA(s) after changes so the next chat can anchor to exact repo state.

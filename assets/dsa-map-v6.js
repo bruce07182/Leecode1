@@ -35,7 +35,7 @@
   };
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const hasConcept=(i,name)=>aliases[qs[i].category]===name||(extraTags[i]||[]).includes(name);
-  const idsFor=name=>qs.map((q,i)=>modeAllows(i)&&hasConcept(i,name)?i:-1).filter(i=>i>=0);
+  const idsFor=name=>qs.map((q,i)=>hasConcept(i,name)?i:-1).filter(i=>i>=0);
   const state=name=>{const ids=idsFor(name);if(!ids.length)return'lockedConcept';if(ids.every(i=>masteryOf(i)==='Mastered'))return'mastered';if(ids.some(i=>completed(i)))return'learning';if(ids.some(i=>unlocked(i)))return'available';return'lockedConcept'};
   const relationsFor=name=>[...new Set([...related,...dsRelated].filter(([a,b])=>a===name||b===name).map(([a,b])=>a===name?b:a))];
   const sharedLessons=name=>{const dsa=window.DSA_LEVEL3||[];return (lessonGroups[name]||[]).map(title=>dsa.find(x=>x.t===title)).filter(Boolean);};

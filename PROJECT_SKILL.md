@@ -172,7 +172,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
 - `assets/menu-controller.js` — single owner of top-right menu presentation/actions and account state.
-- `leetcode.html` + `assets/leetcode-practice.js` — separate LeetCode practice surface; uses the same Supabase account/table but reserved `problem_id` values 10001–10999.
+- `leetcode.html` + `assets/leetcode-practice.js` — separate LeetCode practice surface; uses the same Supabase account/table. The official LeetCode number is the stable practice identity; cloud storage uses `100000 + LeetCode number`.
 - `assets/collapse-fix.js` — single owner of top-level card collapse behavior.
 - `assets/page-init.js` — startup/auth visibility initialization.
 
@@ -221,7 +221,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 ### Separate LeetCode practice
 - LeetCode practice lives on `leetcode.html`, separate from the 37 foundation questions. Do not append LeetCode problems to foundation `qs[]`.
-- Foundation IDs `0–36` are immutable. Reserve `problem_id` `10001–10999` for LeetCode practice so the same `solutions` table can persist code, attempts, complexity, and timestamps without collisions.
+- Foundation IDs `0–36` are immutable. Use the official LeetCode number as the practice identity. In the shared `solutions` table store `100000 + LeetCode number`, keeping Foundation IDs separate and making future additions independent of catalog order.
 - The LeetCode page may reuse the same Supabase auth/session and `solutions` schema, but its localStorage keys use an `lc_` prefix.
 - Foundation Admin totals/viewer must filter to foundation IDs. A dedicated LeetCode admin view can be added later without mixing denominators or question catalogs.
 - The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.

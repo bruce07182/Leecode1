@@ -1,8 +1,10 @@
-// LeetCode Bridge: a small curated next step above Foundations.
-// Uses existing solved question state only; no new DB tables or progress model.
+// LeetCode Bridge: curated next step above Foundations.
+// Lives inside the DSA map card and reuses existing solved state; no new DB tables.
 (()=>{
   const mapCard=document.getElementById('mapCard');
   if(!mapCard)return;
+  const body=mapCard.querySelector('.collapsibleBody');
+  if(!body)return;
   const solved=i=>{
     const q=document.getElementById('q'); if(!q)return false;
     const opt=Array.from(q.options).find(o=>Number(o.value)===i)||q.options[i];
@@ -25,17 +27,23 @@
     {n:78,title:'Subsets',difficulty:'Medium',skills:'Backtracking',req:[32],url:'https://leetcode.com/problems/subsets/'},
     {n:70,title:'Climbing Stairs',difficulty:'Easy',skills:'1-D DP',req:[33],url:'https://leetcode.com/problems/climbing-stairs/'}
   ];
-  const card=document.createElement('div'); card.id='bridgeCard'; card.className='card';
-  card.innerHTML='<div class="sectionHead"><b>Path to LeetCode</b><button type="button" class="collapseBtn" data-collapse="bridgeCard">Collapse</button></div><div class="collapsibleBody"><div class="status">Foundations → patterns → selected LeetCode → mixed practice → interview</div><div id="bridgeList" class="questionList"></div></div>';
-  mapCard.insertAdjacentElement('afterend',card);
+  const section=document.createElement('div');
+  section.id='bridgeSection';
+  section.innerHTML='<div class="sectionHead" style="margin-top:14px"><b>Next · LeetCode</b><button type="button" id="bridgeToggle" class="collapseBtn">Show</button></div><div id="bridgeBody" style="display:none"><div class="status" id="bridgeProgress"></div><div id="bridgeList" class="questionList"></div></div>';
+  body.appendChild(section);
+  const bridgeBody=section.querySelector('#bridgeBody'),toggle=section.querySelector('#bridgeToggle');
+  let open=localStorage.getItem('bb_bridge_open')==='1';
+  function setOpen(v){open=v;bridgeBody.style.display=open?'block':'none';toggle.textContent=open?'Hide':'Show';localStorage.setItem('bb_bridge_open',open?'1':'0');}
+  toggle.onclick=()=>setOpen(!open);
   function render(){
-    const list=document.getElementById('bridgeList'); if(!list)return;
+    const list=section.querySelector('#bridgeList'),progress=section.querySelector('#bridgeProgress'); if(!list||!progress)return;
+    const readyCount=items.filter(x=>x.req.every(solved)).length;
+    progress.textContent=`Foundation readiness: ${readyCount}/${items.length} LeetCode problems ready · Foundations → LeetCode → mixed practice → interview`;
     list.innerHTML=items.map(x=>{
-      const missing=x.req.filter(i=>!solved(i)); const ready=!missing.length;
-      const state=ready?'Ready':'Build foundations first';
-      return `<div class="bridgeItem" style="margin:8px 0;padding:10px;border:1px solid var(--border,#ddd);border-radius:10px"><div><b>LC ${x.n} · ${x.title}</b> <span class="status">${x.difficulty}</span></div><div class="status">${x.skills} · ${state}</div>${ready?`<a href="${x.url}" target="_blank" rel="noopener">Open on LeetCode ↗</a>`:'<span class="status">Finish the related foundation exercises to unlock.</span>'}</div>`;
+      const ready=x.req.every(solved);
+      return `<div class="bridgeItem" style="margin:8px 0;padding:10px;border:1px solid var(--border,#ddd);border-radius:10px"><div><b>LC ${x.n} · ${x.title}</b> <span class="status">${x.difficulty}</span></div><div class="status">${x.skills} · ${ready?'Ready':'Build foundations first'}</div>${ready?`<a href="${x.url}" target="_blank" rel="noopener">Open on LeetCode ↗</a>`:'<span class="status">Complete the related foundation exercises to unlock.</span>'}</div>`;
     }).join('');
   }
-  render();
+  setOpen(open); render();
   document.addEventListener('click',e=>{if(e.target&&e.target.id==='runBtn')setTimeout(render,500);});
 })();

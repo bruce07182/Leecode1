@@ -15,6 +15,8 @@
 
   const openQuestion=i=>{
     if(i==null) return;
+    groupSel.value=questionGroup(i);
+    refreshOptions();
     sel.value=String(i);
     load();
     if(typeof loadCloud==='function') loadCloud();

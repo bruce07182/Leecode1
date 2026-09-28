@@ -29,6 +29,13 @@ L(2,'Useful idioms','Only a few concise forms are worth knowing early.','best = 
 const levelInfo={0:'Essentials · 5 topics · learn enough Python to start coding.',1:'Core · everyday Python used repeatedly in DSA.',2:'DSA Python · useful tools and idioms for algorithm problems.'};
 let level=+(localStorage.getItem('py_level')||0),current=0,pyodide=null;
 const dom=new Map(),$=id=>dom.get(id)||(dom.set(id,document.getElementById(id)),dom.get(id)),esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function registerSharedDSA(){
+  const shared=window.DSATraining;
+  if(!shared)return;
+  if(!lessons.some(x=>x.level===3))lessons.push(...shared.lessons);
+  levelInfo[3]=shared.levelInfo;
+}
+registerSharedDSA();
 const visible=()=>lessons.filter(x=>x.level===level);
 const doneKey=(l,i)=>`py_done_${l}_${i}`;
 function renderTopics(){const a=visible();$('pyTopics').innerHTML=a.map((x,i)=>`<button data-i="${i}" class="${i===current?'active ':''}${localStorage.getItem(doneKey(level,i))?'done':''}">${i+1}. ${x.t}</button>`).join('');$('pyTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});document.querySelectorAll('#levelBar button').forEach(b=>b.classList.toggle('active',+b.dataset.level===level));$('levelDesc').textContent=levelInfo[level]||'Implement core data structures and algorithms in Python.';}

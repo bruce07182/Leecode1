@@ -1,6 +1,6 @@
 # LeetCode Foundations — Project Continuation Skill
 
-Updated: 2026-09-27
+Updated: 2026-09-28
 
 ## Project
 - Repo: `bruce07182/Leecode1`; public site is Cloudflare Pages (`leecode1.pages.dev`).
@@ -9,138 +9,164 @@ Updated: 2026-09-27
 
 ## Critical recovery / deployment note
 - `3a687bc600d7d484fe01c7efd5eff789fb6abd3d` is the confirmed recovery anchor after a blank-screen regression.
-- Batch UI/accessibility changes previously caused both Cloudflare Pages and GitHub Pages to blank/hang. Rolling back restored Cloudflare immediately.
-- Broken/reverted work is preserved on backup branches; do not reintroduce large UI batches wholesale.
-- UI improvements must be small, isolated commits and must not alter the critical startup/auth path unless necessary.
-- Never let cosmetic/accessibility enhancements block app initialization or leave `auth-locked` as a permanent blank screen if startup fails.
-- Keep application behavior in separate JS/CSS files rather than growing inline behavior in `index.html`.
-- After startup/auth/script-order changes, verify the deployed page loads before continuing.
+- Large UI/accessibility batches previously caused both Cloudflare Pages and GitHub Pages to blank/hang. Make small isolated commits and do not alter startup/auth unless necessary.
+- Never let cosmetic enhancements block initialization or leave `auth-locked` permanently blank.
+- Keep behavior in separate JS/CSS modules rather than growing inline code in `index.html`.
+- After startup/auth/script-order changes, verify the deployed page before stacking more changes.
 
 ## Teaching architecture: ONE Level 3, THREE views
-There is one shared Level 3 curriculum/source of truth: `assets/python-dsa.js` (`window.DSA_LEVEL3`).
-
-It feeds:
+There is one shared Level 3 curriculum/source of truth: `assets/python-dsa.js` (`window.DSA_LEVEL3`). It feeds:
 1. Python Training Level 3 — lesson + runnable practice/editor.
-2. DSA Map — same teaching content read-only, plus map context/related questions; no second practice editor.
-3. Main-question **Learn basics** — reuse the same relevant Level 3 teaching instead of maintaining another explanation.
+2. DSA Map — same content read-only plus map context/related questions.
+3. Main-question Learn basics — reuse the same relevant Level 3 teaching.
 
-Adapters/renderers must not become second curricula. Do not duplicate Level 3 explanations in map/Learn Basics files.
-
-`assets/curriculum-clarity-v9.js` currently applies small curriculum refinements after `python-dsa.js`; keep such overrides narrow and eventually fold stable content back into the source of truth when safe.
+Adapters/renderers must not become second curricula. `assets/curriculum-clarity-v9.js` may make narrow refinements; fold stable content back into the source of truth when safe.
 
 ## Core teaching rule: CONCRETE FIRST
-The learner should not have to understand CS terminology in order to understand the question.
-
 Preferred sequence:
-**Concrete problem → tiny example → visual/state → discover the pattern → name/explain the DSA concept → Python implementation → complexity.**
+**Concrete problem → tiny example → visual/state → discover pattern → name/explain DSA concept → Python implementation → complexity.**
 
-Rules:
-- Problem statements should describe the task in ordinary language first.
-- Do not put implementation strategy or unexplained terminology into a beginner problem statement unless the strategy itself is what is being tested.
-- Introduce terms such as dynamic programming, recurrence, adjacency list, heap invariant, etc. in the teaching material after the learner understands the concrete situation.
-- Use a tiny worked example before general formulas.
-- Explain *why* a formula/operation works, not only what to type.
-- Questions should test the concept, not the learner's ability to decode CS vocabulary.
-- Keep examples realistic enough to expose common mistakes; tests should include boundary/non-default cases rather than only the easiest case.
+- Problem statements use ordinary language first.
+- Do not require unexplained CS terminology to understand a beginner problem.
+- Use tiny worked examples before formulas.
+- Explain why an operation/formula works, not only what to type.
+- Questions test the concept, not vocabulary decoding.
+- Tests include boundary/non-default cases.
+- Built-ins are allowed, but when a shortcut hides an important DSA pattern, teach both.
 
-### DP example / standard
-Do **not** start with wording like “use a 1-D dynamic-programming array where each position stores...” for a first DP problem.
-
-Start with the staircase:
-- There are `n` steps.
-- Each move can climb 1 or 2 steps.
-- Ask how many different ways reach the top.
-- For `n=3`, explicitly show `1+1+1`, `1+2`, `2+1`.
-- Then show that reaching step `i` must come from `i-1` or `i-2`, so `ways[i] = ways[i-1] + ways[i-2]`.
-- Only then explain that storing/reusing those smaller answers is dynamic programming and that `dp` is simply a conventional variable name.
+### DP standard
+For first DP exposure, start with the staircase problem and concrete sequences. Explain that reaching step `i` comes from `i-1` or `i-2`, then derive `ways[i] = ways[i-1] + ways[i-2]`. Only afterward name dynamic programming and explain `dp` as a conventional variable name.
 
 ## Current Level 3
-Shared lessons/practice cover:
-- Array patterns
-- Linked list
-- Stack
-- Queue
-- Hash map & set
-- Binary tree
-- Heap / priority queue
-- Graph representation
-- DFS
-- BFS
-- Binary search
-- Two pointers
-- Sliding window
-- Recursion & backtracking
-- Dynamic programming
+Shared lessons/practice cover arrays, linked lists, stacks, queues, hash map/set, binary trees, heaps, graph representation, DFS, BFS, binary search, two pointers, sliding window, recursion/backtracking, and dynamic programming.
 
 ## Professional visual system
-- `assets/dsa-visuals.js` upgrades Level 3 `pre.dsDiagram` placeholders into responsive SVG teaching visuals.
-- Visuals are presentation only; curriculum stays in shared Level 3 data.
+`assets/dsa-visuals.js` upgrades Level 3 placeholders into responsive SVG teaching visuals.
 
-### Visual semantics — important
-- Array: contiguous adjacent indexed cells. **Never draw pointer/edge lines between array elements.** Adjacency is enough.
-- Linked list: explicit links/pointers between nodes.
-- Tree/graph: edges represent actual structural relationships.
-- Stack/queue: show ordering and operation direction, not fake pointers.
-- Two pointers: pointers/index markers may move over an array; they are indexes, not links between cells.
-- Sliding window: highlight one contiguous range; show entering/leaving movement.
-- Binary search: show active search range/middle and discarded half.
-- DFS/BFS/backtracking: edges are structural/search relationships; use state highlighting to explain traversal.
-- DP: show stored states and recurrence/dependency without implying linked-list pointers.
+Visual semantics:
+- Array = contiguous adjacent indexed cells; never draw pointer/edge lines between elements.
+- Linked list = explicit links/pointers between nodes.
+- Tree/graph edges represent actual structure.
+- Stack/queue show ordering and operation direction, not fake pointers.
+- Two-pointer markers are indexes over an array/string, not links.
+- Sliding window highlights one contiguous range and entering/leaving movement.
+- Binary search shows active range/middle/discarded half.
+- DP shows stored states/dependencies without fake linked-list pointers.
 - Prefer clean SVG/state diagrams over ASCII art.
 
 ## Main UX requirements
-- Login is required before exposing main app content; Supabase handles auth/cloud progress.
-- Preserve cross-device progress and complexity/O() persistence.
-- Main cards: How to solve a problem, DSA map, Progress; keep collapsible/mobile-friendly.
-- Run belongs with the editor and result should be immediately visible.
-- Learn basics / Hint / Answer should toggle.
-- DSA map should stay compact, default without a web of connection lines; click a concept to focus details.
-- DSA detail is read-only teaching; no duplicate editor and no redundant old/ASCII teaching when shared Level 3 content exists.
-- Do not label shared content “Python · Level 3” in DSA details; present the lesson naturally.
-- Mobile DSA detail should be vertically scrollable with an accessible close control.
-- Reset code is destructive: keep it visually separated from frequently used controls.
-- Complexity controls should be compact; once correct, hide selectors/check controls and show only a small finished state such as `✓ Time O(n) · Space O(1)`.
-- Admin access only for `bruce0421@gmail.com`; inspect current Supabase RPC/schema before changing admin.
+- Login required before main app content; Supabase handles auth/cloud progress.
+- Preserve cross-device code, attempts, progress, and complexity/O() persistence.
+- Main cards: How to solve a problem, DSA map, Progress; mobile-friendly/collapsible.
+- Run belongs with editor; result immediately visible.
+- Learn basics / Hint / Answer toggle without clutter.
+- DSA map stays compact; click a concept for details.
+- DSA detail is read-only teaching; no duplicate editor or redundant ASCII lesson.
+- Complexity controls stay compact; once correct show a finished state such as `✓ Time O(n) · Space O(1)`.
+- Admin only for `bruce0421@gmail.com`; inspect Supabase schema/RPC before admin changes.
+
+## Completed-solution editor behavior
+- After a successful test run, the learner's code becomes **read-only** to prevent accidental edits.
+- The existing **▶ Run** button becomes **✏️ Edit** while locked.
+- Clicking Edit unlocks the same editor and changes the button back to Run.
+- Running successfully again locks it again.
+- Do not add a separate Edit button.
+- The old visible **Reset code** control was removed because the editor itself can be modified when the learner wants to try another approach.
+- `assets/editor-lock.js` owns this protection behavior.
+- `assets/run-binding-fix.js` currently restores the Run binding because legacy `app.js` still references the removed `resetBtn`; this is compatibility debt to clean up safely later rather than risking a large core rewrite.
+- Every completed Run should append an entry to Attempts and cloud-sync it. If Attempts stops changing, inspect Run binding/startup errors first.
+
+## Multiple-solution / Answer design
+The Answer area is now a **solution comparison browser**, not one canonical answer followed by duplicates.
+
+Rules:
+- When a question has multiple useful solutions, show them in one table: **Approach | Time | Space | Main lesson**.
+- The table row itself is clickable. Clicking a row reveals that solution's code directly under the row; clicking another row switches the open solution.
+- Do not render a separate sample solution above or another expandable solution list below the table.
+- Keep table guidance minimal: **“Tap a solution to view its code.”** Do not repeat generic practice instructions under every table.
+- Important complexity qualifications belong with the expanded solution, not cryptic `*` / `**` footnotes.
+- Do not use unexplained asterisks in O() cells.
+
+### Recommendations
+- Mark the reusable interview/DSA approach as **★ Recommended · DSA**.
+- Mark concise language-specific shortcuts as **Pythonic** where useful.
+- If the preferred DSA approach is not yet unlocked, a simpler currently understood method may be **★ Recommended for now**.
+- Recommendation is educational, not merely shortest-code preference.
+- Example: Reverse String can initially recommend slicing “for now”; after Two Pointers is learned, Two Pointers becomes the DSA recommendation while slicing remains Pythonic.
+
+### Progressive reveal
+- Do not overwhelm beginners with every sophisticated approach immediately.
+- Reveal approaches as prerequisite concepts are learned/solved.
+- The same question can become richer later without changing the original problem.
+- `assets/progressive-solutions-v1.js` contains the first progressive solution library.
+- `assets/progressive-solutions-extra.js` extends the comparison pattern to additional core questions.
+
+### Reverse String reference design
+Useful approaches include Python slicing, direct string construction, list + join, two pointers, `reversed()` + join, stack, and recursion. Only show approaches appropriate to current prerequisites.
+- Python strings are immutable, so the current string→list→two-pointer→join implementation uses O(n) extra space.
+- If input is already a mutable character array, two-pointer swaps themselves use O(1) auxiliary space.
+- Repeated immutable string construction can be O(n²); explain why in the expanded solution rather than using a footnote.
+
+### Questions already expanded / good candidates
+Multi-solution comparison has been applied to examples including Find Maximum, Reverse String, Frequency Map, Contains Duplicate, Stack Basics, Palindrome, Lower Bound/Search Insert, K Largest, Climbing Stairs, Sliding Window, Linked List Traversal, Heap Basics, Two Sum, Binary Search, Tree Max Depth, Tree Level Order, and Subsets. Continue the pattern where alternatives teach a meaningful tradeoff; do not manufacture alternatives just to fill a table.
+
+## Practicing another approach
+- Do **not** add a special “Try this approach” button or a second editor.
+- After reviewing the comparison table, the learner can click **Edit**, modify the existing code, and Run the same tests again.
+- Keep this workflow implicit/simple rather than repeating instructions under every solution table.
+- Multiple successful attempts can naturally represent practicing multiple implementations; separate “approach mastery” tracking may be considered later only if it provides clear value.
+
+## C++ direction — later, optional
+- Python remains the primary learning/implementation language for now.
+- Do not build a parallel full C++ curriculum yet.
+- First deepen alternate approaches in Python.
+- Later, selected algorithms may offer an optional **Python | C++** view where C++ materially clarifies the underlying structure (vectors/mutable arrays, references, pointers/linked lists, stacks/queues, trees, heaps).
+- Teach a small C++ prerequisite set first: `vector`, indexing, loops, references, `string`, basic function syntax.
+- C++ should demonstrate that the algorithm is language-independent, not force the learner to learn two new things simultaneously.
 
 ## Curriculum principles
 1. Foundations → combinations → LeetCode-style problems.
 2. Teach only Python useful for DSA.
 3. Concrete problem before abstraction/terminology.
-4. Prefer code and tiny worked examples to dense prose.
+4. Prefer code + tiny worked examples over dense prose.
 5. Explain a concept when first introduced; later lessons focus on what is new.
 6. Python list is the practical array; clarify conceptual array vs dynamic list only when useful.
 7. Hash concept first, then set vs map/dict.
-8. Built-ins are allowed, but teach the underlying algorithm when a shortcut hides it.
+8. Built-ins are allowed; teach the underlying algorithm when the shortcut hides it.
 9. Keep Time/Space complexity easy to scan.
-10. Use diagrams when they materially improve understanding.
-11. Practice should be runnable with meaningful validation, not placeholder answers/tests.
-12. Test cases should catch common wrong assumptions (for example binary-search midpoint tests must include non-zero `left`, not only `left=0`).
-13. For Python binary search, teach `(left + right) // 2` first; explain that `//` chooses the lower middle when there are two center indexes and that the overflow-avoiding alternative is mainly relevant to fixed-width integer languages.
+10. Use diagrams only when they materially improve understanding.
+11. Practice must be runnable with meaningful validation.
+12. Tests catch common wrong assumptions.
+13. Python binary search teaches `(left + right) // 2` first; fixed-width overflow alternatives are secondary.
+14. Prefer fewer clear controls over redundant workflow buttons.
+15. Protect completed work from accidental editing without making intentional revision difficult.
 
 ## Important files
-- `index.html` — main HTML structure and script loading; keep behavior out of inline code.
+- `index.html` — main shell/script loading; behavior should stay out of inline code.
 - `python.html` — Python Training shell.
-- `assets/page-init.js` — page/startup/auth initialization.
-- `assets/site-shell.css` — shell/page styling moved out of index.
-- `assets/app.js`, `assets/ui-v2.js` — core/UI behavior.
-- `assets/app.css`, `assets/dsa-visuals.css` — shared/visual styling.
-- `assets/python-basics.js` — Python curriculum below Level 3.
+- `assets/app.js` — core questions/tests/progress behavior; currently contains legacy reset binding debt.
+- `assets/run-binding-fix.js` — compatibility Run binding after Reset removal.
+- `assets/editor-lock.js` — read-only-after-pass / Run↔Edit behavior.
+- `assets/ui-v2.js` — UI behavior.
+- `assets/python-basics.js` — curriculum below Level 3.
 - `assets/python-dsa.js` — shared Level 3 source of truth.
-- `assets/curriculum-clarity-v9.js` — narrow concrete-first curriculum refinements.
-- `assets/dsa-teaching-details.js` — supplemental teaching details; avoid duplicating the source curriculum.
-- `assets/dsa-map-v6.js` — map/focus UI.
-- `assets/dsa-python-link-v7.js` — shared-Level-3 map adapter.
-- `assets/shared-learning-v8.js` — shares Level 3 teaching into main-question Learn Basics.
-- `assets/progress-ui-v8.js` — complexity/completion presentation behavior.
-- `assets/dsa-visuals.js` — professional SVG rendering.
+- `assets/curriculum-clarity-v9.js` — narrow concrete-first refinements.
+- `assets/progressive-solutions-v1.js` — progressive multi-solution tables/recommendations.
+- `assets/progressive-solutions-extra.js` — additional multi-solution questions.
+- `assets/dsa-teaching-details.js` — supplemental teaching details; avoid curriculum duplication.
+- `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js`, `assets/shared-learning-v8.js` — shared Level 3 adapters/views.
+- `assets/progress-ui-v8.js` — complexity/completion presentation.
+- `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
+- `assets/page-init.js` — startup/auth initialization.
 
 ## Safe workflow for future changes
 1. Read this file first.
-2. Inspect current repo and fetch latest SHA before every edited file.
+2. Inspect current repo and fetch latest SHA before editing.
 3. Preserve one-Level-3/three-view architecture.
-4. Make small commits, especially for startup/auth/UI changes.
+4. Make small commits, especially startup/auth/UI changes.
 5. Do not mix unrelated UI/auth/deployment changes with curriculum changes.
-6. Treat `3a687bc` as the recovery anchor for the confirmed-working deployment, while later verified changes build on it.
-7. After any change that touches page loading, auth gating, script order, or global observers, verify the public deployment before stacking more changes.
-8. Prefer modifying the owning curriculum/UI module instead of adding DOM observers or patch layers.
-9. State commit SHA(s) after changes so the next chat can anchor to exact repo state.
+6. Treat `3a687bc` as the recovery anchor while later verified commits build on it.
+7. After changes touching page loading, auth gating, script order, or global observers, verify public deployment before stacking more changes.
+8. Prefer modifying the owning module instead of adding observers/patch layers; compatibility patches should eventually be folded into the owner when safe.
+9. For solution UI, avoid duplicate answers, duplicate instructions, or redundant controls.
+10. State commit SHA(s) after changes so the next chat can anchor to exact repo state.

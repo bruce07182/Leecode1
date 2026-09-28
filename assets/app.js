@@ -119,11 +119,7 @@ document.getElementById("signupBtn").onclick=async()=>{const {email,password}=cr
 document.getElementById("forgotBtn").onclick=async()=>{let email=document.getElementById("email").value.trim();if(!email&&user)email=user.email;if(!email){document.getElementById("authCard").classList.remove("hidden");out.textContent="Enter your email first.";return}const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});out.textContent=error?"Reset error: "+error.message:"Password reset email sent."}
 document.getElementById("logoutBtn").onclick=()=>db.auth.signOut();
 db.auth.getSession().then(({data})=>{const u=data.session?.user||null;setUser(u)});db.auth.onAuthStateChange(async(e,session)=>{if(e==="PASSWORD_RECOVERY"){const p=prompt("Enter a new password (at least 6 characters):");if(p&&p.length>=6){const {error}=await db.auth.updateUser({password:p});out.textContent=error?"Password update failed: "+error.message:"Password updated."}}setUser(session?.user||null)});
-code.addEventListener("keydown",e=>{
- const start=code.selectionStart,end=code.selectionEnd,v=code.value;
- if(e.key==="Tab"){e.preventDefault();if(e.shiftKey){const ls=v.lastIndexOf("\n",start-1)+1;const before=v.slice(ls,start);const n=before.startsWith("    ")?4:before.startsWith("\t")?1:0;if(n){code.value=v.slice(0,ls)+v.slice(ls+n);code.selectionStart=code.selectionEnd=start-n}}else{code.setRangeText("    ",start,end,"end")}code.dispatchEvent(new Event("input"));return}
- if(e.key==="Enter"){e.preventDefault();const ls=v.lastIndexOf("\n",start-1)+1,line=v.slice(ls,start),indent=(line.match(/^\s*/)||[""])[0];const extra=line.trimEnd().endsWith(":")?"    ":"";code.setRangeText("\n"+indent+extra,start,end,"end");code.dispatchEvent(new Event("input"))}
-});
+window.attachPythonEditor?.(code);
 loadPyodide().then(x=>{py=x;out.textContent="Ready."}).catch(e=>out.textContent="Could not load Python: "+e);
 function lessonVisual(x){
  const c=x.category;

@@ -194,12 +194,12 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Removed the deleted Reset-button binding from `app.js`; Run now binds directly in core, so `assets/run-binding-fix.js` was deleted.
 - Removed old menu event ownership from `app.js`; `assets/menu-controller.js` is the single menu owner.
 - Deleted `assets/progress-compat.js` and removed the old `assets/lesson-links-v5.js` observer. Learn basics should stay a tiny shared concept lesson, not accumulate question-specific references.
-- The obsolete Mode control and all Mode-dependent filtering were removed. The foundation question picker directly exposes Basics and Combinations; DSA-map navigation must switch the visible group before selecting the unchanged original question ID.
+- The obsolete Mode control, hidden compatibility input, `modeAllows` stub, and all Mode-dependent filtering were removed. The foundation question picker directly exposes Basics and Combinations; DSA-map navigation must switch the visible group before selecting the unchanged original question ID.
 - Supabase session state is authoritative for signed-in/signed-out UI. Do not infer login state from local progress.
 - Single-topic teaching should come from the shared curriculum (`window.DSA_LEVEL3` / Python curriculum). Grouped top-level DSA topics exist to compare related concepts, not to create duplicate single-topic lessons.
 - Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.
 - Current interaction ownership after audit: `app.js` owns Run/auth/cloud/state; `ui-v2.js` owns Hint and the fallback single-answer presentation; `shared-learning-v8.js` owns Learn basics; progressive-solution modules enhance Answer tables; `menu-controller.js` owns the menu; `collapse-fix.js` owns top-level collapse.
-- Repository asset audit: every remaining file under `assets/` is loaded by `index.html` or `python.html`; obsolete `progress-compat.js`, `run-binding-fix.js`, and `lesson-links-v5.js` were deleted.
+- Repository asset audit: live assets are loaded by `index.html`, `python.html`, or `leetcode.html`. Obsolete compatibility assets and the old embedded `leetcode-bridge.js` were deleted.
 
 ### Complexity UI ownership
 - `assets/app.js` is the single owner of the main-question complexity picker/checker and persisted complexity display.
@@ -232,3 +232,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - All runnable Python textareas must use `assets/python-editor.js`; do not copy keydown/indentation logic into individual screens.
 - Keep Python editing consistent across Foundations, Python Training, and LeetCode Practice. Tab inserts four spaces; Shift+Tab unindents; Enter preserves current indentation and adds one level after a line ending in `:`.
 - Disable mobile autocorrect/autocapitalize where practical so code is not silently rewritten.
+
+## 2026-09-28 final cleanup audit
+- Removed the obsolete embedded LeetCode bridge; LeetCode Practice is owned only by `leetcode.html` + `assets/leetcode-practice.js`.
+- Removed the old manual refactor workflow, `tools/refactor_index.py`, and stale `dist/index.html`; they only inlined the original app CSS/JS and did not represent the current multi-page runtime.
+- Removed the final hidden Mode input and no-op Mode compatibility function.
+- Simplified duplicate menu auth-session branching without changing auth behavior.
+- Kept curriculum and progressive-answer overlays that still mutate live lesson/answer data; they are not dead code. Do not merge modules merely to reduce file count when their load order or ownership is behaviorally meaningful.

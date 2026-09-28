@@ -5,10 +5,10 @@
   if(typeof previousRender!=='function') return;
 
   const nextRecommended=()=>{
-    const allowed=qs.map((q,i)=>modeAllows(i)?i:-1).filter(i=>i>=0);
+    const allowed=qs.map((q,i)=>i);
     // Prefer an unlocked, unfinished question whose dependencies are already complete.
     let i=allowed.find(i=>!completed(i)&&unlocked(i));
-    // Defensive fallback: first unfinished question in the current mode.
+    // Defensive fallback: first unfinished foundation question.
     if(i==null) i=allowed.find(i=>!completed(i));
     return i==null?null:i;
   };

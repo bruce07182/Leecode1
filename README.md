@@ -1,6 +1,6 @@
 # LeetCode Foundations
 
-A browser-based Python + DSA trainer that builds fundamentals first, then combinations and LeetCode-style patterns.
+A browser-based Python + DSA trainer that builds fundamentals first, then combinations; LeetCode-style practice comes later.
 
 ## Structure
 - `index.html` — main DSA practice app.

@@ -245,3 +245,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/python-editor.js` owns coding-textarea browser settings as well as indentation: spellcheck off, autocapitalize off, autocorrect off, autocomplete off. Individual pages should not duplicate these attributes.
 - Repeated DOM lookup helpers on self-contained screens may cache stable elements; do not cache elements that are intentionally replaced at runtime.
 - Cloud code saves remain debounced; preserve immediate localStorage writes so typing is never dependent on the network.
+
+## Startup architecture hardening
+- Shared DSA curriculum is self-contained in `assets/python-dsa.js` and publishes one explicit namespace: `window.DSATraining = { lessons, levelInfo }`.
+- Do not create prerequisite globals such as `L`, `lessons`, or `levelInfo` in a separate bootstrap file. A feature module must either own its data or consume an explicit namespace/API.
+- `python-dsa.js` emits `dsa-training-ready`; Python Training registers shared Level-3 data through that explicit event, so its startup is safe whether the consumer loads before or after the shared curriculum.
+- Foundations presentation modules may read `window.DSATraining` (or temporary `window.DSA_LEVEL3` compatibility) but must not require undeclared global identifiers to exist.
+- Prefer startup modules that fail locally and visibly. Avoid architectures where deleting/reordering one unrelated script can stop the whole page before UI initialization.

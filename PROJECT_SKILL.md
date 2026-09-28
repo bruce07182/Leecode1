@@ -87,7 +87,6 @@ Visual semantics:
 - Do not add a separate Edit button.
 - The old visible **Reset code** control was removed because the editor itself can be modified when the learner wants to try another approach.
 - `assets/editor-lock.js` owns this protection behavior.
-- `assets/run-binding-fix.js` currently restores the Run binding because legacy `app.js` still references the removed `resetBtn`; this is compatibility debt to clean up safely later rather than risking a large core rewrite.
 - Every completed Run should append an entry to Attempts and cloud-sync it. If Attempts stops changing, inspect Run binding/startup errors first.
 
 ## Multiple-solution / Answer design
@@ -159,8 +158,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 ## Important files
 - `index.html` — main shell/script loading; behavior should stay out of inline code.
 - `python.html` — Python Training shell.
-- `assets/app.js` — core questions/tests/progress behavior; currently contains legacy reset binding debt.
-- `assets/run-binding-fix.js` — compatibility Run binding after Reset removal.
+- `assets/app.js` — core questions, tests, auth/cloud sync, attempts, complexity, and question selection. Obsolete Reset, old Progress dashboard, and menu ownership were removed in the 2026-09-28 cleanup.
 - `assets/editor-lock.js` — read-only-after-pass / Run↔Edit behavior.
 - `assets/ui-v2.js` — UI behavior.
 - `assets/python-basics.js` — shared Python curriculum below Level 3.
@@ -171,9 +169,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/dsa-teaching-details.js` — supplemental full teaching details; Learn basics should not dump these detailed lessons into a question.
 - `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js` — shared DSA views/adapters.
 - `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
-- `assets/progress-ui-v8.js` — complexity/completion presentation.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
-- `assets/page-init.js` — startup/auth initialization.
+- `assets/menu-controller.js` — single owner of top-right menu presentation/actions; default mode is Basics and account state reflects the Supabase session.
+- `assets/collapse-fix.js` — single owner of top-level card collapse behavior.
+- `assets/page-init.js` — startup/auth visibility initialization.
 
 ## Safe workflow for future changes
 1. Read this file first.
@@ -187,3 +186,13 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 9. For solution UI, avoid duplicate answers, duplicate instructions, or redundant controls.
 10. Learn basics must remain generic enough that opening it does not materially reveal the active problem's solution.
 11. State commit SHA(s) after changes so the next chat can anchor to exact repo state.
+
+## 2026-09-28 code audit / ownership cleanup
+- Removed obsolete Progress dashboard rendering and its hidden DOM compatibility placeholders. DSA Map + question status are the progress surface.
+- Removed the deleted Reset-button binding from `app.js`; Run now binds directly in core, so `assets/run-binding-fix.js` was deleted.
+- Removed old menu event ownership from `app.js`; `assets/menu-controller.js` is the single menu owner.
+- Deleted `assets/progress-compat.js` and removed the old `assets/lesson-links-v5.js` observer. Learn basics should stay a tiny shared concept lesson, not accumulate question-specific references.
+- Basics is the default mode on each page load; Basics + combinations remains a user-selectable session mode.
+- Supabase session state is authoritative for signed-in/signed-out UI. Do not infer login state from local progress.
+- Single-topic teaching should come from the shared curriculum (`window.DSA_LEVEL3` / Python curriculum). Grouped top-level DSA topics exist to compare related concepts, not to create duplicate single-topic lessons.
+- Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.

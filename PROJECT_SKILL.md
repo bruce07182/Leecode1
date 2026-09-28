@@ -239,3 +239,9 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Removed the final hidden Mode input and no-op Mode compatibility function.
 - Simplified duplicate menu auth-session branching without changing auth behavior.
 - Kept curriculum and progressive-answer overlays that still mutate live lesson/answer data; they are not dead code. Do not merge modules merely to reduce file count when their load order or ownership is behaviorally meaningful.
+
+## Optimization guidance
+- Optimize hot paths and ownership before file size: avoid duplicate listeners/renders/network writes, but do not minify source or merge behaviorally distinct curriculum modules merely to reduce file count.
+- `assets/python-editor.js` owns coding-textarea browser settings as well as indentation: spellcheck off, autocapitalize off, autocorrect off, autocomplete off. Individual pages should not duplicate these attributes.
+- Repeated DOM lookup helpers on self-contained screens may cache stable elements; do not cache elements that are intentionally replaced at runtime.
+- Cloud code saves remain debounced; preserve immediate localStorage writes so typing is never dependent on the network.

@@ -1,26 +1,24 @@
 // Clean DSA roadmap: grouped map topics, while preserving the full shared Level-3 lessons inside each group.
 (()=>{
-  const DS=['Array, String & Linked List','Set & Map','Stack & Queue','Tree & Graph','Heap'];
+  const DS=['Array, String & Linked List','Set & Map','Stack & Queue','Tree, Graph & Heap'];
   const ALG=['Traversal','Two Pointers','Sorting','Sliding Window','Prefix Sum','Binary Search','Search','Math & Bitwise','DFS / BFS','Divide & Conquer','Greedy','Backtracking','Dynamic Programming'];
-  const aliases={'Traversal':'Traversal','Lists':'Array, String & Linked List','Strings':'Array, String & Linked List','Linked List':'Array, String & Linked List','Hash Map':'Set & Map','Hash Set':'Set & Map','Stack':'Stack & Queue','Queue':'Stack & Queue','Heap':'Heap','Graphs':'Tree & Graph','Trees / DFS':'Tree & Graph','Two Pointers':'Two Pointers','Sorting':'Sorting','Sliding Window':'Sliding Window','Prefix Sum':'Prefix Sum','Binary Search':'Binary Search','Recursion':'DFS / BFS','1-D DP':'Dynamic Programming'};
+  const aliases={'Traversal':'Traversal','Lists':'Array, String & Linked List','Strings':'Array, String & Linked List','Linked List':'Array, String & Linked List','Hash Map':'Set & Map','Hash Set':'Set & Map','Stack':'Stack & Queue','Queue':'Stack & Queue','Heap':'Tree, Graph & Heap','Graphs':'Tree, Graph & Heap','Trees / DFS':'Tree, Graph & Heap','Two Pointers':'Two Pointers','Sorting':'Sorting','Sliding Window':'Sliding Window','Prefix Sum':'Prefix Sum','Binary Search':'Binary Search','Recursion':'DFS / BFS','1-D DP':'Dynamic Programming'};
   const extraTags={0:['Array, String & Linked List'],1:['Array, String & Linked List','Math & Bitwise'],2:['Array, String & Linked List']};
   const lessonGroups={
     'Array, String & Linked List':['Array patterns','Linked list'],
     'Set & Map':['Hash map & set'],
     'Stack & Queue':['Stack','Queue'],
-    'Tree & Graph':['Binary tree','Graph representation'],
-    'Heap':['Heap / priority queue'],
+    'Tree, Graph & Heap':['Binary tree','Graph representation','Heap / priority queue'],
     'Binary Search':['Binary search'],'Two Pointers':['Two pointers'],'Sliding Window':['Sliding window'],
     'DFS / BFS':['DFS','BFS'],'Backtracking':['Recursion & backtracking'],'Dynamic Programming':['Dynamic programming']
   };
-  const related=[['Array, String & Linked List','Traversal'],['Set & Map','Traversal'],['Stack & Queue','Traversal'],['Heap','Traversal'],['Tree & Graph','Traversal'],['Array, String & Linked List','Two Pointers'],['Array, String & Linked List','Sorting'],['Array, String & Linked List','Sliding Window'],['Array, String & Linked List','Prefix Sum'],['Array, String & Linked List','Binary Search'],['Array, String & Linked List','Search'],['Tree & Graph','Search'],['Array, String & Linked List','Math & Bitwise'],['Set & Map','Math & Bitwise'],['Tree & Graph','DFS / BFS'],['Array, String & Linked List','Divide & Conquer'],['Tree & Graph','Divide & Conquer'],['Heap','Greedy'],['Array, String & Linked List','Greedy'],['Tree & Graph','Backtracking'],['Array, String & Linked List','Backtracking'],['Array, String & Linked List','Dynamic Programming'],['Tree & Graph','Dynamic Programming']];
-  const dsRelated=[['Array, String & Linked List','Stack & Queue'],['Array, String & Linked List','Heap'],['Set & Map','Tree & Graph'],['Tree & Graph','Heap']];
+  const related=[['Array, String & Linked List','Traversal'],['Set & Map','Traversal'],['Stack & Queue','Traversal'],['Tree, Graph & Heap','Traversal'],['Array, String & Linked List','Two Pointers'],['Array, String & Linked List','Sorting'],['Array, String & Linked List','Sliding Window'],['Array, String & Linked List','Prefix Sum'],['Array, String & Linked List','Binary Search'],['Array, String & Linked List','Search'],['Tree, Graph & Heap','Search'],['Array, String & Linked List','Math & Bitwise'],['Set & Map','Math & Bitwise'],['Tree, Graph & Heap','DFS / BFS'],['Array, String & Linked List','Divide & Conquer'],['Tree, Graph & Heap','Divide & Conquer'],['Tree, Graph & Heap','Greedy'],['Array, String & Linked List','Greedy'],['Tree, Graph & Heap','Backtracking'],['Array, String & Linked List','Backtracking'],['Array, String & Linked List','Dynamic Programming'],['Tree, Graph & Heap','Dynamic Programming']];
+  const dsRelated=[['Array, String & Linked List','Stack & Queue'],['Set & Map','Tree, Graph & Heap']];
   const quick={
     'Array, String & Linked List':{one:'Three common sequence structures: arrays/lists and strings use indexes; linked lists connect separate nodes with next references.',code:'a = [10, 20, 30]\ns = "cat"\n# linked list: node.val, node.next',diagram:'ARRAY   [10][20][30]\nSTRING  [ c][ a][ t]\nLIST    [10] → [20] → [30] → None'},
     'Set & Map':{one:'A set stores unique values; a map/dict stores key → value pairs. Both commonly use hashing for fast lookup.',code:'seen = {"cat", "dog"}\nage = {"Amy": 20}',diagram:'hashing\n├─ set: value\n└─ map: key → value'},
     'Stack & Queue':{one:'A stack removes the newest item (LIFO); a queue removes the oldest item (FIFO).',code:'stack.append(x); stack.pop()\nq.append(x); q.popleft()',diagram:'STACK: newest → OUT\nQUEUE: OUT ← oldest ... newest ← IN'},
-    'Tree & Graph':{one:'Both represent connected nodes. A tree is hierarchical; a general graph can contain cycles and multiple paths.',code:'tree.left\ntree.right\ng={"A":["B","C"]}',diagram:'TREE        GRAPH\n   A         A ─ B\n  / \\        │\n B   C        C'},
-    'Heap':{one:'A priority structure that keeps the smallest or highest-priority item easy to access.',code:'import heapq\nheapq.heapify(h)',diagram:'    1\n   / \\\n  3   2'},
+    'Tree, Graph & Heap':{one:'These are node-based structures. Trees organize nodes hierarchically; graphs allow general connections; a heap is a tree-shaped priority structure.',code:'tree.left\ng={"A":["B","C"]}\nheapq.heappush(h,x)',diagram:'TREE        GRAPH       HEAP\n   A         A ─ B        1\n  / \\        │          / \\\n B   C        C         3   2'},
     'Traversal':{one:'Visit relevant elements or nodes.',code:'for x in a:\n    print(x)',diagram:'start → visit → visit → end'},
     'Two Pointers':{one:'Use two positions that move through the same sequence.',code:'left, right = 0, len(a)-1',diagram:'L → [ . . . . ] ← R'},
     'Sorting':{one:'Put values into an order so later work becomes easier.',code:'a.sort()',diagram:'3 1 2 → 1 2 3'},

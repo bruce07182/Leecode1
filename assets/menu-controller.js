@@ -11,10 +11,7 @@
     document.getElementById('menuForgot')?.classList.toggle('hidden',!!u);
     document.getElementById('menuSignOut')?.classList.toggle('hidden',!u);
   };
-  // Basics is the product default. Changing mode during this session is still allowed.
-  if(mode&&!mode.dataset.initialized){mode.value='basic';mode.dataset.initialized='1';}
-
-  btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();box.classList.toggle('show');syncChecks();});
+  btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();box.classList.toggle('show');});
   box.addEventListener('click',e=>e.stopPropagation());
   document.addEventListener('click',close);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});

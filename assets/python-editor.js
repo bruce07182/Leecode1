@@ -3,6 +3,10 @@
   window.attachPythonEditor=function(ta){
     if(!ta||ta.dataset.pythonEditor==='1')return;
     ta.dataset.pythonEditor='1';
+    ta.spellcheck=false;
+    ta.setAttribute('autocapitalize','off');
+    ta.setAttribute('autocorrect','off');
+    ta.setAttribute('autocomplete','off');
     ta.addEventListener('keydown',e=>{
       const start=ta.selectionStart,end=ta.selectionEnd,v=ta.value;
       if(e.key==='Tab'){

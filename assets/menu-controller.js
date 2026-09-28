@@ -35,7 +35,7 @@
     if(action==='account') document.getElementById('authCard')?.classList.remove('hidden');
     else if(action==='logout') document.getElementById('logoutBtn')?.click();
     else if(action==='forgot') document.getElementById('forgotBtn')?.click();
-    else if(action==='admin') document.getElementById('adminCard')?.classList.toggle('hidden');
+    else if(action==='admin' && typeof toggleAdmin==='function') toggleAdmin();
     close();
   }));
 

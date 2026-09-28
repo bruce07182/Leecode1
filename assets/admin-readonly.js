@@ -1,84 +1,17 @@
-// Admin read-only viewer.
-// IMPORTANT: this module reads admin_progress only. It never calls localStorage,
-// saveCloud/queueCloud, upsert/update/insert/delete, or changes the signed-in user's training state.
+// Admin read-only user workspace.
+// Reads admin_progress only. Never writes DB/localStorage and never changes auth user.
 (()=>{
-  const card=document.getElementById('adminCard');
-  if(!card) return;
-
-  let cachedRows=[];
-  let selectedKey='';
-
-  const historyOf=row=>Array.isArray(row.history)?row.history:[];
-  const passedRow=row=>historyOf(row).some(a=>a&&a.passed);
-  const keyOf=row=>String(row.email||row.user_id||'Unknown user');
-  const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-
-  function buildViewer(){
-    let viewer=document.getElementById('adminReadOnlyViewer');
-    if(viewer) return viewer;
-    viewer=document.createElement('div');
-    viewer.id='adminReadOnlyViewer';
-    viewer.className='adminReadOnly hidden';
-    viewer.innerHTML='<div class="adminROHead"><div><b>Read-only progress</b><div class="status">Database view only · nothing here changes this user or your local progress.</div></div><button type="button" id="adminROClose">Close</button></div><div id="adminROBody"></div>';
-    card.appendChild(viewer);
-    viewer.querySelector('#adminROClose').onclick=()=>viewer.classList.add('hidden');
-    return viewer;
-  }
-
-  function renderReadOnly(email){
-    const viewer=buildViewer(),body=viewer.querySelector('#adminROBody');
-    const rows=cachedRows.filter(r=>keyOf(r)===email);
-    const byId=new Map(rows.map(r=>[Number(r.problem_id),r]));
-    const passed=new Set(rows.filter(passedRow).map(r=>Number(r.problem_id)));
-    const attempts=rows.reduce((n,r)=>n+historyOf(r).length,0);
-    const last=rows.map(r=>r.updated_at).filter(Boolean).sort().at(-1);
-
-    const problems=qs.map((q,i)=>{
-      const row=byId.get(i),h=row?historyOf(row):[],isPassed=!!row&&passedRow(row);
-      const complexity=row&&row.complexity;
-      return '<div class="adminROProblem '+(isPassed?'adminROPassed':'')+'"><div><b>'+(isPassed?'✓ ':'')+esc(q.title)+'</b><span class="status"> · '+h.length+' attempt'+(h.length===1?'':'s')+'</span></div><div class="status">'+(complexity?'Time O('+esc(complexity.time)+') · Space O('+esc(complexity.space)+')':'O() not confirmed')+(row&&row.updated_at?' · Synced '+new Date(row.updated_at).toLocaleString():'')+'</div></div>';
-    }).join('');
-
-    body.innerHTML='<div class="adminROSummary"><b>'+esc(email)+'</b><div>'+passed.size+'/'+qs.length+' problems passed · '+attempts+' synced attempts</div><div class="status">'+(last?'Last sync: '+new Date(last).toLocaleString():'No sync time')+'</div></div><div class="adminROLegend"><span>✓ Passed</span><span>○ Not passed</span></div><div class="adminROProblems">'+problems+'</div>';
-    viewer.classList.remove('hidden');
-  }
-
-  async function enterReadOnly(){
-    const pick=document.getElementById('adminUserSelect');
-    if(!pick||!pick.value) return;
-    selectedKey=pick.value;
-    const btn=document.getElementById('adminROOpen');
-    if(btn){btn.disabled=true;btn.textContent='Loading…';}
-    const {data,error}=await db.rpc('admin_progress'); // SELECT/read only
-    if(btn){btn.disabled=false;btn.textContent='View read-only';}
-    if(error){
-      const host=document.getElementById('adminUsers');
-      if(host) host.insertAdjacentHTML('afterbegin','<div class="status">Could not load read-only view: '+esc(error.message)+'</div>');
-      return;
-    }
-    cachedRows=data||[];
-    renderReadOnly(selectedKey);
-  }
-
-  function attachControl(){
-    const pick=document.getElementById('adminUserSelect');
-    if(!pick||document.getElementById('adminROOpen')) return;
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.id='adminROOpen';
-    btn.className='adminROOpen';
-    btn.textContent='View read-only';
-    btn.title='Open this user’s database progress without changing their data or your local progress';
-    pick.parentElement.appendChild(btn);
-    btn.onclick=enterReadOnly;
-    pick.addEventListener('change',()=>{
-      selectedKey=pick.value;
-      document.getElementById('adminReadOnlyViewer')?.classList.add('hidden');
-    });
-  }
-
-  // Admin contents are created asynchronously by loadAdminProgress(). Observe only the admin card.
-  const observer=new MutationObserver(attachControl);
-  observer.observe(card,{childList:true,subtree:true});
-  attachControl();
+ const card=document.getElementById('adminCard'); if(!card)return;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const hist=r=>Array.isArray(r?.history)?r.history:[];
+ const key=r=>String(r.email||r.user_id||'Unknown user');
+ const passed=r=>hist(r).some(a=>a?.passed);
+ let rows=[], selected='';
+ function viewer(){let v=document.getElementById('adminReadOnlyViewer');if(v)return v;v=document.createElement('div');v.id='adminReadOnlyViewer';v.className='adminReadOnly hidden';v.innerHTML='<div class="adminROHead"><div><b id="adminROTitle">Read-only user view</b><div class="status">Viewing database data exactly as saved. Nothing can be edited, run, synced, or saved.</div></div><button id="adminROClose" type="button">Back to admin</button></div><div id="adminROSummary"></div><div class="card"><select id="adminROQuestion"></select><p id="adminRODesc"></p><pre id="adminROSig"></pre></div><div class="card"><div class="editorShell"><div class="editorTop"><span>Python · read only</span><span class="status">Run disabled</span></div><textarea id="adminROCode" readonly spellcheck="false"></textarea></div><div id="adminROComplexity" class="afterPass show"></div><div id="adminROProgress" class="status"></div><details class="status" open><summary>Attempts</summary><div id="adminROHistory" class="history"></div></details></div>';card.appendChild(v);v.querySelector('#adminROClose').onclick=()=>v.classList.add('hidden');v.querySelector('#adminROQuestion').onchange=renderQuestion;return v}
+ function selectedRows(){return rows.filter(r=>key(r)===selected)}
+ function renderQuestion(){const v=viewer(),pick=v.querySelector('#adminROQuestion'),i=+pick.value,q=qs[i],r=selectedRows().find(x=>Number(x.problem_id)===i),h=hist(r);v.querySelector('#adminRODesc').textContent=q.desc;v.querySelector('#adminROSig').textContent=q.sig;v.querySelector('#adminROCode').value=r?.code||q.starter||'';const c=r?.complexity;v.querySelector('#adminROComplexity').innerHTML=c?'<b>Complexity</b><div>✓ Time O('+esc(c.time)+') · Space O('+esc(c.space)+')</div>':'<b>Complexity</b><div class="status">Not confirmed</div>';v.querySelector('#adminROProgress').textContent=passed(r)?'✓ Passed':'Not passed';v.querySelector('#adminROHistory').innerHTML=h.length?h.slice().reverse().map(a=>(a?.passed?'✅':'❌')+' '+(a?.time?new Date(a.time).toLocaleString():'time unavailable')+(a?.code?'<details><summary>Code at this run</summary><pre>'+esc(a.code)+'</pre></details>':'')).join('<br>'):'No synced attempts.'}
+ function renderUser(){const v=viewer(),rs=selectedRows(),by=new Map(rs.map(r=>[Number(r.problem_id),r])),p=v.querySelector('#adminROQuestion');v.querySelector('#adminROTitle').textContent='Read-only · '+selected;p.innerHTML='';qs.forEach((q,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(passed(by.get(i))?'✓ ':'')+q.title;p.appendChild(o)});const pass=rs.filter(passed).length,attempts=rs.reduce((n,r)=>n+hist(r).length,0),last=rs.map(r=>r.updated_at).filter(Boolean).sort().at(-1);v.querySelector('#adminROSummary').innerHTML='<div class="adminROSummary"><b>'+esc(selected)+'</b><div>'+pass+'/'+qs.length+' problems passed · '+attempts+' synced attempts</div><div class="status">'+(last?'Last sync: '+new Date(last).toLocaleString():'No sync time')+'</div></div>';const first=qs.findIndex((q,i)=>by.has(i));p.value=String(first>=0?first:0);renderQuestion();v.classList.remove('hidden')}
+ async function enter(){const p=document.getElementById('adminUserSelect');if(!p?.value)return;selected=p.value;const b=document.getElementById('adminROOpen');b.disabled=true;b.textContent='Loading…';const {data,error}=await db.rpc('admin_progress');b.disabled=false;b.textContent='View as user · read only';if(error){document.getElementById('adminStatus').textContent='Could not load read-only user view: '+error.message;return}rows=data||[];renderUser()}
+ function attach(){const p=document.getElementById('adminUserSelect');if(!p||document.getElementById('adminROOpen'))return;const b=document.createElement('button');b.id='adminROOpen';b.type='button';b.textContent='View as user · read only';b.title='See the selected user’s saved workspace without changing any data';p.parentElement.appendChild(b);b.onclick=enter;p.addEventListener('change',()=>document.getElementById('adminReadOnlyViewer')?.classList.add('hidden'))}
+ new MutationObserver(attach).observe(card,{childList:true,subtree:true});attach();
 })();

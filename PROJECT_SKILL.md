@@ -198,3 +198,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.
 - Current interaction ownership after audit: `app.js` owns Run/auth/cloud/state; `ui-v2.js` owns Hint and the fallback single-answer presentation; `shared-learning-v8.js` owns Learn basics; progressive-solution modules enhance Answer tables; `menu-controller.js` owns the menu; `collapse-fix.js` owns top-level collapse.
 - Repository asset audit: every remaining file under `assets/` is loaded by `index.html` or `python.html`; obsolete `progress-compat.js`, `run-binding-fix.js`, and `lesson-links-v5.js` were deleted.
+
+### Complexity UI ownership
+- `assets/app.js` is the single owner of the main-question complexity picker/checker and persisted complexity display.
+- After a passed solution but before confirmation, show the compact Time/Space picker and Check control.
+- After complexity is confirmed for the current code, replace the controls with one compact line: `✓ Time O(...) · Space O(...)`.
+- Do not restore the verbose `Your solution · complexity` heading or disabled selectors after confirmation.
+- Changing the code invalidates the saved display naturally because complexity is keyed to the exact code text.

@@ -24,10 +24,7 @@
     close();
   }));
 
-  if(window.db?.auth){
-    db.auth.getSession().then(({data})=>showUser(data.session?.user||null)).catch(()=>showUser(null));
-    db.auth.onAuthStateChange((event,session)=>showUser(session?.user||null));
-  }else if(typeof db!=='undefined'&&db.auth){
+  if(typeof db!=='undefined'&&db.auth){
     db.auth.getSession().then(({data})=>showUser(data.session?.user||null)).catch(()=>showUser(null));
     db.auth.onAuthStateChange((event,session)=>showUser(session?.user||null));
   }

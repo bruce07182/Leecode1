@@ -447,3 +447,13 @@ For every curriculum or lesson change:
 - Apply this principle generally to stateful controls: prefer one clear current action over simultaneous inverse/redundant controls.
 - This is a UI-state rule, not a single-session restriction: the same account may remain signed in on multiple devices unless the authentication system explicitly requires otherwise.
 
+
+## 2026-09-28 code audit / ownership cleanup
+- Removed obsolete Progress dashboard rendering and its hidden DOM compatibility placeholders. DSA Map + question status are the progress surface.
+- Removed the deleted Reset-button binding from `app.js`; Run now binds directly in core, so `assets/run-binding-fix.js` was deleted.
+- Removed old menu event ownership from `app.js`; `assets/menu-controller.js` is the single menu owner.
+- Deleted `assets/progress-compat.js` and removed the old `assets/lesson-links-v5.js` observer. Learn basics should stay a tiny shared concept lesson, not accumulate question-specific references.
+- Basics is the default mode on each page load; Basics + combinations remains a user-selectable session mode.
+- Supabase session state is authoritative for signed-in/signed-out UI. Do not infer login state from local progress.
+- Single-topic teaching should come from the shared curriculum (`window.DSA_LEVEL3` / Python curriculum). Grouped top-level DSA topics exist to compare related concepts, not to create duplicate single-topic lessons.
+- Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.

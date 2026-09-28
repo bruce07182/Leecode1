@@ -170,7 +170,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js` — shared DSA views/adapters.
 - `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
-- `assets/menu-controller.js` — single owner of top-right menu presentation/actions; default mode is Basics and account state reflects the Supabase session.
+- `assets/menu-controller.js` — single owner of top-right menu presentation/actions and account state.
+- `leetcode.html` + `assets/leetcode-practice.js` — separate LeetCode practice surface; uses the same Supabase account/table but reserved `problem_id` values 10001–10999.
 - `assets/collapse-fix.js` — single owner of top-level card collapse behavior.
 - `assets/page-init.js` — startup/auth visibility initialization.
 
@@ -192,7 +193,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Removed the deleted Reset-button binding from `app.js`; Run now binds directly in core, so `assets/run-binding-fix.js` was deleted.
 - Removed old menu event ownership from `app.js`; `assets/menu-controller.js` is the single menu owner.
 - Deleted `assets/progress-compat.js` and removed the old `assets/lesson-links-v5.js` observer. Learn basics should stay a tiny shared concept lesson, not accumulate question-specific references.
-- Basics is the default mode on each page load; Basics + combinations remains a user-selectable session mode.
+- The obsolete Mode control was removed. The foundation question picker directly exposes Basics and Combinations.
 - Supabase session state is authoritative for signed-in/signed-out UI. Do not infer login state from local progress.
 - Single-topic teaching should come from the shared curriculum (`window.DSA_LEVEL3` / Python curriculum). Grouped top-level DSA topics exist to compare related concepts, not to create duplicate single-topic lessons.
 - Optimization rule: prefer deleting an obsolete override and fixing its owner over adding another late-loaded patch. Before deleting a small adapter, confirm whether it mutates question data, supplies shared curriculum data, or owns a UI interaction.
@@ -216,3 +217,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Admin access is restricted by `ADMIN_EMAIL` and Supabase/RPC authorization remains authoritative.
 - The Admin menu action must call `toggleAdmin()` so opening the card also runs `loadAdminProgress()`; merely removing the `hidden` class produces an empty Admin view.
 - `assets/admin-readonly.js` enhances loaded admin data with the read-only per-user workspace; it must never write user data or switch auth identity.
+
+### Separate LeetCode practice
+- LeetCode practice lives on `leetcode.html`, separate from the 37 foundation questions. Do not append LeetCode problems to foundation `qs[]`.
+- Foundation IDs `0–36` are immutable. Reserve `problem_id` `10001–10999` for LeetCode practice so the same `solutions` table can persist code, attempts, complexity, and timestamps without collisions.
+- The LeetCode page may reuse the same Supabase auth/session and `solutions` schema, but its localStorage keys use an `lc_` prefix.
+- Foundation Admin totals/viewer must filter to foundation IDs. A dedicated LeetCode admin view can be added later without mixing denominators or question catalogs.
+- The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.

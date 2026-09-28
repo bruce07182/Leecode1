@@ -24,4 +24,5 @@ window.DSATraining=Object.freeze({lessons:DSA_LEVEL3,levelInfo:level3Info});
 window.DSA_LEVEL3=DSA_LEVEL3; // compatibility for existing presentation modules
 if(Array.isArray(window.lessons))window.lessons.push(...DSA_LEVEL3);
 if(window.levelInfo)window.levelInfo[3]=level3Info;
+window.dispatchEvent(new Event('dsa-training-ready'));
 })();

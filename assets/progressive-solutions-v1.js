@@ -7,8 +7,6 @@
   const answerBtn = document.getElementById('sampleBtn');
   if (!qSelect || !answerBox || !answerBtn) return;
 
-  // The existing question picker reflects completion in its option state/text. Check several
-  // representations so this remains compatible with current and future progress renderers.
   function solved(i) {
     const opt = Array.from(qSelect.options).find(o => Number(o.value) === i) || qSelect.options[i];
     if (!opt) return false;
@@ -63,14 +61,17 @@
   };
 
   function render() {
-    answerBox.querySelector('.progressiveSolutions')?.remove();
     const all = libraries[Number(qSelect.value)];
     if (!all) return;
     const rows = all.filter(available);
     if (rows.length < 2) return;
+
+    // For questions with a solution library, replace the legacy single-answer rendering.
+    // This keeps every solution in one comparison area instead of showing one duplicate above it.
+    answerBox.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 'progressiveSolutions';
-    wrap.innerHTML = '<hr><b>Solutions you understand so far</b><div class="status">More approaches appear as their prerequisite concepts are mastered.</div>' +
+    wrap.innerHTML = '<b>Solutions</b><div class="status">Compare the approaches below. More approaches appear as their prerequisite concepts are mastered.</div>' +
       '<div style="overflow-x:auto"><table class="solutionCompare"><thead><tr><th>Approach</th><th>Time</th><th>Space</th><th>Main lesson</th></tr></thead><tbody>' +
       rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.time)}</td><td>${esc(r.space)}</td><td>${esc(r.lesson)}</td></tr>`).join('') +
       '</tbody></table></div>' +

@@ -4,7 +4,7 @@ Updated: 2026-09-28
 
 ## Project
 - Repo: `bruce07182/Leecode1`; public site is Cloudflare Pages (`leecode1.pages.dev`).
-- Goal: teach the minimum Python + DSA foundations needed for LeetCode, then combinations/patterns.
+- Goal: teach Python + DSA foundations first, then combinations/patterns; LeetCode-style practice comes later.
 - Audience may know programming but not DSA terminology. Prefer concise explanation, executable Python, accurate visuals, and mobile-first UI.
 
 ## Critical recovery / deployment note
@@ -138,7 +138,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - C++ should demonstrate that the algorithm is language-independent, not force the learner to learn two new things simultaneously.
 
 ## Curriculum principles
-1. Foundations → combinations → LeetCode-style problems.
+1. Foundations → combinations → later LeetCode-style problems.
 2. Teach only Python useful for DSA.
 3. Concrete problem before abstraction/terminology.
 4. Prefer code + tiny worked examples over dense prose.
@@ -207,7 +207,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Changing the code invalidates the saved display naturally because complexity is keyed to the exact code text.
 
 ### Stable question grouping
-- The question picker is grouped at the UI layer only: `Basics` and `Combinations / LeetCode`.
+- The question picker is grouped at the UI layer only: `Basics` and `Combinations`.
 - Never reorder, splice, or rebuild the canonical `qs[]` array to implement grouping. Existing numeric indexes are persistent problem IDs used by local code/history/hints/complexity and Supabase `problem_id`.
 - Question `<option>` values must always be the original `qs[]` index. Filtering changes visibility only, never identity.
 - DSA-map navigation and restored last-question state must first select the appropriate group, then select the unchanged original question index.

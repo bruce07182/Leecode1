@@ -30,6 +30,11 @@ for(const name of ['app.js','python-basics.js','leetcode-practice.js']){
  if(!src.includes('PythonRuntime.load('))fail(`${name}: bypasses shared Python runtime`);
  if(src.includes('loadPyodide('))fail(`${name}: owns a duplicate Pyodide loader`);
 }
+for(const page of pages){const html=fs.readFileSync(path.join(root,page),'utf8');if(!html.includes('assets/dsa-concepts.js'))fail(`${page}: missing shared DSA concepts`)}
+const conceptSrc=fs.readFileSync(path.join(assets,'dsa-concepts.js'),'utf8');
+for(const name of ['Array, String & Linked List','Set & Map','Stack & Queue','Tree, Graph & Heap'])if(!conceptSrc.includes("'"+name+"'"))fail(`dsa-concepts.js: missing canonical group ${name}`);
+const mapSrc=fs.readFileSync(path.join(assets,'dsa-map-v6.js'),'utf8');
+if(!mapSrc.includes('window.DSAConcepts?.get(name)'))fail('dsa-map-v6.js: must consume shared DSA concepts');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 if(index.includes('dsa-data-init.js'))fail('index.html: obsolete dsa-data-init.js reference');
 const app=fs.readFileSync(path.join(assets,'app.js'),'utf8');

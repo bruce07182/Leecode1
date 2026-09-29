@@ -55,3 +55,7 @@ Visuals used connecting lines where contiguous cells were the correct mental mod
 ## Cloud identity used magic numeric ranges
 LeetCode and Foundation originally shared numeric encodings such as offsets.
 **Lesson:** compact IDs are not worth hidden semantics. Explicit type + number is easier to migrate, inspect, and debug.
+
+## Local/cloud reconciliation became unnecessary complexity
+Once Supabase became the authoritative store, merging browser localStorage back into cloud created more risk than value: stale devices could resurrect old code/history or create rows from obsolete cache state.
+**Lesson:** choose one durable authority. Local cache may accelerate/render the UI, but startup hydrates from cloud and cache existence alone never triggers a cloud write.

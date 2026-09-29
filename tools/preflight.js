@@ -96,5 +96,8 @@ if(!index.includes('id="runBtn"'))fail('index.html: Foundation Run button missin
 if(!app.includes('document.getElementById("runBtn").onclick=run'))fail('app.js: Foundation Run button is not wired to run()');
 if(!app.includes('function load(remember=true)')||!app.includes('load(false)'))fail('app.js: startup must not overwrite last-question preference before cloud hydration');
 if(!app.includes('const preferred=Number(localStorage.getItem("bb_last_question"))'))fail('app.js: last Foundation question is not restored after cloud hydration');
+if(!app.includes('function resetQuestionView()'))fail('app.js: question navigation view reset missing');
+for(const id of ['hintBox','learnBox','answerBox','afterPass','mainOBox'])if(!app.includes('"'+id+'"'))fail('app.js: question view reset missing '+id);
+if(fs.readFileSync(path.join(assets,'ui-v2.js'),'utf8').includes('window.load=function'))fail('ui-v2.js: dead load wrapper returned');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

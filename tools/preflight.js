@@ -28,6 +28,13 @@ if(!app.includes('.gte("problem_id",0).lte("problem_id",36)'))fail('app.js: Foun
 const dsa=fs.readFileSync(path.join(assets,'python-dsa.js'),'utf8');
 if(!dsa.includes('window.DSATraining='))fail('python-dsa.js: missing explicit DSATraining namespace');
 const lc=fs.readFileSync(path.join(assets,'leetcode-practice.js'),'utf8');
+const lcHtml=fs.readFileSync(path.join(root,'leetcode.html'),'utf8');
+const fixedLcIds=new Set([...lcHtml.matchAll(/\bid=["']([^"']+)["']/g)].map(m=>m[1]));
+for(const m of lc.matchAll(/\$\(['"]([A-Za-z][\w-]*)['"]\)/g)){
+  const id=m[1];
+  if(!fixedLcIds.has(id)&&!['lcTime','lcSpace','lcCheck','lcComplexResult'].includes(id))fail(`leetcode-practice.js: references missing fixed DOM id #${id}`);
+}
+
 if(!lc.includes('const cloudId=p=>100000+p.id'))fail('leetcode-practice.js: LeetCode cloud namespace changed');
 if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');
 const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');

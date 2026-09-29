@@ -141,3 +141,9 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The primary login card must be visible from initial HTML/CSS whenever `body.auth-locked` is active. Do not depend on successful JavaScript startup, `getSession()`, or `setUser()` to reveal the sign-in controls.
 - `authCard` therefore starts visible in markup; authenticated `setUser()` hides it. CSS for `body.auth-locked #authCard` must override ordinary visibility so auth failures still leave a usable login form.
 - Regression test: disable/block a late script or Mermaid import and reload signed out; email/password/Sign in must still be visible and usable.
+
+
+### JavaScript parse integrity (regression-critical)
+- Authentication depends on `assets/app.js` parsing completely. A syntax error anywhere in that file prevents login handlers from being installed even if the login card is visible.
+- Never insert escaped source separators such as a literal `\\n` between JavaScript statements. Use an actual newline.
+- After automated source edits, inspect the exact edited region and verify that the login handler (`signInWithPassword`) remains reachable in a parseable script. Login-card visibility alone is not a sufficient auth regression test.

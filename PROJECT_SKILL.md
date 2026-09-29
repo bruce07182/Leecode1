@@ -111,8 +111,7 @@ Rules:
 - Do not overwhelm beginners with every sophisticated approach immediately.
 - Reveal approaches as prerequisite concepts are learned/solved.
 - The same question can become richer later without changing the original problem.
-- `assets/progressive-solutions-v1.js` contains the first progressive solution library.
-- `assets/progressive-solutions-extra.js` extends the comparison pattern to additional core questions.
+- `assets/progressive-solutions-v1.js` is the single owner of progressive solution data and the comparison renderer for all supported Foundation questions.
 
 ### Reverse String reference design
 Useful approaches include Python slicing, direct string construction, list + join, two pointers, `reversed()` + join, stack, and recursion. Only show approaches appropriate to current prerequisites.
@@ -164,10 +163,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/ui-v2.js` — UI behavior.
 - `assets/python-basics.js` — shared Python curriculum below Level 3.
 - `assets/python-dsa.js` — shared Level 3 source of truth.
-- `assets/curriculum-clarity-v9.js` — narrow concrete-first refinements.
-- `assets/progressive-solutions-v1.js` — progressive multi-solution tables/recommendations.
-- `assets/progressive-solutions-extra.js` — additional multi-solution questions.
-- `assets/dsa-teaching-details.js` — supplemental full teaching details; Learn basics should not dump these detailed lessons into a question.
+- `assets/progressive-solutions-v1.js` — single progressive multi-solution data + renderer owner.
+- `assets/dsa-teaching-details.js` — shared Level 3 teaching refinements, including concrete-first DP guidance; Learn basics should not dump these detailed lessons into a question.
 - `assets/dsa-map-v6.js`, `assets/dsa-python-link-v7.js` — shared DSA views/adapters.
 - `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
@@ -338,3 +335,11 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Foundation completed-editor locking must use the same canonical completion source as the app (`completed(i)` / `ex_history_B*` / `ex_history_C*` after cloud restore). `editor-lock.js` must never read legacy `bb_history_<array index>` directly.
 - After login/cloud restore, any exercise with a recorded `passed:true` is immediately read-only and Run becomes Edit. Clicking Edit intentionally unlocks that same editor; the next successful Run locks it again.
 - Preflight guards this ownership so display completion and editor locking cannot diverge again.
+
+## 2026-09-29 ownership/refactor audit
+- Prefer one owner per responsibility over historical patch layers. Static Foundation question corrections belong in the canonical `qs[]` definition; the obsolete graph-question patch was removed.
+- Progressive solution comparison has one renderer/data owner (`progressive-solutions-v1.js`); the duplicate extra renderer was merged and removed.
+- Shared Level 3 teaching refinements belong in `dsa-teaching-details.js`; the separate curriculum-clarity patch was merged and removed.
+- UI overlays must reuse `window.foundationLocalKey(kind, i)` for canonical Foundation local persistence. They must not construct `bb_history_*`, `bb_hints_*`, or `bb_help_*` keys themselves. Legacy `bb_*` reads remain only inside the one-time migration helper in `app.js`.
+- Keep genuinely separate responsibilities separate: Python runtime, Python editor behavior, completed-editor lock, admin read-only UI, menu controller, and page bootstrap should not be merged merely to reduce file count.
+- Removed dead Foundation helpers that had no callers: dummy `titleEl`, `isBasic()`, and superseded `lessonVisual()`.

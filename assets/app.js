@@ -98,18 +98,16 @@ function recommendationOptions(){
  const add=(i,action,reason)=>{if(Number.isInteger(i)&&!used.has(i)){used.add(i);out.push({i,action,reason})}};
  const due=pool.filter(i=>reviewDue(i));
  const unfinished=pool.filter(i=>!completed(i));
- const learning=pool.filter(i=>completed(i)&&masteryOf(i)!=="Mastered");
- const mastered=pool.filter(i=>masteryOf(i)==="Mastered");
+ const learning=pool.filter(i=>completed(i)&&masteryOf(i)!=="Mastered"&&i!==idx);
  const currentDeps=(qs[idx]?.deps||[]).filter(i=>pool.includes(i));
  const followups=pool.filter(i=>(qs[i].deps||[]).includes(idx));
  add(due[0],"Review","Due for review");
  add(unfinished.find(i=>i>idx)??unfinished[0],"Practice","Next unfinished");
- add(learning.find(i=>i!==idx),"Practice again","Build mastery");
+ add(learning[0],"Practice again","Build mastery");
  add(currentDeps.find(i=>completed(i)),"Refresh","Prerequisite");
  add(followups.find(i=>!completed(i)),"Next step","Uses this skill");
- add(followups.find(i=>completed(i)&&i!==idx),"Related","Follow-up practice");
- add(mastered.find(i=>i!==idx),"Challenge again","Already mastered");
- pool.filter(i=>i!==idx).forEach(i=>add(i,completed(i)?"Practice again":"Practice",qs[i].category));
+ const extraFresh=unfinished.filter(i=>!used.has(i)).slice(0,2);
+ extraFresh.forEach(i=>add(i,"Practice",qs[i].category));
  return out;
 }
 function recommendation(){return recommendationOptions()[0]||null}
@@ -126,8 +124,8 @@ function renderRecommendation(){
  const options=recommendationOptions();
  btn.textContent=options.length?"Recommend ▾":"All available mastered";
  btn.disabled=!options.length;
- menu.innerHTML=options.length?options.map((o,n)=>'<button type="button" data-question="'+o.i+'"><span>'+(n===0?"★ ":"")+o.action+" · "+displayTitle(o.i)+'</span><small>'+o.reason+'</small></button>').join(""):'';
- menu.querySelectorAll("button[data-question]").forEach(b=>b.onclick=()=>goToQuestion(Number(b.dataset.question)));
+ menu.innerHTML=options.length?options.map((o,n)=>'<button type="button" data-question="'+o.i+'"><span>'+(n===0?"★ ":"")+o.action+" · "+displayTitle(o.i)+'</span><small>'+o.reason+'</small></button>').join("")+'<button type="button" data-random="1"><span>Random</span><small>Any eligible question</small></button>':'';
+ menu.querySelectorAll("button[data-question]").forEach(b=>b.onclick=()=>goToQuestion(Number(b.dataset.question)));const randomBtn=menu.querySelector("button[data-random]");if(randomBtn)randomBtn.onclick=()=>{const pool=activeFoundationPool().filter(i=>unlocked(i)&&i!==idx);if(pool.length)goToQuestion(pool[Math.floor(Math.random()*pool.length)])};
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}
 function reflectionFor(x){return ""}

@@ -196,3 +196,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Implementation is a formal Python contract: show the required `def ...:` exactly as the learner must implement it.
 - Add Python comment lines only when they add information not obvious from the parameter name/signature: special representations (linked list/tree/graph), sorted/non-empty constraints, operation formats, special sentinel returns, indexes/coordinates, or similarly important contracts.
 - Do not mechanically comment obvious parameters or returns. Avoid comments equivalent to “nums is the input list.”
+
+- In the exercise UI, do not display literal "Question" or "Implementation" headings. The visual order itself communicates the distinction: short problem description first, Python function contract directly below.

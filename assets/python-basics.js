@@ -40,7 +40,14 @@ window.addEventListener('dsa-training-ready',()=>{registerSharedDSA();render()})
 const visible=()=>lessons.filter(x=>x.level===level);
 const doneKey=(l,i)=>`py_done_${l}_${i}`;
 function renderTopics(){const a=visible();$('pyTopics').innerHTML=a.map((x,i)=>`<button data-i="${i}" class="${i===current?'active ':''}${localStorage.getItem(doneKey(level,i))?'done':''}">${i+1}. ${x.t}</button>`).join('');$('pyTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});document.querySelectorAll('#levelBar button').forEach(b=>b.classList.toggle('active',+b.dataset.level===level));$('levelDesc').textContent=levelInfo[level]||'Implement core data structures and algorithms in Python.';}
-function render(){const x=visible()[current]||visible()[0];if(!x)return;renderTopics();$('pyLesson').innerHTML=`<h2>${x.t}</h2>${x.tip?`<div class="why">${x.tip}</div>`:''}<pre class="pyExample">${esc(x.ex)}</pre>`;$('pyTask').innerHTML=x.task;$('pyCode').value=localStorage.getItem(`py_code_${level}_${current}`)||x.start;$('pyOut').textContent=pyodide?'Ready.':'Python is loading…';$('pyAnswerBox').classList.remove('show');$('pyAnswerBox').innerHTML='';$('pyNext').disabled=current>=visible().length-1;}
+const conceptForLesson=t=>({
+ 'Lists':'Array, String & Linked List','Strings':'Array, String & Linked List','Array patterns':'Array, String & Linked List','Linked list':'Array, String & Linked List',
+ 'Dictionary':'Set & Map','Set':'Set & Map','Hash map & set':'Set & Map',
+ 'Stack':'Stack & Queue','Queue':'Stack & Queue','deque':'Stack & Queue',
+ 'Binary tree':'Tree, Graph & Heap','Graph representation':'Tree, Graph & Heap','Heap / priority queue':'Tree, Graph & Heap'
+}[t]||null);
+function conceptDeepDive(t){const name=conceptForLesson(t),d=name&&window.DSAConcepts?.get(name);return d?'<details class="deepDive"><summary>Inside / Deep dive · interview + O()</summary><div class="dsTeachOne">'+d.relationship+'</div><pre class="dsDiagram">'+d.model+'</pre><div class="dsTeachOne"><b>Inside</b><br>'+d.inside+'</div><pre class="dsCode">'+d.pseudo+'</pre><div class="dsTeachOne"><b>Why the O()</b><br>'+d.complexity+'</div></details>':''}
+function render(){const x=visible()[current]||visible()[0];if(!x)return;renderTopics();$('pyLesson').innerHTML=`<h2>${x.t}</h2>${x.tip?`<div class="why">${x.tip}</div>`:''}<pre class="pyExample">${esc(x.ex)}</pre>${conceptDeepDive(x.t)}`;$('pyTask').innerHTML=x.task;$('pyCode').value=localStorage.getItem(`py_code_${level}_${current}`)||x.start;$('pyOut').textContent=pyodide?'Ready.':'Python is loading…';$('pyAnswerBox').classList.remove('show');$('pyAnswerBox').innerHTML='';$('pyNext').disabled=current>=visible().length-1;}
 document.querySelectorAll('#levelBar button').forEach(b=>b.onclick=()=>{level=+b.dataset.level;localStorage.setItem('py_level',level);current=0;render()});
 async function initPython(){try{pyodide=await PythonRuntime.load();$('pyOut').textContent='Ready.'}catch(e){$('pyOut').textContent='Could not load Python: '+e}}
 $('pyCode').addEventListener('input',()=>localStorage.setItem(`py_code_${level}_${current}`,$('pyCode').value));

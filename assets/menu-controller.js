@@ -24,8 +24,6 @@
     close();
   }));
 
-  if(typeof db!=='undefined'&&db.auth){
-    db.auth.getSession().then(({data})=>showUser(data.session?.user||null)).catch(()=>showUser(null));
-    db.auth.onAuthStateChange((event,session)=>showUser(session?.user||null));
-  }
+  window.addEventListener('foundation-auth',e=>showUser(e.detail?.user||null));
+  showUser(typeof user!=='undefined'?user:null);
 })();

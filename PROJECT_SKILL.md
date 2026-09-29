@@ -178,3 +178,11 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Curriculum phase is Basic-first: while any Basic is unfinished, recommendations and Next not solved are restricted to unlocked Basics. Do not recommend a Combination merely because its immediate dependencies happen to be satisfied.
 - After all Basics have been passed, Combinations may enter the recommendation pool.
 - Never recommend a locked unfinished question as a fallback.
+
+
+### Question description format
+- Keep every exercise description compact and non-duplicative: **task → Input → Output**.
+- Describe the expected transformation/behavior first, then name the input shape/type, then state exactly what the function returns.
+- Do not repeat concrete sample inputs/outputs in the description; tests/examples already own those.
+- Preserve only constraints that affect correctness (for example: non-empty, sorted, exactly one answer, allowed movement, or missing-node behavior).
+- Teaching rationale, implementation suggestions, complexity, and Python alternatives belong in Learn/Hint/sample content, not the question description.

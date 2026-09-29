@@ -4,14 +4,7 @@
   const previousRender=window.renderConceptMap;
   if(typeof previousRender!=='function') return;
 
-  const nextRecommended=()=>{
-    const allowed=qs.map((q,i)=>i);
-    // Prefer an unlocked, unfinished question whose dependencies are already complete.
-    let i=allowed.find(i=>!completed(i)&&unlocked(i));
-    // Defensive fallback: first unfinished foundation question.
-    if(i==null) i=allowed.find(i=>!completed(i));
-    return i==null?null:i;
-  };
+  const nextRecommended=()=>window.foundationRecommendation?.()?.i ?? null;
 
   const openQuestion=i=>{
     if(!window.foundationRequireUser?.()||i==null) return;
@@ -40,7 +33,7 @@
     if(next==null){
       nextBox.innerHTML='<span class="dsaNextLabel">Next recommended</span><b>✓ All available questions completed</b>';
     }else{
-      nextBox.innerHTML='<span class="dsaNextLabel">Next recommended</span><button type="button" class="dsaNextBtn">'+qs[next].title+'</button>';
+      const rec=window.foundationRecommendation?.();nextBox.innerHTML='<span class="dsaNextLabel">Next recommended</span><button type="button" class="dsaNextBtn">'+(rec?.action?rec.action+' · ':'')+(typeof displayTitle==='function'?displayTitle(next):qs[next].title)+'</button>';
       nextBox.querySelector('button').onclick=()=>openQuestion(next);
     }
     host.appendChild(nextBox);

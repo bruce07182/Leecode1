@@ -75,7 +75,6 @@ $('lcPracticeMode').onchange=()=>render();
 function startOA(){const pool=problems.filter(p=>unlocked(p)&&!mastered(p));if(!pool.length)return;oa={ids:pool.slice(0,Math.min(3,pool.length)).map(p=>p.id),start:Date.now(),minutes:75};$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`OA practice · ${oa.ids.length} problems · 75 min · Hint/Answer hidden`;current=problems.find(p=>p.id===oa.ids[0]);render();$('lcHint').style.display='none';$('lcAnswer').style.display='none'}
 $('lcOAStart').onclick=startOA;
 $('lcWhy').onclick=()=>{$('lcWhyBox').innerHTML='<b>Why this problem?</b><br>'+esc(current.why);$('lcWhyBox').classList.toggle('show')};
-$('lcMaster').onclick=()=>{localStorage.setItem(masterKey(current),'1');localStorage.setItem(reviewKey(current),String(Date.now()+7*86400000));renderProgress();renderList()};
 $('lcPracticeMode').onchange=()=>render();
 function startOA(){const pool=problems.filter(p=>unlocked(p)&&!mastered(p));if(!pool.length)return;oa={ids:pool.slice(0,Math.min(3,pool.length)).map(p=>p.id),start:Date.now(),minutes:75};$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`OA practice · ${oa.ids.length} problems · 75 min · Hint/Answer hidden`;current=problems.find(p=>p.id===oa.ids[0]);render();$('lcHint').style.display='none';$('lcAnswer').style.display='none'}
 $('lcOAStart').onclick=startOA;

@@ -20,7 +20,7 @@
   btn.onclick=()=>{
     if(box.classList.contains('show')){box.classList.remove('show');box.innerHTML='';return;}
     const lesson=sharedLesson(qs[idx]);
-    localStorage.setItem('bb_help_'+idx,helpLevel(idx)+1);
+    localStorage.setItem(window.foundationLocalKey('help',idx),helpLevel(idx)+1);
     box.classList.add('show');
     box.innerHTML=lesson
       ? '<b>Learn basics · '+esc(lesson.t)+'</b><div class="sharedLearn"><div class="dsTeachOne">'+lesson.tip+'</div><pre class="dsCode">'+esc(lesson.ex)+'</pre></div>'

@@ -58,6 +58,7 @@ const ADMIN_EMAIL="bruce0421@gmail.com";
 const db=supabase.createClient("https://eylaymrbyjjbvkgebvzv.supabase.co","sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9");
 const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),titleEl={set textContent(v){}},descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
 function completed(i){return getHistory(i).some(a=>a.passed)}
+window.foundationCompleted=completed;
 function isBasic(i){return qs[i].level==="basic"}
 function unlocked(i){return qs[i].deps.every(completed)}
 function categoryState(c){const ids=qs.map((x,i)=>x.category===c?i:-1).filter(i=>i>=0);if(ids.length&&ids.every(i=>masteryOf(i)==="Mastered"))return"mastered";if(ids.some(i=>completed(i)))return"learning";if(ids.some(i=>unlocked(i)))return"available";return"lockedConcept"}

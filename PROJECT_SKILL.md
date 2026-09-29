@@ -36,7 +36,7 @@ Admin UI is read-only for other users. It must never switch auth identity or wri
 Admin user progress comes from `admin_progress()`.
 Admin DB Structure comes from `admin_db_structure()` and displays metadata only: public tables, columns, constraints, indexes, RLS policies, and public functions.
 
-Privileged RPCs must enforce authorization inside Postgres. Hiding UI is never authorization. SECURITY DEFINER functions require controlled `search_path`, internal admin check, PUBLIC/anon EXECUTE revoked, and explicit authenticated grant.
+Privileged RPCs must enforce authorization inside Postgres. Hiding UI is never authorization. `admin_progress()` and `admin_db_structure()` intentionally use SECURITY DEFINER, controlled `search_path`, an internal admin-email check, PUBLIC/anon EXECUTE revoked, and explicit authenticated EXECUTE. Supabase's generic SECURITY DEFINER advisor will still warn because authenticated can call the RPC endpoint; treat that warning as expected only while the internal check remains verified.
 
 ## Module ownership
 Keep separate because responsibilities differ:
@@ -45,7 +45,7 @@ Keep separate because responsibilities differ:
 - `editor-lock.js`: completed-editor lock only.
 - `admin-readonly.js`: admin read-only presentation.
 - `menu-controller.js`: menu presentation.
-- `page-init.js`: page bootstrap/auth visibility.
+- `page-init.js`: Mermaid/page bootstrap only. Auth/session state has one owner: `app.js`; other modules consume the `foundation-auth` event.
 - `dsa-map-v6.js` + adapters: map/view behavior.
 
 Single owners:
@@ -98,7 +98,7 @@ Preflight must protect local asset existence, JS syntax, shared Python runtime o
 - Foundation curriculum/data still largely lives in `app.js`.
 - Python/DSA/solution curriculum still contains hard-coded JS data.
 - Some dependencies/mappings still use legacy array indexes.
-- `app.js` is large; split it only after DB/data boundaries exist.
+- `app.js` is large because legacy curriculum data and behavior are mixed. Do not add more durable data there; migrate DB-backed domains incrementally, then split behavior by ownership after parity.
 - Foundation and LeetCode progress are now cloud + in-memory session state; do not reintroduce progress localStorage.
 - OA session state is not yet cloud-backed. LeetCode mastery/review is derived from cloud-backed attempt history rather than separate local durable flags.
 - Exact-output tests can reject alternate valid outputs in some exercises.
@@ -119,13 +119,15 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The main Foundations page has no Practice/Review mode selector; solving is always Practice.
 - Review defaults to only the user's saved code and saved Time/Space complexity.
 - Problem statement, reference answer, learning notes, and attempt history are secondary opt-in details under collapsed More options.
-\n- Recommendation also exposes a separate `Next not solved` action when an unlocked unfinished question exists. It selects the next unfinished unlocked question after the current position, wrapping to the first unfinished unlocked question when needed; locked questions are never selected.\n
+
+- Recommendation also exposes a separate `Next not solved` action when an unlocked unfinished question exists. It selects the next unfinished unlocked question after the current position, wrapping to the first unfinished unlocked question when needed; locked questions are never selected.
+
 
 ## Authentication invariants (regression-critical)
 - The application is **fail closed**. Until Supabase confirms an authenticated session, `body.auth-locked` remains active and only the sign-in/create-account card may be usable.
 - A brand-new/signed-out user must be prompted to sign in before seeing or using the roadmap, questions, editor, Run, Review, recommendations, learning panels, or admin features.
 - Never remove `auth-locked` as an error fallback. If auth initialization fails or session state is uncertain, keep the app locked and show the auth card.
-- `setUser()` is the authoritative auth UI transition and must always synchronize `body.auth-locked` with session state.
+- `app.js` is the only Supabase auth/session owner on the Foundations page. `setUser()` is the authoritative auth UI transition, synchronizes `body.auth-locked`, and emits `foundation-auth` for presentation modules. Do not add duplicate `getSession()` / `onAuthStateChange()` listeners in `page-init.js`, menus, or feature modules.
 - Interactive entry points that can bypass ordinary card visibility (Run, Review, roadmap popups/question navigation, recommendation navigation) must call `foundationRequireUser()` / `requireUser()` before doing work.
 - Signed-out state must never be a usable local-practice mode. Progress is cloud/Supabase authoritative; no offline/local practice mode exists.
 - Regression check after UI/auth changes: fresh/incognito load => only auth UI; signed-in load => cloud hydrate before normal work; sign-out => practice UI immediately locks; auth lookup failure => remains locked.
@@ -145,10 +147,20 @@ Use Git history and small commits for recovery. Never discard current user progr
 
 ### JavaScript parse integrity (regression-critical)
 - Authentication depends on `assets/app.js` parsing completely. A syntax error anywhere in that file prevents login handlers from being installed even if the login card is visible.
-- Never insert escaped source separators such as a literal `\\n` between JavaScript statements. Use an actual newline.
+- Never insert escaped source separators such as a literal `\
+` between JavaScript statements. Use an actual newline.
 - After automated source edits, inspect the exact edited region and verify that the login handler (`signInWithPassword`) remains reachable in a parseable script. Login-card visibility alone is not a sufficient auth regression test.
 
 
 ### Recommendation action labeling
 - Keep recommendation explanation out of the surrounding panel when the button can communicate the action.
 - The recommendation button must be the complete recommendation: action + exercise ID + question name, e.g. `Review B4 · Reverse string`, `Practice B12 · Binary search boundaries`, or `Practice again B7 · Contains duplicate`. Do not duplicate the question in a separate `Recommended:` heading. `Next not solved` should likewise show its target question.
+
+
+## Current DB optimization state — 2026-09-29
+- Public app tables: `solutions` and `intern_prep`; both use RLS.
+- Ownership policies target `authenticated`, not `public`, and use `(select auth.uid())` where applicable.
+- `intern_prep` has one SELECT policy combining owner access with the existing admin exception, avoiding duplicate permissive SELECT policies.
+- Admin RPC execute is revoked from PUBLIC/anon and granted to authenticated; internal admin authorization remains mandatory.
+- Live hardening SQL is recorded in `supabase/security_hardening_2026-09-29.sql`.
+- Leaked-password protection remains a Supabase project-setting recommendation, not an application-schema change.

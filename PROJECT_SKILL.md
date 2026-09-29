@@ -164,3 +164,10 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Admin RPC execute is revoked from PUBLIC/anon and granted to authenticated; internal admin authorization remains mandatory.
 - Live hardening SQL is recorded in `supabase/security_hardening_2026-09-29.sql`.
 - Leaked-password protection remains a Supabase project-setting recommendation, not an application-schema change.
+
+
+### Authenticated startup visibility
+- After Supabase confirms a user, keep the practice workspace hidden with `body.app-loading` until the authoritative `solutions` hydration finishes.
+- Do not reveal stale/default question, recommendation, editor, or map state before hydration. Signed-out users still see the login card immediately.
+- Do not make startup hydration wait for optional/heavy presentation work such as Mermaid rendering or Pyodide loading; those may finish asynchronously after authoritative progress is ready.
+- Practice actions belong immediately above the question: Review, Recommended, and Next not solved. Do not put Review back in the global top navigation.

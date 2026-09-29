@@ -16,7 +16,8 @@ const assets=path.join(root,'assets');
 for(const name of fs.readdirSync(assets).filter(x=>x.endsWith('.js'))){
   const file=path.join(assets,name),src=fs.readFileSync(file,'utf8');
   try{
-    const parseSrc=name==='page-init.js'?src.replace(/^\s*import\s+[^;]+;?\s*$/gm,''):src;
+    const stripped=name==='page-init.js'?src.replace(/^\s*import\s+[^;]+;?\s*$/gm,''):src;
+    const parseSrc=name==='page-init.js'?`(async()=>{\n${stripped}\n})()`:stripped;
     new vm.Script(parseSrc,{filename:name});
   }catch(e){fail(`${name}: JavaScript syntax error: ${e.message}`)}
 }

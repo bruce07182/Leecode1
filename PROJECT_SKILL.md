@@ -198,3 +198,11 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Do not mechanically comment obvious parameters or returns. Avoid comments equivalent to “nums is the input list.”
 
 - In the exercise UI, do not display literal "Question" or "Implementation" headings. The visual order itself communicates the distinction: short problem description first, Python function contract directly below.
+
+
+### Recommendation menu
+- Practice navigation uses one expandable **Recommend** control, not separate Recommended / Next-not-solved buttons.
+- The menu may offer multiple useful unlocked choices: due review, next unfinished, practice again for mastery, prerequisite refresh, a follow-up that uses the current skill, related follow-up practice, mastered challenge, and additional eligible questions.
+- The first menu item is the canonical recommendation exposed through `window.foundationRecommendation`; the DSA map must use that same item.
+- Preserve Basic-first phase gating and never offer a locked question. While any Basic remains unfinished, recommendation choices stay within the Basic pool.
+- Deduplicate questions in the menu even when one question qualifies for several reasons.

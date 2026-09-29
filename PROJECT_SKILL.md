@@ -206,3 +206,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The first menu item is the canonical recommendation exposed through `window.foundationRecommendation`; the DSA map must use that same item.
 - Preserve Basic-first phase gating and never offer a locked question. While any Basic remains unfinished, recommendation choices stay within the Basic pool.
 - Deduplicate questions in the menu even when one question qualifies for several reasons.
+
+- Keep the Recommend menu concise: at most one **Practice again** item. Do not fill remaining menu space with completed questions. Include one **Random** action that chooses an eligible unlocked question from the active Basic-first pool, preferably excluding the current question.

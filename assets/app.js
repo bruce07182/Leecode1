@@ -80,19 +80,20 @@ function bindInterview(x){const key=x.title.includes(". ")?x.title.slice(x.title
 function renderProgress(){const h=getHistory(idx),passed=h.filter(x=>x.passed),mastery=masteryOf(idx),x=qs[idx];document.getElementById("progress").textContent=passed.length?'✓ Passed':'Not passed';document.getElementById("reviewBtn").style.display=passed.length?"inline-block":"none";document.getElementById("sampleBtn").style.display=passed.length?"inline-block":"none";const ob=document.getElementById("mainOBox");ob.classList.toggle("show",!!passed.length);let savedComplexity=null;if(passed.length){try{const saved=JSON.parse(localStorage.getItem(localKey("complexity",idx))||"null");if(saved&&saved.code===code.value)savedComplexity=saved}catch(e){}}ob.innerHTML=!passed.length?"":savedComplexity?`<div class="complexityDone">✓ Time O(${escapeHtml(savedComplexity.time)}) · Space O(${escapeHtml(savedComplexity.space)})</div>`:"<b>Complexity</b>"+oPicker();const ap=document.getElementById("afterPass");ap.classList.remove("show");ap.innerHTML="";if(passed.length)bindInterview(x);document.getElementById("history").innerHTML=h.length?h.slice(-5).reverse().map(a=>(a.passed?'✅':'❌')+' '+new Date(a.time).toLocaleString()).join('<br>'):'No attempts yet.'}
 function helpLevel(i){return +(localStorage.getItem(localKey("help",i))||0)}
 function saveAttempt(passed){const h=getHistory(idx);h.push({time:new Date().toISOString(),passed,code:code.value});localStorage.setItem(localKey("history",idx),JSON.stringify(h.slice(-20)));renderProgress();refreshOptions();queueCloud()}
-async function saveCloud(){if(!user)return;document.getElementById("cloudState").textContent="Saving…";let complexity=null;try{const saved=JSON.parse(localStorage.getItem(localKey("complexity",idx))||"null");if(saved&&saved.code===code.value)complexity={time:saved.time,space:saved.space}}catch(e){}const {error}=await db.from("solutions").upsert({user_id:user.id,problem_id:idx,code:code.value,history:getHistory(idx),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced"}
+async function detectCanonicalCloud(){if(canonicalCloud!==null)return canonicalCloud;const {data}=await db.from("solutions").select("problem_id").eq("user_id",user.id).limit(1);canonicalCloud=!!(data&&data.length&&typeof data[0].problem_id==="string");return canonicalCloud}
+async function saveCloud(){if(!user)return;document.getElementById("cloudState").textContent="Saving…";let complexity=null;try{const saved=JSON.parse(localStorage.getItem(localKey("complexity",idx))||"null");if(saved&&saved.code===code.value)complexity={time:saved.time,space:saved.space}}catch(e){}const {error}=await db.from("solutions").upsert({user_id:user.id,problem_id:(await detectCanonicalCloud())?exerciseId(idx):idx,code:code.value,history:getHistory(idx),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced"}
 async function mergeLocalToCloud(){
  if(!user)return;
- const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id).gte("problem_id",0).lte("problem_id",45);
+ const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id);
  if(error){document.getElementById("cloudState").textContent="Cloud error";return}
- const cloud=new Map((data||[]).map(r=>[Number(r.problem_id),r]));
+ const canonical=await detectCanonicalCloud(),cloud=new Map((data||[]).map(r=>[canonical?String(r.problem_id):Number(r.problem_id),r]));
  for(let i=0;i<qs.length;i++){
   const localCode=localStorage.getItem("bb"+i)||"";
   let localHistory=[];try{localHistory=JSON.parse(localStorage.getItem(localKey("history",i))||"[]")||[]}catch(e){}
   let localComplexity=null;try{const x=JSON.parse(localStorage.getItem("bb_complexity_"+i)||"null");if(x&&x.code===localCode)localComplexity={time:x.time,space:x.space}}catch(e){}
-  const row=cloud.get(i);
+  const row=cloud.get(canonical?exerciseId(i):i);
   if(!row){
-   if(localCode||localHistory.length||localComplexity)await db.from("solutions").upsert({user_id:user.id,problem_id:i,code:localCode,history:localHistory,complexity:localComplexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
+   if(localCode||localHistory.length||localComplexity)await db.from("solutions").upsert({user_id:user.id,problem_id:canonical?exerciseId(i):i,code:localCode,history:localHistory,complexity:localComplexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
    continue;
   }
   const ch=Array.isArray(row.history)?row.history:[],seen=new Set(),merged=[];
@@ -100,20 +101,20 @@ async function mergeLocalToCloud(){
   const useLocal=localHistory.length>ch.length;
   const mergedCode=useLocal&&localCode?localCode:(row.code||localCode);
   const mergedComplexity=(useLocal&&localComplexity)?localComplexity:(row.complexity||localComplexity);
-  if(localHistory.length||localCode||localComplexity)await db.from("solutions").upsert({user_id:user.id,problem_id:i,code:mergedCode,history:merged.slice(-20),complexity:mergedComplexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
+  if(localHistory.length||localCode||localComplexity)await db.from("solutions").upsert({user_id:user.id,problem_id:canonical?exerciseId(i):i,code:mergedCode,history:merged.slice(-20),complexity:mergedComplexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
  }
 }
-async function syncAllCloud(){if(!user)return;const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id).gte("problem_id",0).lte("problem_id",45);if(error){document.getElementById("cloudState").textContent="Cloud error";return}for(const row of data||[]){if(row.code)localStorage.setItem("bb"+row.problem_id,row.code);if(row.history)localStorage.setItem("bb_history_"+row.problem_id,JSON.stringify(row.history));if(row.complexity&&row.code)localStorage.setItem("bb_complexity_"+row.problem_id,JSON.stringify({code:row.code,time:row.complexity.time,space:row.complexity.space}))}refreshOptions();load()}
-async function loadCloud(){if(!user)return;document.getElementById("cloudState").textContent="Syncing…";const {data,error}=await db.from("solutions").select("code,history,complexity").eq("user_id",user.id).eq("problem_id",idx).maybeSingle();if(error){document.getElementById("cloudState").textContent="Cloud error";return}if(data){if(data.code){code.value=data.code;localStorage.setItem("bb"+idx,data.code)}if(data.history)localStorage.setItem(localKey("history",idx),JSON.stringify(data.history));if(data.complexity&&data.code)localStorage.setItem(localKey("complexity",idx),JSON.stringify({code:data.code,time:data.complexity.time,space:data.complexity.space}));renderProgress()}else await saveCloud();document.getElementById("cloudState").textContent="☁ Synced"}
+async function syncAllCloud(){if(!user)return;const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id);if(error){document.getElementById("cloudState").textContent="Cloud error";return}for(const row of data||[]){const rid=String(row.problem_id),i=canonicalIdToIndex(rid);if(i<0)continue;if(row.code)localStorage.setItem(localKey("code",i),row.code);if(row.history)localStorage.setItem(localKey("history",i),JSON.stringify(row.history));if(row.complexity&&row.code)localStorage.setItem(localKey("complexity",i),JSON.stringify({code:row.code,time:row.complexity.time,space:row.complexity.space}))}refreshOptions();load()}
+function canonicalIdToIndex(id){const s=String(id);if(/^B\\d+$/.test(s)){const n=+s.slice(1);return basicIndexes()[n-1]??-1}if(/^C\\d+$/.test(s)){const n=+s.slice(1);return combinationIndexes()[n-1]??-1}const n=Number(s);return Number.isInteger(n)&&n>=0&&n<qs.length?n:-1}\nasync function loadCloud(){if(!user)return;document.getElementById("cloudState").textContent="Syncing…";const canonical=await detectCanonicalCloud();const {data,error}=await db.from("solutions").select("code,history,complexity").eq("user_id",user.id).eq("problem_id",canonical?exerciseId(idx):idx).maybeSingle();if(error){document.getElementById("cloudState").textContent="Cloud error";return}if(data){if(data.code){code.value=data.code;localStorage.setItem("bb"+idx,data.code)}if(data.history)localStorage.setItem(localKey("history",idx),JSON.stringify(data.history));if(data.complexity&&data.code)localStorage.setItem(localKey("complexity",idx),JSON.stringify({code:data.code,time:data.complexity.time,space:data.complexity.space}));renderProgress()}else await saveCloud();document.getElementById("cloudState").textContent="☁ Synced"}
 function queueCloud(){
  if(!user)return;
- const problemId=idx,codeValue=code.value,userId=user.id;
+ const problemIndex=idx,codeValue=code.value,userId=user.id;
  clearTimeout(syncTimer);
  syncTimer=setTimeout(async()=>{
   let complexity=null;
-  try{const saved=JSON.parse(localStorage.getItem("bb_complexity_"+problemId)||"null");if(saved&&saved.code===codeValue)complexity={time:saved.time,space:saved.space}}catch(e){}
-  const {error}=await db.from("solutions").upsert({user_id:userId,problem_id:problemId,code:codeValue,history:getHistory(problemId),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
-  if(user?.id===userId&&idx===problemId)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
+  try{const saved=JSON.parse(localStorage.getItem(localKey("complexity",problemIndex))||"null");if(saved&&saved.code===codeValue)complexity={time:saved.time,space:saved.space}}catch(e){}
+  const {error}=await db.from("solutions").upsert({user_id:userId,problem_id:(await detectCanonicalCloud())?exerciseId(problemIndex):problemIndex,code:codeValue,history:getHistory(problemIndex),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
+  if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
 migrateFoundationLocal();

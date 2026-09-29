@@ -107,7 +107,7 @@ function queueCloud(){
  syncTimer=setTimeout(async()=>{
   let complexity=null;
   try{const saved=JSON.parse(localStorage.getItem(localKey("complexity",problemIndex))||"null");if(saved&&saved.code===codeValue)complexity={time:saved.time,space:saved.space}}catch(e){}
-  const {error}=await db.from("solutions").upsert({user_id:userId,...((await detectCanonicalCloud())?{exercise_type:exerciseIdentity(problemIndex).type,exercise_number:exerciseIdentity(problemIndex).number}:{problem_id:problemIndex}),code:codeValue,history:getHistory(problemIndex),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
+  const identity=exerciseIdentity(problemIndex),{error}=await db.from("solutions").upsert({user_id:userId,exercise_type:identity.type,exercise_number:identity.number,code:codeValue,history:getHistory(problemIndex),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,exercise_type,exercise_number"});
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
@@ -115,20 +115,15 @@ migrateFoundationLocal();
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{localStorage.setItem(localKey("code",idx),code.value);queueCloud()};const saved=+(localStorage.getItem("bb_last_question")||0);if(saved>=0&&saved<qs.length&&unlocked(saved))idx=saved;groupSel.value=questionGroup(idx);refreshOptions();if([...sel.options].some(o=>Number(o.value)===idx))sel.value=String(idx);load();
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){
- const card=document.getElementById("adminCard"),status=document.getElementById("adminStatus"),host=document.getElementById("adminUsers");
- if(!isAdmin()){card.classList.add("hidden");return}
+ const status=document.getElementById("adminProgressStatus"),host=document.getElementById("adminProgressBody");if(!status||!host)return;
  status.textContent="Loading…";host.innerHTML="";
  const {data,error}=await db.rpc("admin_progress");
  if(error){status.textContent="Admin data is not enabled in Supabase yet: "+error.message;return}
  const by={};
- for(const row of (data||[]).filter(r=>Number(r.problem_id)>=0&&Number(r.problem_id)<qs.length)){const key=row.email||row.user_id||"Unknown user";if(!by[key])by[key]={passed:new Set(),attempts:0,last:null,problems:[]};const x=by[key],h=Array.isArray(row.history)?row.history:[];x.attempts+=h.length;const passed=h.some(a=>a&&a.passed);if(passed)x.passed.add(Number(row.problem_id));x.problems.push({id:Number(row.problem_id),passed,attempts:h.length,complexity:row.complexity||null,updated_at:row.updated_at});if(row.updated_at&&(!x.last||row.updated_at>x.last))x.last=row.updated_at}
- const entries=Object.entries(by);
- if(!entries.length){status.textContent="No synced user progress yet.";return}
- status.innerHTML='<label><b>View user:</b> <select id="adminUserSelect"></select></label>';
- const pick=document.getElementById("adminUserSelect");
- entries.forEach(([email])=>{const o=document.createElement("option");o.value=email;o.textContent=email;pick.appendChild(o)});
- const render=email=>{const x=by[email];host.innerHTML='<div style="margin:10px 0"><b>'+escapeHtml(email)+'</b><div>'+x.passed.size+'/'+qs.length+' problems passed · '+x.attempts+' synced attempts</div><div class="status">'+(x.last?'Last sync: '+new Date(x.last).toLocaleString():'No sync time')+'</div></div>'+x.problems.sort((a,b)=>a.id-b.id).map(p=>'<div class="skill" style="margin:7px 0"><b>'+escapeHtml(qs[p.id]?.title||('Problem '+(p.id+1)))+'</b><div>'+(p.passed?'✅ Passed':'Not passed')+' · '+p.attempts+' attempt'+(p.attempts===1?'':'s')+'</div><div class="status">'+(p.complexity?'Time O('+escapeHtml(p.complexity.time)+') · Space O('+escapeHtml(p.complexity.space)+')':'O() not confirmed')+(p.updated_at?' · Synced '+new Date(p.updated_at).toLocaleString():'')+'</div></div>').join("")};
- pick.onchange=()=>render(pick.value);render(pick.value);
+ for(const row of (data||[]).filter(r=>r.exercise_type==="B"||r.exercise_type==="C")){const id=String(row.exercise_type)+String(row.exercise_number),key=row.email||row.user_id||"Unknown user";if(!by[key])by[key]={passed:new Set(),attempts:0,last:null,problems:[]};const x=by[key],h=Array.isArray(row.history)?row.history:[];x.attempts+=h.length;const passed=h.some(a=>a&&a.passed);if(passed)x.passed.add(id);x.problems.push({id,passed,attempts:h.length,complexity:row.complexity||null,updated_at:row.updated_at});if(row.updated_at&&(!x.last||row.updated_at>x.last))x.last=row.updated_at}
+ const entries=Object.entries(by);if(!entries.length){status.textContent="No synced user progress yet.";return}
+ status.innerHTML='<label><b>View user:</b> <select id="adminUserSelect"></select></label>';const pick=document.getElementById("adminUserSelect");for(const [name] of entries){const o=document.createElement("option");o.value=name;o.textContent=name;pick.appendChild(o)}
+ const render=()=>{const x=by[pick.value];host.innerHTML='<div><b>Passed:</b> '+x.passed.size+' · <b>Attempts:</b> '+x.attempts+' · <b>Last:</b> '+(x.last||"—")+'</div><div class="status">Exercises: '+x.problems.map(p=>(p.passed?"✓ ":"")+p.id).join(", ")+'</div>'};pick.onchange=render;render();
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
 async function setUser(u){user=u;document.getElementById("authCard").classList.add("hidden");document.getElementById("cloudState").textContent=u?"Synced":"Local";document.getElementById("menuSignIn").classList.toggle("hidden",!!u);document.getElementById("menuForgot").classList.toggle("hidden",!!u);document.getElementById("menuSignOut").classList.toggle("hidden",!u);document.getElementById("menuAdmin").classList.toggle("hidden",!isAdmin());if(!isAdmin())document.getElementById("adminCard").classList.add("hidden");["questionCard","workCard","mapCard"].forEach(id=>document.getElementById(id).classList.toggle("hidden",!u));if(u){await mergeLocalToCloud();await syncAllCloud()}else{document.getElementById("authCard").classList.remove("hidden")}}

@@ -119,3 +119,4 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The main Foundations page has no Practice/Review mode selector; solving is always Practice.
 - Review defaults to only the user's saved code and saved Time/Space complexity.
 - Problem statement, reference answer, learning notes, and attempt history are secondary opt-in details under collapsed More options.
+\n- Recommendation also exposes a separate `Next not solved` action when an unlocked unfinished question exists. It selects the next unfinished unlocked question after the current position, wrapping to the first unfinished unlocked question when needed; locked questions are never selected.\n

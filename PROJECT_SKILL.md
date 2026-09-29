@@ -24,9 +24,7 @@ Do not reintroduce `problem_id`.
 Until curriculum data is fully moved to DB, the compatibility app still derives some B/C positions from legacy arrays. Treat this as migration debt, not the desired design.
 
 ## Persistence
-Canonical local keys use semantic exercise IDs through `foundationLocalKey(kind, i)`. No feature module may construct old `bb_history_*`, `bb_hints_*`, `bb_help_*`, etc. Legacy `bb_*` reads are allowed only in the one-time migration boundary in `app.js`.
-
-Cloud progress uses `solutions(user_id, exercise_type, exercise_number)`. Supabase is authoritative. There is no local→cloud merge/reconciliation path. localStorage is temporary UI/cache state only; authenticated startup clears stale progress cache and hydrates it from cloud. User actions may save directly to cloud, but the existence of local cache data must never cause an upload. Every DB write must inspect Supabase `error`.
+Cloud progress uses `solutions(user_id, exercise_type, exercise_number)`. Supabase is authoritative. There is no local→cloud merge/reconciliation path. Progress state is session memory only; authenticated startup hydrates it from cloud. localStorage is allowed only for disposable UI preferences such as the last selected question, not code/history/complexity/mastery/help progress. User actions may save directly to cloud, but the existence of local cache data must never cause an upload. Every DB write must inspect Supabase `error`.
 
 Completion has one meaning: any saved attempt with `passed:true`. Checkmarks, map state, admin state, and editor locking must derive from that same state.
 
@@ -101,6 +99,7 @@ Preflight must protect local asset existence, JS syntax, shared Python runtime o
 - Python/DSA/solution curriculum still contains hard-coded JS data.
 - Some dependencies/mappings still use legacy array indexes.
 - `app.js` is large; split it only after DB/data boundaries exist.
+- Foundation and LeetCode progress are now cloud + in-memory session state; do not reintroduce progress localStorage.
 - OA session state is not yet cloud-backed. LeetCode mastery/review is derived from cloud-backed attempt history rather than separate local durable flags.
 - Exact-output tests can reject alternate valid outputs in some exercises.
 - No source CI can substitute for a real deployed-browser startup test.

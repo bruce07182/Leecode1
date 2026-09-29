@@ -295,3 +295,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - All three pages load it. DSA Map renders it directly; Python Training reuses it for matching structure lessons; LeetCode may reuse it only post-pass inside Pattern explained so it never leaks the intended structure/pattern before solving.
 - Do not copy canonical relationship/deep-dive/complexity prose into page controllers. Page-specific curriculum examples and exercises remain in their owning modules.
 - Preflight enforces the shared module and DSA Map ownership contract.
+
+## Atomic prerequisite practice
+- Before adding or strengthening a combination problem, audit whether every non-trivial primitive it uses has already been practiced independently; a concept explanation is not a substitute for hands-on practice.
+- Existing Foundation array positions are persistent problem IDs. Never insert or reorder existing entries. Add new Basics at unused tail IDs within the reserved 0–36 namespace, even when their display numbers therefore appear later.
+- Basic 25 practices string membership such as `ch in "([{"`. Basic 26 practices map membership, retrieval, and value-to-index storage without the Two Sum complement step.
+- Two Sum depends on Frequency Map plus Map lookup & store. Valid Parentheses depends on Stack basics plus String membership plus Map lookup & store.
+- Preflight guards the original combination IDs and these prerequisite edges against accidental shifts or regressions.

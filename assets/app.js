@@ -138,3 +138,4 @@ async function run(){if(!py){out.textContent="Python is loading…";return}const
  const lines=[];for(let i=0;i<x.tests.length;i++){const [input,exp]=x.tests[i];const call=x.args?x.fn+"("+input.map(pyLiteral).join(",")+")":x.fn+"("+pyLiteral(input)+")";const got=py.runPython(call);let js=got&&got.toJs?got.toJs({dict_converter:Object.fromEntries}):got;if(got&&got.destroy)got.destroy();const ok=JSON.stringify(js)===JSON.stringify(exp);lines.push("Test "+(i+1)+": "+(ok?"✅":"❌")+"  expected "+JSON.stringify(exp)+", got "+JSON.stringify(js))}
  const passed=lines.every(x=>x.includes("✅"));out.textContent=lines.join("\n")+(passed?"\n\n✅ Passed. Answer the interview questions below.":"");saveAttempt(passed);
 }catch(e){const s=String(e);out.textContent="❌ "+s.split("\n").slice(-4).join("\n")}}
+document.getElementById("runBtn").onclick=run;

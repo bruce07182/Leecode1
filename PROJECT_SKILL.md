@@ -298,7 +298,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 ## Atomic prerequisite practice
 - Before adding or strengthening a combination problem, audit whether every non-trivial primitive it uses has already been practiced independently; a concept explanation is not a substitute for hands-on practice.
-- Existing Foundation array positions are persistent problem IDs. Never insert or reorder existing entries. Add new Basics at unused tail IDs within the reserved 0–36 namespace, even when their display numbers therefore appear later.
+- Existing Foundation array positions are stable dependency/navigation coordinates and legacy-local migration anchors. Do not insert or reorder existing entries casually; append new exercises and assign an immutable canonical `B*` or `C*` identity.
 - Basic 25 practices string membership such as `ch in "([{"`. Basic 26 practices map membership, retrieval, and value-to-index storage without the Two Sum complement step.
 - Two Sum depends on Frequency Map plus Map lookup & store. Valid Parentheses depends on Stack basics plus String membership plus Map lookup & store.
 - Preflight guards the original combination IDs and these prerequisite edges against accidental shifts or regressions.

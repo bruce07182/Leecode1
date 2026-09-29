@@ -61,7 +61,7 @@ for(const m of lc.matchAll(/\$\(['"]([A-Za-z][\w-]*)['"]\)/g)){
 
 if(!lcHtml.includes('id="lcPattern"')||!lcHtml.includes('id="lcOANext"')||!lcHtml.includes('id="lcOAEnd"'))fail('leetcode.html: pattern/OA controls missing');
 if(!lc.includes('function nextOA()')||!lc.includes('function endOA(')||!lc.includes('setInterval(updateOA,1000)'))fail('leetcode-practice.js: OA session workflow incomplete');
-if(!lc.includes('const masterKey=')||!lc.includes('reviewKey=p=>'))fail('leetcode-practice.js: mastery/review storage key contract missing');
+if(lc.includes('const masterKey=')||lc.includes('reviewKey=p=>'))fail('leetcode-practice.js: durable mastery/review must not live only in local storage');
 if(!lc.includes('id:`LC${lc}`')||!lc.includes("exerciseIdentity=p=>({type:'LC',number:p.lc})"))fail('leetcode-practice.js: canonical LC type+number identity missing');if(lc.includes('problem_id')||lc.includes('legacyCloudId'))fail('leetcode-practice.js: legacy numeric cloud identity remains');
 if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');
 const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');if(!lc.includes("select('exercise_type,exercise_number,code,history,complexity')"))fail('leetcode-practice.js: canonical type/number cloud read missing');
@@ -76,7 +76,8 @@ if(!app.includes('if(/^B\\d+$/.test(s))')||!app.includes('if(/^C\\d+$/.test(s))'
 if(!app.includes('getElementById("adminStatus")')||!app.includes('getElementById("adminUsers")'))fail('app.js: admin loader must target live admin DOM IDs');
 if(!lcHtml.includes('id="lcCloud"'))fail('leetcode.html: cloud sync status surface missing');
 if(!lc.includes("const {error}=await db.from('solutions').upsert")||!lc.includes("const {data,error}=await db.from('solutions').select"))fail('leetcode-practice.js: database errors must be surfaced');
-if(!app.includes('if(merged!==false)await syncAllCloud()'))fail('app.js: failed merge must stop cloud restore');
+if(app.includes('mergeLocalToCloud')||app.includes('syncAllCloud')||app.includes('migrateFoundationLocal'))fail('app.js: retired local/cloud reconciliation code returned');
+if(!app.includes('async function hydrateCloudCache()')||!app.includes('clearFoundationTempProgress()'))fail('app.js: cloud-authoritative cache hydration missing');
 const lock=fs.readFileSync(path.join(assets,'editor-lock.js'),'utf8');
 if(lock.includes("bb_history_")||!lock.includes("window.foundationCompleted"))fail('editor-lock.js: completed lock must use canonical Foundation progress state');
 if(!app.includes('window.foundationCompleted=completed'))fail('app.js: canonical completion state is not exposed to editor lock');
@@ -87,5 +88,6 @@ if(!index.includes('id="adminDbTab"')||!index.includes('id="adminDbStructure"'))
 const adminSrc=fs.readFileSync(path.join(assets,'admin-readonly.js'),'utf8');
 if(!adminSrc.includes("db.rpc('admin_db_structure')"))fail('admin-readonly.js: DB structure RPC missing');
 for(const doc of ['DATABASE_DESIGN_LESSONS.md','DESIGN_LESSONS.md','BUG_POSTMORTEMS.md'])if(!fs.existsSync(path.join(root,'docs',doc)))fail('architecture document missing: '+doc);
+if(lc.includes('migrateLegacyLocal')||lc.includes('legacyIds=new Map'))fail('leetcode-practice.js: retired local migration returned');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

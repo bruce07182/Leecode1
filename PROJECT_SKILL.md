@@ -171,3 +171,10 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Do not reveal stale/default question, recommendation, editor, or map state before hydration. Signed-out users still see the login card immediately.
 - Do not make startup hydration wait for optional/heavy presentation work such as Mermaid rendering or Pyodide loading; those may finish asynchronously after authoritative progress is ready.
 - Review is a separate completed-question browsing feature and stays in the top navigation. It must not be grouped with question navigation. Only Recommended and Next not solved belong immediately above the question.
+
+
+### Canonical Foundation recommendation
+- There is one recommendation rule owned by `app.js` and exposed as `window.foundationRecommendation`. The question UI and DSA map must consume the same result; feature modules must not implement private recommenders.
+- Curriculum phase is Basic-first: while any Basic is unfinished, recommendations and Next not solved are restricted to unlocked Basics. Do not recommend a Combination merely because its immediate dependencies happen to be satisfied.
+- After all Basics have been passed, Combinations may enter the recommendation pool.
+- Never recommend a locked unfinished question as a fallback.

@@ -88,9 +88,9 @@ async function mergeLocalToCloud(){
  if(error){document.getElementById("cloudState").textContent="Cloud error";return}
  const canonical=await detectCanonicalCloud(),cloud=new Map((data||[]).map(r=>[canonical?String(r.problem_id):Number(r.problem_id),r]));
  for(let i=0;i<qs.length;i++){
-  const localCode=localStorage.getItem("bb"+i)||"";
+  const localCode=localStorage.getItem(localKey("code",i))||"";
   let localHistory=[];try{localHistory=JSON.parse(localStorage.getItem(localKey("history",i))||"[]")||[]}catch(e){}
-  let localComplexity=null;try{const x=JSON.parse(localStorage.getItem("bb_complexity_"+i)||"null");if(x&&x.code===localCode)localComplexity={time:x.time,space:x.space}}catch(e){}
+  let localComplexity=null;try{const x=JSON.parse(localStorage.getItem(localKey("complexity",i))||"null");if(x&&x.code===localCode)localComplexity={time:x.time,space:x.space}}catch(e){}
   const row=cloud.get(canonical?exerciseId(i):i);
   if(!row){
    if(localCode||localHistory.length||localComplexity)await db.from("solutions").upsert({user_id:user.id,problem_id:canonical?exerciseId(i):i,code:localCode,history:localHistory,complexity:localComplexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
@@ -105,7 +105,8 @@ async function mergeLocalToCloud(){
  }
 }
 async function syncAllCloud(){if(!user)return;const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id);if(error){document.getElementById("cloudState").textContent="Cloud error";return}for(const row of data||[]){const rid=String(row.problem_id),i=canonicalIdToIndex(rid);if(i<0)continue;if(row.code)localStorage.setItem(localKey("code",i),row.code);if(row.history)localStorage.setItem(localKey("history",i),JSON.stringify(row.history));if(row.complexity&&row.code)localStorage.setItem(localKey("complexity",i),JSON.stringify({code:row.code,time:row.complexity.time,space:row.complexity.space}))}refreshOptions();load()}
-function canonicalIdToIndex(id){const s=String(id);if(/^B\\d+$/.test(s)){const n=+s.slice(1);return basicIndexes()[n-1]??-1}if(/^C\\d+$/.test(s)){const n=+s.slice(1);return combinationIndexes()[n-1]??-1}const n=Number(s);return Number.isInteger(n)&&n>=0&&n<qs.length?n:-1}\nasync function loadCloud(){if(!user)return;document.getElementById("cloudState").textContent="Syncing…";const canonical=await detectCanonicalCloud();const {data,error}=await db.from("solutions").select("code,history,complexity").eq("user_id",user.id).eq("problem_id",canonical?exerciseId(idx):idx).maybeSingle();if(error){document.getElementById("cloudState").textContent="Cloud error";return}if(data){if(data.code){code.value=data.code;localStorage.setItem("bb"+idx,data.code)}if(data.history)localStorage.setItem(localKey("history",idx),JSON.stringify(data.history));if(data.complexity&&data.code)localStorage.setItem(localKey("complexity",idx),JSON.stringify({code:data.code,time:data.complexity.time,space:data.complexity.space}));renderProgress()}else await saveCloud();document.getElementById("cloudState").textContent="☁ Synced"}
+function canonicalIdToIndex(id){const s=String(id);if(/^B\\d+$/.test(s)){const n=+s.slice(1);return basicIndexes()[n-1]??-1}if(/^C\\d+$/.test(s)){const n=+s.slice(1);return combinationIndexes()[n-1]??-1}const n=Number(s);return Number.isInteger(n)&&n>=0&&n<qs.length?n:-1}
+async function loadCloud(){if(!user)return;document.getElementById("cloudState").textContent="Syncing…";const canonical=await detectCanonicalCloud();const {data,error}=await db.from("solutions").select("code,history,complexity").eq("user_id",user.id).eq("problem_id",canonical?exerciseId(idx):idx).maybeSingle();if(error){document.getElementById("cloudState").textContent="Cloud error";return}if(data){if(data.code){code.value=data.code;localStorage.setItem(localKey("code",idx),data.code)}if(data.history)localStorage.setItem(localKey("history",idx),JSON.stringify(data.history));if(data.complexity&&data.code)localStorage.setItem(localKey("complexity",idx),JSON.stringify({code:data.code,time:data.complexity.time,space:data.complexity.space}));renderProgress()}else await saveCloud();document.getElementById("cloudState").textContent="☁ Synced"}
 function queueCloud(){
  if(!user)return;
  const problemIndex=idx,codeValue=code.value,userId=user.id;

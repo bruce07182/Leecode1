@@ -83,5 +83,9 @@ if(!app.includes('window.foundationCompleted=completed'))fail('app.js: canonical
 for(const retired of ['graph-question-clarity.js','progressive-solutions-extra.js','curriculum-clarity-v9.js'])if(fs.existsSync(path.join(assets,retired)))fail('retired patch layer returned: '+retired);
 if(!app.includes('window.foundationLocalKey=localKey'))fail('app.js: canonical Foundation local-key API missing');
 for(const name of ['ui-v2.js','shared-learning-v8.js']){const src=fs.readFileSync(path.join(assets,name),'utf8');if(/bb_(?:history|code|complexity|hints|help)_/.test(src))fail(name+': constructs legacy Foundation storage keys');}
+if(!index.includes('id="adminDbTab"')||!index.includes('id="adminDbStructure"'))fail('index.html: admin DB structure view missing');
+const adminSrc=fs.readFileSync(path.join(assets,'admin-readonly.js'),'utf8');
+if(!adminSrc.includes("db.rpc('admin_db_structure')"))fail('admin-readonly.js: DB structure RPC missing');
+for(const doc of ['DATABASE_DESIGN_LESSONS.md','DESIGN_LESSONS.md','BUG_POSTMORTEMS.md'])if(!fs.existsSync(path.join(root,'docs',doc)))fail('architecture document missing: '+doc);
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

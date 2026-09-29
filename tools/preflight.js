@@ -94,5 +94,7 @@ if(progressStorage.test(lc))fail('leetcode-practice.js: durable/progress localSt
 if(!app.includes('const foundationState=new Map()')||!lc.includes('const lcState=new Map()'))fail('session progress state maps missing');
 if(!index.includes('id="runBtn"'))fail('index.html: Foundation Run button missing');
 if(!app.includes('document.getElementById("runBtn").onclick=run'))fail('app.js: Foundation Run button is not wired to run()');
+if(!app.includes('function load(remember=true)')||!app.includes('load(false)'))fail('app.js: startup must not overwrite last-question preference before cloud hydration');
+if(!app.includes('const preferred=Number(localStorage.getItem("bb_last_question"))'))fail('app.js: last Foundation question is not restored after cloud hydration');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

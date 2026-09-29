@@ -129,7 +129,7 @@ document.getElementById("forgotBtn").onclick=async()=>{let email=document.getEle
 document.getElementById("logoutBtn").onclick=()=>db.auth.signOut();
 db.auth.getSession().then(({data})=>{const u=data.session?.user||null;setUser(u)});db.auth.onAuthStateChange(async(e,session)=>{if(e==="PASSWORD_RECOVERY"){const p=prompt("Enter a new password (at least 6 characters):");if(p&&p.length>=6){const {error}=await db.auth.updateUser({password:p});out.textContent=error?"Password update failed: "+error.message:"Password updated."}}setUser(session?.user||null)});
 window.attachPythonEditor?.(code);
-loadPyodide().then(x=>{py=x;out.textContent="Ready."}).catch(e=>out.textContent="Could not load Python: "+e);
+PythonRuntime.load().then(x=>{py=x;out.textContent="Ready."}).catch(e=>out.textContent="Could not load Python: "+e);
 function lessonVisual(x){
  const c=x.category;
  const cells=(vals,marks={},active=[])=>'<div class="learnVisual"><div class="vizRow">'+vals.map((v,i)=>'<div class="vizCell '+(active.includes(i)?'active ':'')+'">'+v+(marks[i]?'<span class="vizMark">'+marks[i]+'</span>':'')+'</div>').join('')+'</div></div>';
@@ -159,7 +159,7 @@ const oldLoad=load;load=function(){oldLoad();document.getElementById("learnBox")
 document.getElementById("runBtn").onclick=run;
 function sampleNotes(x){const text=(x.lesson||"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&").replace(/&quot;/g,'"');const parts=[];const c=text.match(/Complexity\n([\s\S]*?)(?=\n\n|$)/i);if(c)parts.push("Complexity\n"+c[1].trim());const m=text.match(/(?:Two correct versions|Correct approaches|Pythonic \+ interview view|Shortcut vs pattern)\n([\s\S]*?)(?=\n\nComplexity|$)/i);if(m)parts.push("Alternative / deeper view\n"+m[1].trim());return parts.join("\n\n")}
 document.getElementById("reviewBtn").onclick=()=>{const x=qs[idx];const prompt="Review this Python LeetCode practice solution. Do not just rewrite it. Explain correctness, time/space complexity, Python style, edge cases, the DS&A building block demonstrated, and one concrete improvement or next practice step.\n\nProblem: "+x.desc+"\nSignature: "+x.sig+"\n\nSolution:\n"+code.value;navigator.clipboard.writeText(prompt).then(()=>out.textContent="AI review prompt copied.").catch(()=>out.textContent=prompt)};
-function pyLiteral(x){return JSON.stringify(x).replace(/true/g,"True").replace(/false/g,"False").replace(/null/g,"None")}
+const pyLiteral=PythonRuntime.literal;
 async function run(){if(!py){out.textContent="Python is loading…";return}const x=qs[idx];out.textContent="Running…";try{
  await py.runPythonAsync(code.value);
  if(!py.runPython("globals().__contains__('"+x.fn+"')")){out.textContent="❌ Function not found.\n\nExpected: "+x.sig+"\nCheck the function name in your def statement.";return}

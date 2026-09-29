@@ -70,13 +70,23 @@ function queueSave(){
 }
 async function loadCloud(){if(!user)return;const [{data:newRows},{data:oldRows}]=await Promise.all([db.from('solutions').select('*').gte('problem_id',100001).lt('problem_id',200000).eq('user_id',user.id),db.from('solutions').select('*').gte('problem_id',10001).lt('problem_id',11000).eq('user_id',user.id)]);const legacyByCloud=new Map([[10001,1],[10002,217],[10003,125]]);rows=new Map();for(const r of (oldRows||[])){const id=legacyByCloud.get(Number(r.problem_id));if(id)rows.set(id,r)}for(const r of (newRows||[]))rows.set(Number(r.problem_id)-100000,r);for(const p of problems){const r=rows.get(p.id);if(!r)continue;if(r.code)localStorage.setItem(codeKey(p),r.code);if(Array.isArray(r.history))localStorage.setItem(histKey(p),JSON.stringify(r.history));if(r.complexity)localStorage.setItem(complexKey(p),JSON.stringify({code:r.code||'',time:r.complexity.time,space:r.complexity.space}))}render()}
 function gate(u){user=u;document.body.classList.toggle('auth-locked',!u);$('lcAuth').classList.toggle('hidden',!!u);if(u)loadCloud()}
-$('lcRun').onclick=run;$('lcProblem').onchange=()=>{current=problems.find(p=>p.id===Number($('lcProblem').value))||current;render();setEditorLocked(history(current).some(a=>a.passed))};$('lcCode').oninput=()=>{localStorage.setItem(codeKey(current),$('lcCode').value);queueSave()};$('lcHint').onclick=()=>{usedHelp=true;usedHelp=true;$('lcHintBox').innerHTML='<b>Hint</b><br>'+esc(current.hint);$('lcHintBox').classList.toggle('show')};$('lcAnswer').onclick=()=>{usedHelp=true;usedHelp=true;$('lcAnswerBox').innerHTML='<b>Answer</b><pre>'+esc(current.answer)+'</pre>';$('lcAnswerBox').classList.toggle('show')};$('lcWhy').onclick=()=>{$('lcWhyBox').innerHTML='<b>Why this problem?</b><br>'+esc(current.why);$('lcWhyBox').classList.toggle('show')};
+$('lcRun').onclick=run;$('lcProblem').onchange=()=>{current=problems.find(p=>p.id===Number($('lcProblem').value))||current;render();setEditorLocked(history(current).some(a=>a.passed))};$('lcCode').oninput=()=>{localStorage.setItem(codeKey(current),$('lcCode').value);queueSave()};$('lcHint').onclick=()=>{usedHelp=true;$('lcHintBox').innerHTML='<b>Hint</b><br>'+esc(current.hint);$('lcHintBox').classList.toggle('show')};$('lcAnswer').onclick=()=>{usedHelp=true;$('lcAnswerBox').innerHTML='<b>Answer</b><pre>'+esc(current.answer)+'</pre>';$('lcAnswerBox').classList.toggle('show')};$('lcWhy').onclick=()=>{$('lcWhyBox').innerHTML='<b>Why this problem?</b><br>'+esc(current.why);$('lcWhyBox').classList.toggle('show')};
 $('lcPracticeMode').onchange=()=>render();
 function startOA(){const pool=problems.filter(p=>unlocked(p)&&!mastered(p));if(!pool.length)return;oa={ids:pool.slice(0,Math.min(3,pool.length)).map(p=>p.id),start:Date.now(),minutes:75};$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`OA practice · ${oa.ids.length} problems · 75 min · Hint/Answer hidden`;current=problems.find(p=>p.id===oa.ids[0]);render();$('lcHint').style.display='none';$('lcAnswer').style.display='none'}
 $('lcOAStart').onclick=startOA;
-$('lcWhy').onclick=()=>{$('lcWhyBox').innerHTML='<b>Why this problem?</b><br>'+esc(current.why);$('lcWhyBox').classList.toggle('show')};
-$('lcPracticeMode').onchange=()=>render();
-function startOA(){const pool=problems.filter(p=>unlocked(p)&&!mastered(p));if(!pool.length)return;oa={ids:pool.slice(0,Math.min(3,pool.length)).map(p=>p.id),start:Date.now(),minutes:75};$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`OA practice · ${oa.ids.length} problems · 75 min · Hint/Answer hidden`;current=problems.find(p=>p.id===oa.ids[0]);render();$('lcHint').style.display='none';$('lcAnswer').style.display='none'}
-$('lcOAStart').onclick=startOA;
-$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};migrateLegacyLocal();db.auth.getSession().then(({data})=>gate(data.session?.user||null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));render();setEditorLocked(history(current).some(a=>a.passed));loadPyodide().then(x=>{py=x;$('lcOut').textContent='Ready.'}).catch(e=>$('lcOut').textContent='Python failed to load: '+e.message);
+$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};migrateLegacyLocal();db.auth.getSession().then(({data})=>gate(data.session?.user||null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));render();setEditorLocked(history(current).some(a=>a.passed));
+async function initPython(){
+ $('lcOut').textContent='Loading Python…';
+ $('lcRun').disabled=true;
+ try{
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Loading timed out. Check network/CDN access and retry.')),20000));
+  py=await Promise.race([loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'}),timeout]);
+  $('lcOut').textContent='Ready.';$('lcRun').disabled=false;
+ }catch(e){
+  py=null;$('lcRun').disabled=false;
+  $('lcOut').innerHTML='Python failed to load: '+esc(e?.message||e)+'\\n';
+  const retry=document.createElement('button');retry.textContent='Retry Python';retry.onclick=initPython;$('lcOut').appendChild(retry);
+ }
+}
+initPython();
 })();

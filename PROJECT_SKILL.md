@@ -106,3 +106,12 @@ Preflight must protect local asset existence, JS syntax, shared Python runtime o
 
 ## Recovery
 Use Git history and small commits for recovery. Never discard current user progress to fix a code issue. Compatibility/migration code may be removed only after the relevant old state has been migrated and verified in real use.
+
+
+## Review browser
+- Review is a separate read-only browsing experience, not the Practice solver UI.
+- The top-level Review control opens a compact catalog of completed Foundation questions.
+- Review reads the already hydrated Supabase-authoritative progress state; it must not save, mutate, or sync progress.
+- Completed questions can be searched and filtered by topic and Basics/Combinations, and sorted by question order, recent completion, or attempts.
+- Each compact row expands inline to show the problem, saved final code, saved Time/Space complexity, reference answer, attempts, last pass, and learning notes.
+- Do not reintroduce a Review-done mode into the normal question picker. Practice remains one-question-at-a-time; Review is optimized for scanning many completed questions.

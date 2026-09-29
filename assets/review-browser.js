@@ -1,0 +1,27 @@
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const strip=s=>String(s||"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]*>/g,"").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&");
+function api(){return window.foundationReviewApi}
+function rows(){
+ const a=api(); if(!a)return [];
+ return a.questions.map((q,i)=>{const id=a.exerciseId(i),st=a.state.get(id)||{},h=Array.isArray(st.history)?st.history:[],passes=h.filter(x=>x&&x.passed);if(!passes.length)return null;const last=passes[passes.length-1];return {q,i,id,st,h,passes,last,mastery:a.masteryOf?a.masteryOf(i):(passes.length?"Learning":"New")}}).filter(Boolean);
+}
+function populateTopics(data){const s=$("reviewTopic"),keep=s.value,topics=[...new Set(data.map(x=>x.q.category).filter(Boolean))].sort();s.innerHTML='<option value="">All topics</option>'+topics.map(x=>'<option>'+esc(x)+'</option>').join("");if(topics.includes(keep))s.value=keep}
+function render(){
+ let data=rows(); populateTopics(data);
+ const term=$("reviewSearch").value.trim().toLowerCase(),topic=$("reviewTopic").value,level=$("reviewLevel").value,sort=$("reviewSort").value;
+ data=data.filter(x=>(!topic||x.q.category===topic)&&(!level||x.q.level===level)&&(!term||(x.id+" "+x.q.title+" "+x.q.category+" "+x.q.desc).toLowerCase().includes(term)));
+ if(sort==="recent")data.sort((a,b)=>new Date(b.last.time||0)-new Date(a.last.time||0));
+ else if(sort==="attempts")data.sort((a,b)=>b.h.length-a.h.length||a.i-b.i); else data.sort((a,b)=>a.i-b.i);
+ $("reviewSummary").textContent=data.length+" completed question"+(data.length===1?"":"s")+" shown";
+ $("reviewList").innerHTML=data.length?data.map(x=>{
+   const complexity=x.st.complexity&&x.st.complexity.code===x.st.code?x.st.complexity:null;
+   const lastDate=x.last.time?new Date(x.last.time).toLocaleString():"—";
+   return '<details class="reviewItem"><summary><div><div class="reviewItemTitle">✓ '+esc(x.id+" · "+x.q.title.replace(/^\d+\.\s*/,""))+'</div><div class="reviewMeta">'+esc(x.q.category||"")+" · "+esc(x.q.level==="basic"?"Basic":"Combination")+'</div></div><div class="reviewBadges"><span class="reviewBadge">'+esc(x.mastery)+'</span><span class="reviewBadge">'+x.h.length+' attempt'+(x.h.length===1?"":"s")+'</span></div></summary><div class="reviewBody"><section><h4>Problem</h4><p>'+esc(x.q.desc)+'</p><pre>'+esc(x.q.sig||"")+'</pre></section><section><h4>Your saved solution</h4><pre class="reviewCode">'+esc(x.st.code||x.last.code||"No saved code.")+'</pre></section><section><h4>Complexity</h4><p>'+(complexity?'Time O('+esc(complexity.time)+') · Space O('+esc(complexity.space)+')':'No saved complexity.')+'</p></section><section><h4>Reference answer</h4><pre class="reviewCode">'+esc(x.q.sample||"No reference answer.")+'</pre></section><section><h4>Learning notes</h4><p>'+esc(strip(x.q.lesson)||"No notes.")+'</p></section><div class="reviewMeta">Last pass: '+esc(lastDate)+' · Passed '+x.passes.length+' time'+(x.passes.length===1?"":"s")+'</div></div></details>';
+ }).join(""):'<div class="reviewEmpty">No completed questions match these filters.</div>';
+}
+function openReview(){["guideCard","mapCard","questionCard","workCard","adminCard"].forEach(id=>$(id)?.classList.add("hidden"));$("reviewBrowser").classList.remove("hidden");render();window.scrollTo({top:0,behavior:"smooth"})}
+function closeReview(){$("reviewBrowser").classList.add("hidden");["guideCard","mapCard","questionCard","workCard"].forEach(id=>$(id)?.classList.remove("hidden"));window.scrollTo({top:0,behavior:"smooth"})}
+document.addEventListener("DOMContentLoaded",()=>{$("openReview")?.addEventListener("click",openReview);$("closeReview")?.addEventListener("click",closeReview);["reviewSearch","reviewTopic","reviewLevel","reviewSort"].forEach(id=>$(id)?.addEventListener(id==="reviewSearch"?"input":"change",render))});
+})();

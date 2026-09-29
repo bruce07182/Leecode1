@@ -87,7 +87,17 @@ async function mergeLocalToCloud(){
 }
 async function syncAllCloud(){if(!user)return;const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id).gte("problem_id",0).lte("problem_id",36);if(error){document.getElementById("cloudState").textContent="Cloud error";return}for(const row of data||[]){if(row.code)localStorage.setItem("bb"+row.problem_id,row.code);if(row.history)localStorage.setItem("bb_history_"+row.problem_id,JSON.stringify(row.history));if(row.complexity&&row.code)localStorage.setItem("bb_complexity_"+row.problem_id,JSON.stringify({code:row.code,time:row.complexity.time,space:row.complexity.space}))}refreshOptions();load()}
 async function loadCloud(){if(!user)return;document.getElementById("cloudState").textContent="Syncing…";const {data,error}=await db.from("solutions").select("code,history,complexity").eq("user_id",user.id).eq("problem_id",idx).maybeSingle();if(error){document.getElementById("cloudState").textContent="Cloud error";return}if(data){if(data.code){code.value=data.code;localStorage.setItem("bb"+idx,data.code)}if(data.history)localStorage.setItem("bb_history_"+idx,JSON.stringify(data.history));if(data.complexity&&data.code)localStorage.setItem("bb_complexity_"+idx,JSON.stringify({code:data.code,time:data.complexity.time,space:data.complexity.space}));renderProgress()}else await saveCloud();document.getElementById("cloudState").textContent="☁ Synced"}
-function queueCloud(){if(!user)return;clearTimeout(syncTimer);syncTimer=setTimeout(saveCloud,800)}
+function queueCloud(){
+ if(!user)return;
+ const problemId=idx,codeValue=code.value,userId=user.id;
+ clearTimeout(syncTimer);
+ syncTimer=setTimeout(async()=>{
+  let complexity=null;
+  try{const saved=JSON.parse(localStorage.getItem("bb_complexity_"+problemId)||"null");if(saved&&saved.code===codeValue)complexity={time:saved.time,space:saved.space}}catch(e){}
+  const {error}=await db.from("solutions").upsert({user_id:userId,problem_id:problemId,code:codeValue,history:getHistory(problemId),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});
+  if(user?.id===userId&&idx===problemId)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
+ },800);
+}
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{localStorage.setItem("bb"+idx,code.value);queueCloud()};const saved=+(localStorage.getItem("bb_last_question")||0);if(saved>=0&&saved<qs.length&&unlocked(saved))idx=saved;groupSel.value=questionGroup(idx);refreshOptions();if([...sel.options].some(o=>Number(o.value)===idx))sel.value=String(idx);load();
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){

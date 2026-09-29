@@ -252,3 +252,9 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `python-dsa.js` emits `dsa-training-ready`; Python Training registers shared Level-3 data through that explicit event, so its startup is safe whether the consumer loads before or after the shared curriculum.
 - Foundations presentation modules may read `window.DSATraining` (or temporary `window.DSA_LEVEL3` compatibility) but must not require undeclared global identifiers to exist.
 - Prefer startup modules that fail locally and visibly. Avoid architectures where deleting/reordering one unrelated script can stop the whole page before UI initialization.
+
+## Mandatory preflight before/after code changes
+- Run `node tools/preflight.js` before considering a code change complete. GitHub Actions also runs it automatically on every push and pull request.
+- Preflight checks: every local script/stylesheet referenced by the three HTML pages exists; every JS asset parses; obsolete DSA bootstrap is not referenced; the explicit `window.DSATraining` startup contract exists; Foundation cloud reads remain scoped to IDs 0–36; LeetCode keeps official IDs and the `100000 + LC ID` cloud namespace.
+- For startup/auth/persistence changes, make the code change first on an isolated commit/branch when practical, require preflight to pass, then verify the deployed page before stacking another risky change.
+- Extend `tools/preflight.js` whenever a bug reveals a new invariant that can be checked cheaply. A fixed regression should ideally become a permanent test.

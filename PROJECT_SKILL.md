@@ -302,3 +302,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Basic 25 practices string membership such as `ch in "([{"`. Basic 26 practices map membership, retrieval, and value-to-index storage without the Two Sum complement step.
 - Two Sum depends on Frequency Map plus Map lookup & store. Valid Parentheses depends on Stack basics plus String membership plus Map lookup & store.
 - Preflight guards the original combination IDs and these prerequisite edges against accidental shifts or regressions.
+
+## Foundation display numbering
+- Internal Foundation array positions remain immutable persistence IDs, but they are not user-facing question numbers.
+- Display Basics and Combinations as independent sequences using `B1, B2, ...` and `C1, C2, ...`. Compute these labels from the stable array plus level; do not renumber/reorder storage IDs.
+- All Foundation selectors, concept/map practice links, and future question navigation should use the shared `displayTitle(i)` presentation helper rather than raw numbered `title` text where practical.

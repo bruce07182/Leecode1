@@ -1,3 +1,7 @@
 body.auth-locked .wrap>:not(#authCard){display:none!important}
 body.auth-locked #authCard{display:block!important}
 .pythonLink{font-size:13px;font-weight:700;text-decoration:none;color:#1d4ed8;padding:5px 9px;border:1px solid #c8d9ee;border-radius:8px;background:#f2f7ff}
+
+body.app-loading:not(.auth-locked) .wrap{visibility:hidden}
+body.app-loading:not(.auth-locked) #appLoading{display:flex!important}
+.appLoading{position:fixed;inset:0;align-items:center;justify-content:center;font-weight:700;background:#fff;z-index:9999}

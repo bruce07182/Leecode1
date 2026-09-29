@@ -161,7 +161,22 @@ async function loadAdminProgress(){
  const render=()=>{const x=by[pick.value];host.innerHTML='<div><b>Passed:</b> '+x.passed.size+' · <b>Attempts:</b> '+x.attempts+' · <b>Last:</b> '+(x.last||"—")+'</div><div class="status">Exercises: '+x.problems.map(p=>(p.passed?"✓ ":"")+p.id).join(", ")+'</div>'};pick.onchange=render;render();
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
-async function setUser(u){user=u;document.body.classList.toggle("auth-locked",!u);document.getElementById("authCard").classList.toggle("hidden",!!u);document.getElementById("cloudState").textContent=u?"☁ Synced":"Sign in required";document.getElementById("menuSignIn").classList.toggle("hidden",!!u);document.getElementById("menuForgot").classList.toggle("hidden",!!u);document.getElementById("menuSignOut").classList.toggle("hidden",!u);document.getElementById("menuAdmin").classList.toggle("hidden",!isAdmin());if(!isAdmin())document.getElementById("adminCard").classList.add("hidden");["questionCard","workCard","mapCard"].forEach(id=>document.getElementById(id).classList.toggle("hidden",!u));window.dispatchEvent(new CustomEvent("foundation-auth",{detail:{user:u}}));if(u)await hydrateCloudState();else document.getElementById("authCard").classList.remove("hidden")}
+async function setUser(u){
+ user=u;
+ if(u)document.body.classList.add("app-loading");
+ document.body.classList.toggle("auth-locked",!u);
+ document.getElementById("authCard").classList.toggle("hidden",!!u);
+ document.getElementById("cloudState").textContent=u?"Loading progress…":"Sign in required";
+ document.getElementById("menuSignIn").classList.toggle("hidden",!!u);
+ document.getElementById("menuForgot").classList.toggle("hidden",!!u);
+ document.getElementById("menuSignOut").classList.toggle("hidden",!u);
+ document.getElementById("menuAdmin").classList.toggle("hidden",!isAdmin());
+ if(!isAdmin())document.getElementById("adminCard").classList.add("hidden");
+ ["practiceActions","questionCard","workCard","mapCard"].forEach(id=>document.getElementById(id)?.classList.toggle("hidden",!u));
+ window.dispatchEvent(new CustomEvent("foundation-auth",{detail:{user:u}}));
+ if(!u){document.body.classList.remove("app-loading");document.getElementById("authCard").classList.remove("hidden");return}
+ try{await hydrateCloudState()}finally{document.body.classList.remove("app-loading")}
+}
 function toggleMap(){if(!requireUser())return;const opening=document.getElementById("mapCard").classList.contains("hidden");if(opening)renderConceptMap();document.getElementById("mapCard").classList.toggle("hidden");["questionCard","workCard"].forEach(id=>document.getElementById(id).classList.toggle("hidden",opening))}
 function toggleAccount(){if(!user){document.getElementById("authCard").classList.remove("hidden");return}document.getElementById("authCard").classList.toggle("hidden")}
 function toggleGuide(){if(!requireUser())return;document.getElementById("guideCard").classList.toggle("show")}

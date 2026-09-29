@@ -70,5 +70,9 @@ if(!coverageMatch)fail('leetcode-practice.js: missing Foundation Basic coverage 
 else for(const id of catalogIds)if(!new RegExp('(?:^|[,\\s])'+id+':\\[').test(coverageMatch[1]))fail(`leetcode-practice.js: LC${id} has no Foundation Basic coverage`);
 for(const id of [37,38,39,40,41,42,43,44,45])if(!foundationTitles[id])fail(`app.js: extension Basic ID ${id} missing`);
 
+
+if(!app.includes('replace(/^\\d+\\.\\s*/,"")'))fail('app.js: displayTitle must strip legacy numeric title prefix');
+if(!app.includes('if(/^B\\d+$/.test(s))')||!app.includes('if(/^C\\d+$/.test(s))'))fail('app.js: canonical B/C cloud restore regex missing');
+if(!app.includes('getElementById("adminStatus")')||!app.includes('getElementById("adminUsers")'))fail('app.js: admin loader must target live admin DOM IDs');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

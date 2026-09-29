@@ -14,7 +14,7 @@
   };
 
   const openQuestion=i=>{
-    if(i==null) return;
+    if(!window.foundationRequireUser?.()||i==null) return;
     groupSel.value=questionGroup(i);
     refreshOptions();
     sel.value=String(i);

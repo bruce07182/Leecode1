@@ -39,7 +39,8 @@ P(347,[242,215],'Top K Frequent Elements','top-k-frequent-elements','Medium','Ha
 P(56,[121],'Merge Intervals','merge-intervals','Medium','Intervals · Sorting','Merge overlapping [start,end] intervals.','def merge(intervals):','merge','def merge(intervals):\n    pass',[[[[[1,3],[2,6],[8,10],[15,18]]],[[1,6],[8,10],[15,18]]],[[[[1,4],[4,5]]],[[1,5]]]],'n log n','n','Sort by start; compare each interval with the last merged interval.','Introduces the standard sorted-interval scan.','def merge(intervals):\n    intervals=sorted(intervals);out=[]\n    for s,e in intervals:\n        if not out or s>out[-1][1]:out.append([s,e])\n        else:out[-1][1]=max(out[-1][1],e)\n    return out')
 ];
 let user=null,py=null,current=problems[0],rows=new Map(),saveTimer=null,usedHelp=false,oa=null;
-const legacyCloudId=p=>100000+p.lc;\nconst cloudId=async p=>(await detectCanonicalCloud())?p.id:legacyCloudId(p);
+const legacyCloudId=p=>100000+p.lc;
+const cloudId=async p=>(await detectCanonicalCloud())?p.id:legacyCloudId(p);
 const codeKey=p=>`lc_code_${p.id}`,histKey=p=>`lc_history_${p.id}`,complexKey=p=>`lc_complexity_${p.id}`;
 const masterKey=p=>`lc_master_${p.id}`,reviewKey=p=>`lc_review_${p.id}`;
 const history=p=>{try{return JSON.parse(localStorage.getItem(histKey(p))||'[]')}catch{return[]}};

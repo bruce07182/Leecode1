@@ -186,3 +186,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Do not repeat concrete sample inputs/outputs in the description; tests/examples already own those.
 - Preserve only constraints that affect correctness (for example: non-empty, sorted, exactly one answer, allowed movement, or missing-node behavior).
 - Teaching rationale, implementation suggestions, complexity, and Python alternatives belong in Learn/Hint/sample content, not the question description.
+
+- Present the required function signature and compact task/Input/Output contract as one question-spec line/block. Do not render the signature as a separate standalone `<pre>` below the description. Keep `sig` in question data because runtime validation and AI-review prompts depend on it.

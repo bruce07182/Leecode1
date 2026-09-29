@@ -45,7 +45,7 @@ const originalFoundationTitles=['1. Count positives','2. Build a list','3. Find 
 for(let i=0;i<originalFoundationTitles.length;i++)if(foundationTitles[i]!==originalFoundationTitles[i])fail(`app.js: saved Foundation ID ${i} shifted from ${originalFoundationTitles[i]} to ${foundationTitles[i]||'missing'}`);
 if(!foundationTitles.includes('25. String membership')||!foundationTitles.includes('26. Map lookup & store'))fail('app.js: atomic membership/map prerequisites missing');
 if(!app.includes("function displayTitle(i)"))fail('app.js: Basic/Combination display numbering missing');
-if(!app.includes("?'B':'C'"))fail('app.js: Basic/Combination display prefixes missing');
+if(!app.includes('exerciseId(i)+". "+name'))fail('app.js: canonical Basic/Combination display IDs missing');
 if(!app.includes('title:"21. Two Sum",category:"Advanced Hash Map",difficulty:"Medium",deps:[5,38]'))fail('app.js: Two Sum must depend on map lookup/store basic');
 if(!app.includes('title:"23. Valid parentheses",category:"Stack",difficulty:"Easy",deps:[7,37,38]'))fail('app.js: Valid parentheses must depend on stack + membership + map lookup basics');
 if(!fs.existsSync(path.join(root,'supabase','migrate_problem_ids_to_canonical.sql')))fail('canonical migration SQL missing');

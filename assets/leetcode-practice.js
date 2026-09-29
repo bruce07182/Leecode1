@@ -43,16 +43,6 @@ const exerciseIdentity=p=>({type:'LC',number:p.lc});
 const codeKey=p=>`lc_code_${p.id}`,histKey=p=>`lc_history_${p.id}`,complexKey=p=>`lc_complexity_${p.id}`;
 const masterKey=p=>`lc_master_${p.id}`,reviewKey=p=>`lc_review_${p.id}`;
 const history=p=>{try{return JSON.parse(localStorage.getItem(histKey(p))||'[]')}catch{return[]}};
-const legacyIds=new Map([[1,10001],[217,10002],[125,10003]]);
-function migrateLegacyLocal(){
-  for(const p of problems){
-    const old=legacyIds.get(p.lc);
-    for(const [prefix,key] of [['lc_code_',codeKey(p)],['lc_history_',histKey(p)],['lc_complexity_',complexKey(p)]]){
-      for(const legacy of [p.lc,old].filter(Boolean))if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+legacy)!=null)localStorage.setItem(key,localStorage.getItem(prefix+legacy));
-    }
-    for(const [prefix,key] of [['lc_master_',masterKey(p)],['lc_review_',reviewKey(p)]])if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+p.lc)!=null)localStorage.setItem(key,localStorage.getItem(prefix+p.lc));
-  }
-}
 const literal=PythonRuntime.literal;
 const completed=p=>history(p).some(a=>a.passed);
 const mastered=p=>localStorage.getItem(masterKey(p))==='1';
@@ -100,7 +90,7 @@ function startOA(){const pool=oaPool();if(!pool.length){$('lcOAStatus').classLis
 function nextOA(){if(!oa)return;if(oa.pos+1>=oa.ids.length){endOA('OA complete.');return}oa.pos++;current=problems.find(p=>p.id===oa.ids[oa.pos]);render();setEditorLocked(history(current).some(a=>a.passed));updateOA()}
 function endOA(message='OA ended.'){if(!oa)return;const done=oa.ids.filter(id=>completed(problems.find(p=>p.id===id))).length,total=oa.ids.length;clearInterval(oaTimer);oaTimer=null;oa=null;$('lcOAStart').classList.remove('hidden');$('lcOANext').classList.add('hidden');$('lcOAEnd').classList.add('hidden');$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`${message} ${done}/${total} passed.`;render()}
 $('lcOAStart').onclick=startOA;$('lcOANext').onclick=nextOA;$('lcOAEnd').onclick=()=>endOA();
-$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};migrateLegacyLocal();db.auth.getSession().then(({data})=>gate(data.session?.user||null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));render();setEditorLocked(history(current).some(a=>a.passed));
+$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};db.auth.getSession().then(({data})=>gate(data.session?.user||null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));render();setEditorLocked(history(current).some(a=>a.passed));
 async function initPython(){
  $('lcOut').textContent='Loading Python…';
  $('lcRun').disabled=true;

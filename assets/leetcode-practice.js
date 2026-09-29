@@ -48,7 +48,7 @@ function migrateLegacyLocal(){
   for(const p of problems){
     const old=legacyIds.get(p.lc);
     for(const [prefix,key] of [['lc_code_',codeKey(p)],['lc_history_',histKey(p)],['lc_complexity_',complexKey(p)]]){
-      if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+old)!=null)localStorage.setItem(key,localStorage.getItem(prefix+old));
+      for(const legacy of [p.lc,old].filter(Boolean))if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+legacy)!=null)localStorage.setItem(key,localStorage.getItem(prefix+legacy));
     }
   }
 }

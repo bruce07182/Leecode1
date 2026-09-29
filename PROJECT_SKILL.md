@@ -258,3 +258,12 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Preflight checks: every local script/stylesheet referenced by the three HTML pages exists; every JS asset parses; obsolete DSA bootstrap is not referenced; the explicit `window.DSATraining` startup contract exists; Foundation cloud reads remain scoped to IDs 0–36; LeetCode keeps official IDs and the `100000 + LC ID` cloud namespace.
 - For startup/auth/persistence changes, make the code change first on an isolated commit/branch when practical, require preflight to pass, then verify the deployed page before stacking another risky change.
 - Extend `tools/preflight.js` whenever a bug reveals a new invariant that can be checked cheaply. A fixed regression should ideally become a permanent test.
+
+## 2026-09-29 LeetCode learning track expansion
+- LeetCode Practice now uses a curated dependency path of roughly 25 OA-relevant problems instead of the original 3-problem proof of concept. Keep official LeetCode number as stable identity and cloud ID = 100000 + LC number.
+- “Why this problem?” is strictly post-pass because naming the intended learning pattern beforehand can act as a hint.
+- States are New/Passed/Mastered. Passed = any successful run. Mastered is earned by a later successful attempt without opening Hint or Answer during that attempt; do not add a manual mastery shortcut.
+- First pass schedules a short review; clean later mastery schedules a longer review. Review mode surfaces due completed problems.
+- OA Practice is a timed, no-Hint/no-Answer practice surface using unlocked not-yet-mastered problems. Keep it separate from normal learning mode and do not reveal pattern metadata before pass.
+- Failure feedback may classify syntax/signature/runtime/indexing failures, but should not reveal the intended algorithm before pass.
+- Preflight enforces unique official LC IDs and guards against accidental catalog shrinkage.

@@ -41,3 +41,10 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 .questionSection p{margin:6px 0 12px}
 .implementationSection{margin-top:4px}
 .implementationSpec{margin:6px 0 0;padding:10px 12px;white-space:pre-wrap}
+
+.recommendation{position:relative;background:transparent;border:0;padding:0;margin:0}
+.recommendMenu{position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:min(430px,calc(100vw - 32px));max-height:360px;overflow:auto;padding:6px;background:var(--card,#fff);border:1px solid var(--border,#d8dde3);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.recommendMenu button{display:flex;width:100%;justify-content:space-between;gap:14px;text-align:left;padding:9px 10px;border:0;background:transparent;border-radius:7px}
+.recommendMenu button:hover{background:#f3f6fa}
+.recommendMenu small{opacity:.65;white-space:nowrap}
+@media(max-width:600px){.recommendMenu{position:fixed;left:16px;right:16px;top:auto;bottom:16px;min-width:0;max-height:55vh}.recommendMenu button{align-items:flex-start}.recommendMenu small{white-space:normal}}

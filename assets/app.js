@@ -60,7 +60,7 @@ window.foundationReviewApi={questions:qs,state:foundationState,exerciseId,master
 
 const ADMIN_EMAIL="bruce0421@gmail.com";
 const db=supabase.createClient("https://eylaymrbyjjbvkgebvzv.supabase.co","sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9");
-const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
+const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig"),ioEl=document.getElementById("ioSpec");
 function completed(i){return getHistory(i).some(a=>a.passed)}
 window.foundationCompleted=completed;
 function unlocked(i){return qs[i].deps.every(completed)}
@@ -77,7 +77,7 @@ function resetQuestionView(){
  for(const id of ["hintBox","learnBox","answerBox","afterPass"]){const el=document.getElementById(id);if(!el)continue;el.classList.remove("show");el.innerHTML=""}
  const mainO=document.getElementById("mainOBox");if(mainO){mainO.classList.remove("show");mainO.innerHTML=""}
 }
-function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx];descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
+function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx],parts=x.desc.split(/\s+Input:\s+|\s+Output:\s+/);descEl.textContent=parts[0]||x.desc;sigEl.textContent=x.sig;ioEl.innerHTML="<span><b>Input:</b> "+(parts[1]||"See function parameters.")+"</span><span><b>Output:</b> "+(parts[2]||"See problem description.")+"</span>";code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
 function getHistory(i){return stateFor(i).history||[]}
 function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return passes.length>=2&&passes.slice(1).some(a=>a.help===false)?"Mastered":passes.length?"Learning":"New"}
 window.foundationReviewApi.masteryOf=masteryOf;

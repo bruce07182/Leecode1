@@ -93,36 +93,41 @@ function activeFoundationPool(){
  const unfinishedBasics=basicIndexes().filter(i=>!completed(i));
  return unfinishedBasics.length?basicIndexes():qs.map((_,i)=>i);
 }
-function recommendation(){
- const eligible=activeFoundationPool().filter(i=>unlocked(i));
- const due=eligible.find(i=>reviewDue(i));
- if(due!==undefined)return {i:due,action:"Review"};
- const fresh=eligible.find(i=>!completed(i));
- if(fresh!==undefined)return {i:fresh,action:"Practice"};
- const learning=eligible.find(i=>masteryOf(i)!=="Mastered");
- if(learning!==undefined)return {i:learning,action:"Practice again"};
- return null;
+function recommendationOptions(){
+ const pool=activeFoundationPool().filter(i=>unlocked(i)),out=[],used=new Set();
+ const add=(i,action,reason)=>{if(Number.isInteger(i)&&!used.has(i)){used.add(i);out.push({i,action,reason})}};
+ const due=pool.filter(i=>reviewDue(i));
+ const unfinished=pool.filter(i=>!completed(i));
+ const learning=pool.filter(i=>completed(i)&&masteryOf(i)!=="Mastered");
+ const mastered=pool.filter(i=>masteryOf(i)==="Mastered");
+ const currentDeps=(qs[idx]?.deps||[]).filter(i=>pool.includes(i));
+ const followups=pool.filter(i=>(qs[i].deps||[]).includes(idx));
+ add(due[0],"Review","Due for review");
+ add(unfinished.find(i=>i>idx)??unfinished[0],"Practice","Next unfinished");
+ add(learning.find(i=>i!==idx),"Practice again","Build mastery");
+ add(currentDeps.find(i=>completed(i)),"Refresh","Prerequisite");
+ add(followups.find(i=>!completed(i)),"Next step","Uses this skill");
+ add(followups.find(i=>completed(i)&&i!==idx),"Related","Follow-up practice");
+ add(mastered.find(i=>i!==idx),"Challenge again","Already mastered");
+ pool.filter(i=>i!==idx).forEach(i=>add(i,completed(i)?"Practice again":"Practice",qs[i].category));
+ return out;
 }
+function recommendation(){return recommendationOptions()[0]||null}
 window.foundationRecommendation=recommendation;
-function nextUnsolved(){
- const eligible=activeFoundationPool().filter(i=>unlocked(i)&&!completed(i));
- if(!eligible.length)return null;
- const after=eligible.find(i=>i>idx);
- return after??eligible[0];
-}
 function goToQuestion(target){
  if(!requireUser()||!Number.isInteger(target)||!unlocked(target))return;
  idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud();
+ document.getElementById("recommendMenu")?.classList.add("hidden");
+ document.getElementById("recommendMenuBtn")?.setAttribute("aria-expanded","false");
 }
 function renderRecommendation(){
- const title=document.getElementById("recommendTitle"),btn=document.getElementById("recommendBtn"),nextBtn=document.getElementById("nextUnsolvedBtn");
- if(!title||!btn||!nextBtn)return;
- const rec=recommendation(),next=nextUnsolved();
- title.textContent=rec?"":(next?"":"All available questions mastered");
- btn.hidden=!rec;
- if(rec){btn.dataset.question=String(rec.i);btn.textContent=rec.action+" "+displayTitle(rec.i)}
- nextBtn.hidden=next===null;
- if(next!==null){nextBtn.dataset.question=String(next);nextBtn.textContent="Next not solved · "+displayTitle(next)}
+ const menu=document.getElementById("recommendMenu"),btn=document.getElementById("recommendMenuBtn");
+ if(!menu||!btn)return;
+ const options=recommendationOptions();
+ btn.textContent=options.length?"Recommend ▾":"All available mastered";
+ btn.disabled=!options.length;
+ menu.innerHTML=options.length?options.map((o,n)=>'<button type="button" data-question="'+o.i+'"><span>'+(n===0?"★ ":"")+o.action+" · "+displayTitle(o.i)+'</span><small>'+o.reason+'</small></button>').join(""):'';
+ menu.querySelectorAll("button[data-question]").forEach(b=>b.onclick=()=>goToQuestion(Number(b.dataset.question)));
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}
 function reflectionFor(x){return ""}
@@ -158,8 +163,7 @@ function queueCloud(){
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
-document.getElementById("recommendBtn").onclick=()=>goToQuestion(Number(document.getElementById("recommendBtn").dataset.question));
-const nextUnsolvedBtn=document.getElementById("nextUnsolvedBtn");if(nextUnsolvedBtn)nextUnsolvedBtn.onclick=()=>goToQuestion(Number(nextUnsolvedBtn.dataset.question));
+const recommendMenuBtn=document.getElementById("recommendMenuBtn");if(recommendMenuBtn)recommendMenuBtn.onclick=()=>{if(!requireUser())return;const menu=document.getElementById("recommendMenu");const opening=menu.classList.contains("hidden");if(opening)renderRecommendation();menu.classList.toggle("hidden");recommendMenuBtn.setAttribute("aria-expanded",String(opening))};
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{setState(idx,{code:code.value});queueCloud()};groupSel.value=questionGroup(idx);refreshOptions();load(false);
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){

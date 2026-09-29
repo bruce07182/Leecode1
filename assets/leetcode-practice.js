@@ -32,6 +32,7 @@ P(56,[121],'Merge Intervals','merge-intervals','Medium','Intervals · Sorting','
 let user=null,py=null,current=problems[0],rows=new Map(),saveTimer=null,usedHelp=false,oa=null;
 const cloudId=p=>100000+p.id;
 const codeKey=p=>`lc_code_${p.id}`,histKey=p=>`lc_history_${p.id}`,complexKey=p=>`lc_complexity_${p.id}`;
+const masterKey=p=>`lc_master_${p.id}`,reviewKey=p=>`lc_review_${p.id}`;
 const history=p=>{try{return JSON.parse(localStorage.getItem(histKey(p))||'[]')}catch{return[]}};
 const legacyIds=new Map([[1,10001],[217,10002],[125,10003]]);
 function migrateLegacyLocal(){

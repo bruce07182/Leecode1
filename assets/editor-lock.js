@@ -8,13 +8,10 @@
   if (!code || !button || !history || !select) return;
 
   function hasPassedCurrent() {
-    try {
-      const i = Number(select.value);
-      const attempts = JSON.parse(localStorage.getItem('bb_history_' + i) || '[]');
-      return attempts.some(a => a && a.passed);
-    } catch (_) {
-      return false;
-    }
+    const i = Number(select.value);
+    return Number.isInteger(i) && typeof window.foundationCompleted === 'function'
+      ? window.foundationCompleted(i)
+      : false;
   }
 
   function setLocked(locked) {

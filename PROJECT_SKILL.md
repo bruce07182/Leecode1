@@ -120,3 +120,12 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Review defaults to only the user's saved code and saved Time/Space complexity.
 - Problem statement, reference answer, learning notes, and attempt history are secondary opt-in details under collapsed More options.
 \n- Recommendation also exposes a separate `Next not solved` action when an unlocked unfinished question exists. It selects the next unfinished unlocked question after the current position, wrapping to the first unfinished unlocked question when needed; locked questions are never selected.\n
+
+## Authentication invariants (regression-critical)
+- The application is **fail closed**. Until Supabase confirms an authenticated session, `body.auth-locked` remains active and only the sign-in/create-account card may be usable.
+- A brand-new/signed-out user must be prompted to sign in before seeing or using the roadmap, questions, editor, Run, Review, recommendations, learning panels, or admin features.
+- Never remove `auth-locked` as an error fallback. If auth initialization fails or session state is uncertain, keep the app locked and show the auth card.
+- `setUser()` is the authoritative auth UI transition and must always synchronize `body.auth-locked` with session state.
+- Interactive entry points that can bypass ordinary card visibility (Run, Review, roadmap popups/question navigation, recommendation navigation) must call `foundationRequireUser()` / `requireUser()` before doing work.
+- Signed-out state must never be a usable local-practice mode. Progress is cloud/Supabase authoritative; no offline/local practice mode exists.
+- Regression check after UI/auth changes: fresh/incognito load => only auth UI; signed-in load => cloud hydrate before normal work; sign-out => practice UI immediately locks; auth lookup failure => remains locked.

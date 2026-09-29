@@ -77,12 +77,11 @@ if(!app.includes('getElementById("adminStatus")')||!app.includes('getElementById
 if(!lcHtml.includes('id="lcCloud"'))fail('leetcode.html: cloud sync status surface missing');
 if(!lc.includes("const {error}=await db.from('solutions').upsert")||!lc.includes("const {data,error}=await db.from('solutions').select"))fail('leetcode-practice.js: database errors must be surfaced');
 if(app.includes('mergeLocalToCloud')||app.includes('syncAllCloud')||app.includes('migrateFoundationLocal'))fail('app.js: retired local/cloud reconciliation code returned');
-if(!app.includes('async function hydrateCloudCache()')||!app.includes('clearFoundationTempProgress()'))fail('app.js: cloud-authoritative cache hydration missing');
+if(!app.includes('async function hydrateCloudState()')||!app.includes('foundationState.clear()'))fail('app.js: cloud-authoritative session hydration missing');
 const lock=fs.readFileSync(path.join(assets,'editor-lock.js'),'utf8');
 if(lock.includes("bb_history_")||!lock.includes("window.foundationCompleted"))fail('editor-lock.js: completed lock must use canonical Foundation progress state');
 if(!app.includes('window.foundationCompleted=completed'))fail('app.js: canonical completion state is not exposed to editor lock');
 for(const retired of ['graph-question-clarity.js','progressive-solutions-extra.js','curriculum-clarity-v9.js'])if(fs.existsSync(path.join(assets,retired)))fail('retired patch layer returned: '+retired);
-if(!app.includes('window.foundationLocalKey=localKey'))fail('app.js: canonical Foundation local-key API missing');
 for(const name of ['ui-v2.js','shared-learning-v8.js']){const src=fs.readFileSync(path.join(assets,name),'utf8');if(/bb_(?:history|code|complexity|hints|help)_/.test(src))fail(name+': constructs legacy Foundation storage keys');}
 if(!index.includes('id="adminDbTab"')||!index.includes('id="adminDbStructure"'))fail('index.html: admin DB structure view missing');
 const adminSrc=fs.readFileSync(path.join(assets,'admin-readonly.js'),'utf8');

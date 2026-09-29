@@ -26,7 +26,7 @@ Until curriculum data is fully moved to DB, the compatibility app still derives 
 ## Persistence
 Canonical local keys use semantic exercise IDs through `foundationLocalKey(kind, i)`. No feature module may construct old `bb_history_*`, `bb_hints_*`, `bb_help_*`, etc. Legacy `bb_*` reads are allowed only in the one-time migration boundary in `app.js`.
 
-Cloud progress uses `solutions(user_id, exercise_type, exercise_number)`. Every DB write must inspect Supabase `error`. Failed merge/write must stop dependent sync work. A new device must restore cloud state before empty local state can replace it.
+Cloud progress uses `solutions(user_id, exercise_type, exercise_number)`. Supabase is authoritative. There is no local→cloud merge/reconciliation path. localStorage is temporary UI/cache state only; authenticated startup clears stale progress cache and hydrates it from cloud. User actions may save directly to cloud, but the existence of local cache data must never cause an upload. Every DB write must inspect Supabase `error`.
 
 Completion has one meaning: any saved attempt with `passed:true`. Checkmarks, map state, admin state, and editor locking must derive from that same state.
 
@@ -101,7 +101,7 @@ Preflight must protect local asset existence, JS syntax, shared Python runtime o
 - Python/DSA/solution curriculum still contains hard-coded JS data.
 - Some dependencies/mappings still use legacy array indexes.
 - `app.js` is large; split it only after DB/data boundaries exist.
-- Review/mastery and OA state are not fully cloud-backed.
+- OA session state is not yet cloud-backed. LeetCode mastery/review is derived from cloud-backed attempt history rather than separate local durable flags.
 - Exact-output tests can reject alternate valid outputs in some exercises.
 - No source CI can substitute for a real deployed-browser startup test.
 

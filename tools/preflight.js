@@ -21,6 +21,15 @@ for(const name of fs.readdirSync(assets).filter(x=>x.endsWith('.js'))){
     new vm.Script(parseSrc,{filename:name});
   }catch(e){fail(`${name}: JavaScript syntax error: ${e.message}`)}
 }
+for(const page of pages){
+ const html=fs.readFileSync(path.join(root,page),'utf8');
+ if(!html.includes('assets/python-runtime.js'))fail(`${page}: missing shared Python runtime`);
+}
+for(const name of ['app.js','python-basics.js','leetcode-practice.js']){
+ const src=fs.readFileSync(path.join(assets,name),'utf8');
+ if(!src.includes('PythonRuntime.load('))fail(`${name}: bypasses shared Python runtime`);
+ if(src.includes('loadPyodide('))fail(`${name}: owns a duplicate Pyodide loader`);
+}
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 if(index.includes('dsa-data-init.js'))fail('index.html: obsolete dsa-data-init.js reference');
 const app=fs.readFileSync(path.join(assets,'app.js'),'utf8');

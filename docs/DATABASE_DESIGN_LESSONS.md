@@ -24,7 +24,7 @@ Keep language separate from identity when it is merely an implementation variant
 ## Progress rules
 A saved pass is durable state. UI completion, editor locking, map status, admin status, and cloud restore must all derive from the same persisted definition. Do not create separate completion rules in separate modules.
 
-Cloud is authoritative. Do not merge or reconcile local progress into cloud. localStorage may be used only as a temporary render/draft cache. Authenticated startup clears stale progress cache and hydrates it from cloud. Only explicit user actions create cloud writes; cached local data must never create or update a cloud row merely because it exists. Every DB write must inspect and surface its error.
+Cloud is authoritative. Do not merge or reconcile local progress into cloud. Progress data is held only in session memory after cloud hydration. localStorage is not a progress cache; reserve it for disposable UI preferences. Only explicit user actions create cloud writes; cached local data must never create or update a cloud row merely because it exists. Every DB write must inspect and surface its error.
 
 ## RLS and admin
 Every exposed table uses RLS. Ordinary users see/write only their own progress. Admin cross-user access is explicit and read-only unless a separate mutation feature is intentionally designed.

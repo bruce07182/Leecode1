@@ -16,6 +16,7 @@ try{
   db.auth.onAuthStateChange((event,session)=>applyAuthVisibility(session?.user||null));
 }catch(error){
   console.error('Auth initialization failed',error);
-  // Fail visibly instead of leaving the application permanently blank.
-  document.body.classList.remove('auth-locked');
+  // Fail closed: auth uncertainty must never expose practice.
+  document.body.classList.add('auth-locked');
+  document.getElementById('authCard')?.classList.remove('hidden');
 }

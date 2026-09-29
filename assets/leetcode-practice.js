@@ -42,7 +42,7 @@ function migrateLegacyLocal(){
     }
   }
 }
-function literal(v){if(v===null)return'None';if(v===true)return'True';if(v===false)return'False';if(typeof v==='string')return JSON.stringify(v);if(Array.isArray(v))return'['+v.map(literal).join(',')+']';return String(v)}
+const literal=PythonRuntime.literal;
 const completed=p=>history(p).some(a=>a.passed);
 const mastered=p=>localStorage.getItem(masterKey(p))==='1';
 const reviewDue=p=>{const t=Number(localStorage.getItem(reviewKey(p))||0);return completed(p)&&(!t||t<=Date.now())};
@@ -79,8 +79,7 @@ async function initPython(){
  $('lcOut').textContent='Loading Python…';
  $('lcRun').disabled=true;
  try{
-  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Loading timed out. Check network/CDN access and retry.')),20000));
-  py=await Promise.race([loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'}),timeout]);
+  py=await PythonRuntime.load();
   $('lcOut').textContent='Ready.';$('lcRun').disabled=false;
  }catch(e){
   py=null;$('lcRun').disabled=false;

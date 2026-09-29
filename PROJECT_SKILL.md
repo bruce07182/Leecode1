@@ -138,7 +138,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - C++ should demonstrate that the algorithm is language-independent, not force the learner to learn two new things simultaneously.
 
 ## Curriculum principles
-1. Foundations → combinations → later LeetCode-style problems.
+1. Data structures → algorithms/patterns → combinations → later LeetCode-style problems.
 2. Teach only Python useful for DSA.
 3. Concrete problem before abstraction/terminology.
 4. Prefer code + tiny worked examples over dense prose.
@@ -273,3 +273,9 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Foundations, Python Training, and LeetCode Practice must all load this module before their page controller and call `PythonRuntime.load()`; page controllers must not call `loadPyodide()` directly.
 - Keep page-specific execution/test semantics in their owning controller. Share infrastructure and pure utilities; do not create a giant cross-page controller.
 - Preflight enforces this ownership so Python loading cannot silently diverge again.
+
+## 2026-09-28 pattern + OA refinement
+- DSA map left column is named **Data Structures**, not Foundations; the right column remains **Algorithms / Patterns**.
+- LeetCode has an optional pre-code **Find pattern** reflection. It asks generic recognition questions only and must not reveal the specific problem pattern before pass.
+- After pass, **Pattern explained** may reveal the problem-specific pattern/rationale.
+- OA practice is assessment mode: choose up to 3 randomized unlocked/unmastered problems, run a 75-minute countdown, provide Next and End controls, and show a passed/total summary. Hide Hint, Find pattern, Answer, and Pattern explained for the entire OA session.

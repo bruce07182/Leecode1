@@ -4,7 +4,7 @@
 BEGIN;
 
 ALTER TABLE public.solutions ADD COLUMN IF NOT EXISTS exercise_type text;
-ALTER TABLE public.solutions ADD COLUMN IF NOT EXISTS exercise_number integer;
+ALTER TABLE public.solutions ADD COLUMN IF NOT EXISTS exercise_number integer;\nALTER TABLE public.solutions ALTER COLUMN problem_id DROP NOT NULL;
 
 UPDATE public.solutions SET
   exercise_type = CASE

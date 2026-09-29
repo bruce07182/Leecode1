@@ -307,3 +307,13 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Internal Foundation array positions remain immutable persistence IDs, but they are not user-facing question numbers.
 - Display Basics and Combinations as independent sequences using `B1, B2, ...` and `C1, C2, ...`. Compute these labels from the stable array plus level; do not renumber/reorder storage IDs.
 - All Foundation selectors, concept/map practice links, and future question navigation should use the shared `displayTitle(i)` presentation helper rather than raw numbered `title` text where practical.
+
+## 2026-09-29 saved-progress + atomic-skill audit
+- Verified and now preflight-lock all original Foundation persistence IDs 0–36 to their exact original question titles. Existing `bb<ID>`, history, complexity, and cloud `problem_id` values therefore continue to refer to the same original questions.
+- New atomic Basics are append-only extension IDs 37–45; never reuse an original ID for a new exercise. Foundation cloud bulk reads now include 0–45 while preserving the original mapping.
+- Corrected prerequisite wiring: String membership is ID 37 and Map lookup & store is ID 38. Two Sum depends on 5+38; Valid Parentheses depends on 7+37+38.
+- Added hands-on atomic Basics for string normalization (39), running best/min state (40), variable sliding-window movement (41), linked-list rewiring (42), fast/slow pointers (43), grid neighbors/bounds (44), and choose→recurse→undo backtracking (45).
+- New atomic Basics must have runnable tests; concept-only explanation is not enough to count as practiced.
+- Audited all current Foundation Combinations against their prerequisite Basics. Combination dependencies should point to independently practiced building blocks before the combined exercise.
+- `leetcode-practice.js` owns `foundationBasicCoverage`, an informational cross-reference mapping every curated LeetCode problem to the Foundation Basics that drill its atomic building blocks. This does not alter LeetCode's own unlock graph. Preflight requires every curated LC ID to have coverage.
+- Preflight also protects the exact original 0–36 title mapping and requires extension Basic IDs 37–45 to exist.

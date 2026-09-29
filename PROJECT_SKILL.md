@@ -289,3 +289,9 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Each data-structure group may expose an optional **Inside / Deep dive · interview + O()** section.
 - Deep dives should show a tiny implementation model or C++-like pseudocode only when it explains memory/layout/pointers or operation cost. The goal is not a parallel C++ course.
 - Always connect implementation mechanics directly to complexity: e.g. address arithmetic -> O(1) array index; following links -> O(n) linked-list indexing; hash bucket lookup -> expected O(1); complete heap height -> O(log n).
+
+## Shared DSA concept ownership
+- `assets/dsa-concepts.js` is the canonical owner of grouped data-structure relationships, internal implementation models/pseudocode, and implementation-derived O() explanations.
+- All three pages load it. DSA Map renders it directly; Python Training reuses it for matching structure lessons; LeetCode may reuse it only post-pass inside Pattern explained so it never leaks the intended structure/pattern before solving.
+- Do not copy canonical relationship/deep-dive/complexity prose into page controllers. Page-specific curriculum examples and exercises remain in their owning modules.
+- Preflight enforces the shared module and DSA Map ownership contract.

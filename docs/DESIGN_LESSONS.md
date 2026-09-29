@@ -18,7 +18,7 @@ Semantic IDs must survive reorderings. Dependencies use semantic references, nev
 Do not combine everything to reduce file count. Do not split a tightly coupled 90 KB file merely for aesthetics. First establish data/API boundaries, then extract modules along those boundaries.
 
 ## Reliability
-Every asynchronous persistence operation handles errors. UI status must reflect actual state, not assumed success. New-device restore, offline/local state, and cloud state need explicit merge semantics.
+Every asynchronous persistence operation handles errors. UI status must reflect actual state, not assumed success. New-device restore has no merge semantics: cloud wins. Local state is temporary cache/draft state and must not be treated as an independent durable replica.
 
 ## Security
 The browser is untrusted. Hiding an admin button is presentation, not authorization. Enforce authorization in Postgres/RLS/RPCs. Never expose service-role credentials. Read-only admin tooling should remain read-only end to end.

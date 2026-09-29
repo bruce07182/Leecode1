@@ -115,7 +115,7 @@ migrateFoundationLocal();
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{localStorage.setItem(localKey("code",idx),code.value);queueCloud()};const saved=+(localStorage.getItem("bb_last_question")||0);if(saved>=0&&saved<qs.length&&unlocked(saved))idx=saved;groupSel.value=questionGroup(idx);refreshOptions();if([...sel.options].some(o=>Number(o.value)===idx))sel.value=String(idx);load();
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){
- const status=document.getElementById("adminProgressStatus"),host=document.getElementById("adminProgressBody");if(!status||!host)return;
+ const status=document.getElementById("adminStatus"),host=document.getElementById("adminUsers");if(!status||!host)return;
  status.textContent="Loading…";host.innerHTML="";
  const {data,error}=await db.rpc("admin_progress");
  if(error){status.textContent="Admin data is not enabled in Supabase yet: "+error.message;return}

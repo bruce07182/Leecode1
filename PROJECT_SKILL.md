@@ -135,3 +135,9 @@ Use Git history and small commits for recovery. Never discard current user progr
 - `python.html` and `leetcode.html` are direct-entry pages and must independently enforce authentication; never assume the user arrived through `index.html`.
 - Their training UI and Python runtime must not initialize until an authenticated Supabase session is confirmed. Auth lookup failure remains signed-out/locked.
 - Regression review note: Python Training currently has legacy localStorage-backed lesson code/completion. Do not copy this pattern into Foundations or new features; migrate it deliberately to Supabase before treating Python Training progress as cross-device/cloud authoritative.
+
+
+### Login visibility invariant
+- The primary login card must be visible from initial HTML/CSS whenever `body.auth-locked` is active. Do not depend on successful JavaScript startup, `getSession()`, or `setUser()` to reveal the sign-in controls.
+- `authCard` therefore starts visible in markup; authenticated `setUser()` hides it. CSS for `body.auth-locked #authCard` must override ordinary visibility so auth failures still leave a usable login form.
+- Regression test: disable/block a late script or Mermaid import and reload signed out; email/password/Sign in must still be visible and usable.

@@ -102,12 +102,14 @@ function goToQuestion(target){
  idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud();
 }
 function renderRecommendation(){
- const box=document.getElementById("recommendation"),title=document.getElementById("recommendTitle"),reason=document.getElementById("recommendReason"),btn=document.getElementById("recommendBtn"),nextBtn=document.getElementById("nextUnsolvedBtn");
- if(!box||!title||!reason||!btn)return;
+ const title=document.getElementById("recommendTitle"),btn=document.getElementById("recommendBtn"),nextBtn=document.getElementById("nextUnsolvedBtn");
+ if(!title||!btn||!nextBtn)return;
  const rec=recommendation(),next=nextUnsolved();
- if(!rec){title.textContent="All available questions mastered";reason.textContent="";btn.hidden=true}
- else{title.textContent="";reason.textContent="";btn.hidden=false;btn.dataset.question=String(rec.i);btn.textContent=rec.action+" "+displayTitle(rec.i)}
- if(nextBtn){nextBtn.hidden=next===null;if(next!==null){nextBtn.dataset.question=String(next);nextBtn.textContent="Next not solved · "+displayTitle(next);nextBtn.title=""}}
+ title.textContent=rec?"":(next?"":"All available questions mastered");
+ btn.hidden=!rec;
+ if(rec){btn.dataset.question=String(rec.i);btn.textContent=rec.action+" "+displayTitle(rec.i)}
+ nextBtn.hidden=next===null;
+ if(next!==null){nextBtn.dataset.question=String(next);nextBtn.textContent="Next not solved · "+displayTitle(next)}
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}
 function reflectionFor(x){return ""}

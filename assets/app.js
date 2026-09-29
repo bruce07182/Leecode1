@@ -69,7 +69,12 @@ function displayTitle(i){const name=qs[i].title.replace(/^\d+\.\s*/,"");return e
 
 function syncQuestionGroup(){if(groupSel&&qs[idx])groupSel.value=questionGroup(idx)}
 function refreshOptions(){if(!groupSel)return;const current=Number(sel.value);sel.innerHTML="";qs.forEach((x,i)=>{if(questionGroup(i)!==groupSel.value)return;const o=document.createElement("option");o.value=i;const ok=unlocked(i);o.disabled=!ok;o.textContent=(completed(i)?"✓ ":"")+displayTitle(i)+(ok?"":" 🔒");sel.appendChild(o)});if([...sel.options].some(o=>Number(o.value)===current))sel.value=String(current);else{const first=[...sel.options].find(o=>!o.disabled)||sel.options[0];if(first)sel.value=first.value}}
-function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});const x=qs[idx];descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
+function resetQuestionView(){
+ out.textContent=py?"Ready.":"Loading Python…";
+ for(const id of ["hintBox","learnBox","answerBox","afterPass"]){const el=document.getElementById(id);if(!el)continue;el.classList.remove("show");el.innerHTML=""}
+ const mainO=document.getElementById("mainOBox");if(mainO){mainO.classList.remove("show");mainO.innerHTML=""}
+}
+function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx];descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
 function getHistory(i){return stateFor(i).history||[]}
 function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return passes.length>=2&&passes.slice(1).some(a=>a.help===false)?"Mastered":passes.length?"Learning":"New"}
 function reviewDue(i){const h=getHistory(i).filter(a=>a.passed);if(!h.length)return false;const days=masteryOf(i)==="Mastered"?7:2;return Date.now()-new Date(h[h.length-1].time).getTime()>=days*86400000}

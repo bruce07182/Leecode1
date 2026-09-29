@@ -38,8 +38,7 @@
 
 
   // Concrete-first dynamic-programming lesson refinement.
-  {
-    const dp=dsa.find(x=>x.t==='Dynamic programming');
+  const dp=dsa.find(x=>x.t==='Dynamic programming');
     if(!dp) return;
   
     dp.tip=`<b>Start with the problem, not the DP terminology.</b><br><br>

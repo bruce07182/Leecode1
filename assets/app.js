@@ -129,7 +129,7 @@ function queueCloud(){
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
-document.getElementById("recommendBtn").onclick=()=>{const target=Number(document.getElementById("recommendBtn").dataset.question);if(!Number.isInteger(target)||!unlocked(target))return;idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud()};
+document.getElementById("recommendBtn").onclick=()=>{const target=Number(document.getElementById("recommendBtn").dataset.question),reviewing=practiceMode?.value==="review";if(!Number.isInteger(target)||!(reviewing?completed(target):unlocked(target)))return;idx=target;if(!reviewing)groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud()};
 practiceMode.onchange=()=>{refreshOptions();if(sel.options.length){load();loadCloud()}else{resetQuestionView();descEl.textContent="No completed questions yet.";sigEl.textContent="";code.value=""}};
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{setState(idx,{code:code.value});queueCloud()};groupSel.value=questionGroup(idx);refreshOptions();load(false);
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}

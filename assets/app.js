@@ -52,6 +52,7 @@ function exerciseIdentity(i){const type=qs[i].level==="basic"?"B":"C",list=type=
 function exerciseId(i){const x=exerciseIdentity(i);return x.type+x.number}
 function legacyLocalKey(kind,i){return kind==="code"?"bb"+i:kind==="history"?"bb_history_"+i:kind==="complexity"?"bb_complexity_"+i:kind==="hints"?"bb_hints_"+i:"bb_help_"+i}
 function localKey(kind,i){const id=exerciseId(i);return kind==="code"?"ex_code_"+id:kind==="history"?"ex_history_"+id:kind==="complexity"?"ex_complexity_"+id:kind==="hints"?"ex_hints_"+id:"ex_help_"+id}
+window.foundationLocalKey=localKey;
 function migrateFoundationLocal(){for(let i=0;i<qs.length;i++)for(const kind of ["code","history","complexity","hints","help"]){const n=localKey(kind,i),o=legacyLocalKey(kind,i);if(localStorage.getItem(n)==null&&localStorage.getItem(o)!=null)localStorage.setItem(n,localStorage.getItem(o))}}
 
 const ADMIN_EMAIL="bruce0421@gmail.com";

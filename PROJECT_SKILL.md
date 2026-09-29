@@ -188,3 +188,11 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Teaching rationale, implementation suggestions, complexity, and Python alternatives belong in Learn/Hint/sample content, not the question description.
 
 - Present the required function signature and compact task/Input/Output contract as one question-spec line/block. Do not render the signature as a separate standalone `<pre>` below the description. Keep `sig` in question data because runtime validation and AI-review prompts depend on it.
+
+
+### Question vs Implementation
+- Treat **Question** and **Implementation** as separate concepts.
+- Question is short plain-English behavior: what the learner must accomplish. Do not repeat parameter names, Input/Output labels, samples, implementation advice, or teaching content unless essential to understanding the problem.
+- Implementation is a formal Python contract: show the required `def ...:` exactly as the learner must implement it.
+- Add Python comment lines only when they add information not obvious from the parameter name/signature: special representations (linked list/tree/graph), sorted/non-empty constraints, operation formats, special sentinel returns, indexes/coordinates, or similarly important contracts.
+- Do not mechanically comment obvious parameters or returns. Avoid comments equivalent to “nums is the input list.”

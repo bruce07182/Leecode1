@@ -267,3 +267,9 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - OA Practice is a timed, no-Hint/no-Answer practice surface using unlocked not-yet-mastered problems. Keep it separate from normal learning mode and do not reveal pattern metadata before pass.
 - Failure feedback may classify syntax/signature/runtime/indexing failures, but should not reveal the intended algorithm before pass.
 - Preflight enforces unique official LC IDs and guards against accidental catalog shrinkage.
+
+## Shared Python runtime
+- `assets/python-runtime.js` is the single owner of Pyodide loading, CDN/index URL, timeout/retry reset behavior, JS→Python literal conversion, and common PyProxy→JS conversion.
+- Foundations, Python Training, and LeetCode Practice must all load this module before their page controller and call `PythonRuntime.load()`; page controllers must not call `loadPyodide()` directly.
+- Keep page-specific execution/test semantics in their owning controller. Share infrastructure and pure utilities; do not create a giant cross-page controller.
+- Preflight enforces this ownership so Python loading cannot silently diverge again.

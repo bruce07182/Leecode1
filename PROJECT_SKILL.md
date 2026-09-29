@@ -172,7 +172,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `assets/shared-learning-v8.js` — tiny neutral Learn-basics concept previews mapped to the shared curriculum.
 - `assets/dsa-visuals.js`, `assets/dsa-visuals.css` — professional visual rendering.
 - `assets/menu-controller.js` — single owner of top-right menu presentation/actions and account state.
-- `leetcode.html` + `assets/leetcode-practice.js` — separate LeetCode practice surface; uses the same Supabase account/table. The official LeetCode number is the stable practice identity; cloud storage uses `100000 + LeetCode number`.
+- `leetcode.html` + `assets/leetcode-practice.js` — separate LeetCode practice surface; uses the same Supabase account/table. The official LeetCode number is stored canonically as `(exercise_type='LC', exercise_number=<official number>)`.
 - `assets/collapse-fix.js` — single owner of top-level card collapse behavior.
 - `assets/page-init.js` — startup/auth visibility initialization.
 
@@ -210,8 +210,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 ### Stable question grouping
 - The question picker is grouped at the UI layer only: `Basics` and `Combinations`.
-- Never reorder, splice, or rebuild the canonical `qs[]` array to implement grouping. Existing numeric indexes are persistent problem IDs used by local code/history/hints/complexity and Supabase `problem_id`.
-- Question `<option>` values must always be the original `qs[]` index. Filtering changes visibility only, never identity.
+- Do not reorder/splice `qs[]` casually: array indexes still drive dependencies, navigation, and legacy browser-local recovery. Supabase identity is exclusively `(exercise_type, exercise_number)`.
+- Question `<option>` values may remain `qs[]` indexes as UI navigation coordinates. Filtering changes visibility only; persistence identity comes from `exerciseIdentity(i)`.
 - DSA-map navigation and restored last-question state must first select the appropriate group, then select the unchanged original question index.
 
 ### Admin behavior
@@ -221,7 +221,7 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 ### Separate LeetCode practice
 - LeetCode practice lives on `leetcode.html`, separate from the 37 foundation questions. Do not append LeetCode problems to foundation `qs[]`.
-- Foundation IDs `0–36` are immutable. Use the official LeetCode number as the practice identity. In the shared `solutions` table store `100000 + LeetCode number`, keeping Foundation IDs separate and making future additions independent of catalog order.
+- Foundation array indexes are implementation/navigation coordinates only, not cloud identity. Canonical cloud identity is `(exercise_type, exercise_number)`: `B*` for Basics, `C*` for Combinations, and official LeetCode numbers under `LC`.
 - The LeetCode page may reuse the same Supabase auth/session and `solutions` schema, but its localStorage keys use an `lc_` prefix.
 - Foundation Admin totals/viewer must filter to foundation IDs. A dedicated LeetCode admin view can be added later without mixing denominators or question catalogs.
 - The initial LeetCode page is intentionally independent and small; grow its curated problem catalog without changing foundation indexes.
@@ -255,12 +255,12 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 ## Mandatory preflight before/after code changes
 - Run `node tools/preflight.js` before considering a code change complete. GitHub Actions also runs it automatically on every push and pull request.
-- Preflight checks: every local script/stylesheet referenced by the three HTML pages exists; every JS asset parses; obsolete DSA bootstrap is not referenced; the explicit `window.DSATraining` startup contract exists; Foundation cloud reads remain scoped to IDs 0–36; LeetCode keeps official IDs and the `100000 + LC ID` cloud namespace.
+- Preflight checks: every local script/stylesheet referenced by the three HTML pages exists; every JS asset parses; obsolete DSA bootstrap is not referenced; the explicit `window.DSATraining` startup contract exists; canonical B/C/LC identity is present; and active cloud code contains no legacy `problem_id`/packed numeric namespace.
 - For startup/auth/persistence changes, make the code change first on an isolated commit/branch when practical, require preflight to pass, then verify the deployed page before stacking another risky change.
 - Extend `tools/preflight.js` whenever a bug reveals a new invariant that can be checked cheaply. A fixed regression should ideally become a permanent test.
 
 ## 2026-09-29 LeetCode learning track expansion
-- LeetCode Practice now uses a curated dependency path of roughly 25 OA-relevant problems instead of the original 3-problem proof of concept. Keep official LeetCode number as stable identity and cloud ID = 100000 + LC number.
+- LeetCode Practice now uses a curated dependency path of roughly 25 OA-relevant problems instead of the original 3-problem proof of concept. Keep the official LeetCode number as `exercise_number` with `exercise_type='LC'`.
 - “Why this problem?” is strictly post-pass because naming the intended learning pattern beforehand can act as a hint.
 - States are New/Passed/Mastered. Passed = any successful run. Mastered is earned by a later successful attempt without opening Hint or Answer during that attempt; do not add a manual mastery shortcut.
 - First pass schedules a short review; clean later mastery schedules a longer review. Review mode surfaces due completed problems.
@@ -304,13 +304,13 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Preflight guards the original combination IDs and these prerequisite edges against accidental shifts or regressions.
 
 ## Foundation display numbering
-- Internal Foundation array positions remain immutable persistence IDs, but they are not user-facing question numbers.
-- Display Basics and Combinations as independent sequences using `B1, B2, ...` and `C1, C2, ...`. Compute these labels from the stable array plus level; do not renumber/reorder storage IDs.
+- Internal Foundation array positions remain stable implementation/navigation coordinates for dependencies and legacy local recovery; they are not cloud persistence IDs or user-facing question numbers.
+- Display Basics and Combinations as independent canonical sequences `B1, B2, ...` and `C1, C2, ...`. Once assigned, each type+number pair is immutable.
 - All Foundation selectors, concept/map practice links, and future question navigation should use the shared `displayTitle(i)` presentation helper rather than raw numbered `title` text where practical.
 
 ## 2026-09-29 saved-progress + atomic-skill audit
-- Verified and now preflight-lock all original Foundation persistence IDs 0–36 to their exact original question titles. Existing `bb<ID>`, history, complexity, and cloud `problem_id` values therefore continue to refer to the same original questions.
-- New atomic Basics are append-only extension IDs 37–45; never reuse an original ID for a new exercise. Foundation cloud bulk reads now include 0–45 while preserving the original mapping.
+- Preflight-lock the original Foundation array indexes 0–36 to their exact original question titles so legacy browser-local `bb*` recovery remains safe. Cloud identity no longer uses these indexes.
+- New atomic Basics occupy legacy array indexes 37–45 for stable navigation/local migration. Their canonical cloud IDs are `B20`–`B28`.
 - Corrected prerequisite wiring: String membership is ID 37 and Map lookup & store is ID 38. Two Sum depends on 5+38; Valid Parentheses depends on 7+37+38.
 - Added hands-on atomic Basics for string normalization (39), running best/min state (40), variable sliding-window movement (41), linked-list rewiring (42), fast/slow pointers (43), grid neighbors/bounds (44), and choose→recurse→undo backtracking (45).
 - New atomic Basics must have runnable tests; concept-only explanation is not enough to count as practiced.

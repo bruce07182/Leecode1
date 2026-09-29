@@ -102,5 +102,7 @@ if(fs.readFileSync(path.join(assets,'ui-v2.js'),'utf8').includes('window.load=fu
 if(!index.includes('id="recommendation"')||!index.includes('id="recommendBtn"'))fail('index.html: recommended-next control missing');
 if(!app.includes('function recommendation()')||!app.includes('function renderRecommendation()'))fail('app.js: recommendation engine missing');
 if(!app.includes('reviewDue(i)')||!app.includes('!completed(i)')||!app.includes('masteryOf(i)!=="Mastered"'))fail('app.js: recommendation priority contract missing');
+if(!index.includes('id="practiceMode"')||!index.includes('value="review"'))fail('index.html: Review done mode missing');
+if(!app.includes('practiceMode?.value==="review"')||!app.includes('reviewing?completed(i):unlocked(i)'))fail('app.js: Review done filtering/recommendation contract missing');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

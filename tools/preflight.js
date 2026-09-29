@@ -29,6 +29,7 @@ const dsa=fs.readFileSync(path.join(assets,'python-dsa.js'),'utf8');
 if(!dsa.includes('window.DSATraining='))fail('python-dsa.js: missing explicit DSATraining namespace');
 const lc=fs.readFileSync(path.join(assets,'leetcode-practice.js'),'utf8');
 if(!lc.includes('const cloudId=p=>100000+p.id'))fail('leetcode-practice.js: LeetCode cloud namespace changed');
-if(!/id:1,lc:1/.test(lc)||!/id:125,lc:125/.test(lc)||!/id:217,lc:217/.test(lc))fail('leetcode-practice.js: official LeetCode IDs changed');
+if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');
+const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

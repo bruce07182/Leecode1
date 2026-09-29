@@ -44,6 +44,8 @@ for(const m of lc.matchAll(/\$\(['"]([A-Za-z][\w-]*)['"]\)/g)){
   if(!fixedLcIds.has(id)&&!['lcTime','lcSpace','lcCheck','lcComplexResult'].includes(id))fail(`leetcode-practice.js: references missing fixed DOM id #${id}`);
 }
 
+if(!lcHtml.includes('id="lcPattern"')||!lcHtml.includes('id="lcOANext"')||!lcHtml.includes('id="lcOAEnd"'))fail('leetcode.html: pattern/OA controls missing');
+if(!lc.includes('function nextOA()')||!lc.includes('function endOA(')||!lc.includes('setInterval(updateOA,1000)'))fail('leetcode-practice.js: OA session workflow incomplete');
 if(!lc.includes('const masterKey=')||!lc.includes('reviewKey=p=>'))fail('leetcode-practice.js: mastery/review storage key contract missing');
 if(!lc.includes('const cloudId=p=>100000+p.id'))fail('leetcode-practice.js: LeetCode cloud namespace changed');
 if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');

@@ -143,7 +143,8 @@ function queueCloud(){
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
-document.getElementById("recommendBtn").onclick=()=>goToQuestion(Number(document.getElementById("recommendBtn").dataset.question));\nconst nextUnsolvedBtn=document.getElementById("nextUnsolvedBtn");if(nextUnsolvedBtn)nextUnsolvedBtn.onclick=()=>goToQuestion(Number(nextUnsolvedBtn.dataset.question));
+document.getElementById("recommendBtn").onclick=()=>goToQuestion(Number(document.getElementById("recommendBtn").dataset.question));
+const nextUnsolvedBtn=document.getElementById("nextUnsolvedBtn");if(nextUnsolvedBtn)nextUnsolvedBtn.onclick=()=>goToQuestion(Number(nextUnsolvedBtn.dataset.question));
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{setState(idx,{code:code.value});queueCloud()};groupSel.value=questionGroup(idx);refreshOptions();load(false);
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){

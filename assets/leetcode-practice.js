@@ -76,13 +76,15 @@ $('lcPracticeMode').onchange=()=>render();
 let oaTimer=null;
 function oaPool(){return problems.filter(p=>unlocked(p)&&!mastered(p))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function oaFamily(p){const s=p.skills.toLowerCase();if(/tree|graph|dfs|bfs/.test(s))return'traversal';if(/hash|set|map/.test(s))return'hash';if(/two pointers|sliding|interval|binary search/.test(s))return'array-pattern';if(/heap/.test(s))return'heap';if(/dynamic|backtracking/.test(s))return'reasoning';return'core'}
+function selectOA(pool,count=3){const shuffled=shuffle(pool.slice()),picked=[],families=new Set();for(const p of shuffled){const f=oaFamily(p);if(!families.has(f)){picked.push(p);families.add(f);if(picked.length===count)return picked}}for(const p of shuffled)if(!picked.includes(p)){picked.push(p);if(picked.length===count)break}return picked}
 function updateOA(){
  if(!oa)return;
  const left=Math.max(0,oa.minutes*60-Math.floor((Date.now()-oa.start)/1000)),m=Math.floor(left/60),s=String(left%60).padStart(2,'0');
  $('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`OA practice · problem ${oa.pos+1}/${oa.ids.length} · ${m}:${s} remaining · help hidden`;
  if(!left)endOA('Time is up.');
 }
-function startOA(){const pool=shuffle(oaPool().slice());if(!pool.length){$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent='No unlocked unmastered problems available for OA practice.';return}oa={ids:pool.slice(0,Math.min(3,pool.length)).map(p=>p.id),pos:0,start:Date.now(),minutes:75};$('lcOAStart').classList.add('hidden');$('lcOANext').classList.remove('hidden');$('lcOAEnd').classList.remove('hidden');current=problems.find(p=>p.id===oa.ids[0]);render();setEditorLocked(history(current).some(a=>a.passed));updateOA();clearInterval(oaTimer);oaTimer=setInterval(updateOA,1000)}
+function startOA(){const pool=oaPool();if(!pool.length){$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent='No unlocked unmastered problems available for OA practice.';return}const selected=selectOA(pool,Math.min(3,pool.length));oa={ids:selected.map(p=>p.id),pos:0,start:Date.now(),minutes:75};$('lcOAStart').classList.add('hidden');$('lcOANext').classList.remove('hidden');$('lcOAEnd').classList.remove('hidden');current=problems.find(p=>p.id===oa.ids[0]);render();setEditorLocked(history(current).some(a=>a.passed));updateOA();clearInterval(oaTimer);oaTimer=setInterval(updateOA,1000)}
 function nextOA(){if(!oa)return;if(oa.pos+1>=oa.ids.length){endOA('OA complete.');return}oa.pos++;current=problems.find(p=>p.id===oa.ids[oa.pos]);render();setEditorLocked(history(current).some(a=>a.passed));updateOA()}
 function endOA(message='OA ended.'){if(!oa)return;const done=oa.ids.filter(id=>completed(problems.find(p=>p.id===id))).length,total=oa.ids.length;clearInterval(oaTimer);oaTimer=null;oa=null;$('lcOAStart').classList.remove('hidden');$('lcOANext').classList.add('hidden');$('lcOAEnd').classList.add('hidden');$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`${message} ${done}/${total} passed.`;render()}
 $('lcOAStart').onclick=startOA;$('lcOANext').onclick=nextOA;$('lcOAEnd').onclick=()=>endOA();

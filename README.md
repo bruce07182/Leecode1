@@ -22,4 +22,4 @@ For development or continuation work, read `PROJECT_SKILL.md` first.
 
 ## Maintenance
 - Live pages load source assets directly; the obsolete standalone `dist/` builder was removed.
-- LeetCode problems use their official LeetCode number as identity; shared Supabase storage namespaces them as `100000 + LC number`.
+- All cloud progress uses canonical `(exercise_type, exercise_number)` identity. Examples: `B1`, `C2`, and official LeetCode `LC217`.

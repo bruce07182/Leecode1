@@ -89,5 +89,9 @@ const adminSrc=fs.readFileSync(path.join(assets,'admin-readonly.js'),'utf8');
 if(!adminSrc.includes("db.rpc('admin_db_structure')"))fail('admin-readonly.js: DB structure RPC missing');
 for(const doc of ['DATABASE_DESIGN_LESSONS.md','DESIGN_LESSONS.md','BUG_POSTMORTEMS.md'])if(!fs.existsSync(path.join(root,'docs',doc)))fail('architecture document missing: '+doc);
 if(lc.includes('migrateLegacyLocal')||lc.includes('legacyIds=new Map'))fail('leetcode-practice.js: retired local migration returned');
+const progressStorage=/localStorage\.(?:getItem|setItem|removeItem)\([^\n]*(?:ex_|lc_(?:code|history|complexity|master|review)|bb_(?:history|complexity|hints|help))/;
+if(progressStorage.test(app))fail('app.js: durable/progress localStorage returned');
+if(progressStorage.test(lc))fail('leetcode-practice.js: durable/progress localStorage returned');
+if(!app.includes('const foundationState=new Map()')||!lc.includes('const lcState=new Map()'))fail('session progress state maps missing');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

@@ -333,3 +333,8 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - `solutions` ownership RLS uses `(select auth.uid()) = user_id` for read/insert/update/delete; update includes both USING and WITH CHECK.
 - Legacy `bb*` and numeric LC browser-local keys may remain only as read/copy migration sources so an old device can recover unsynced work. They must not be used as cloud identity or displayed to users.
 - Supabase's current breaking-change review found no migration-specific action required for this app. Existing `solutions` Data API grants are not affected by the Oct. 30, 2026 new-table exposure change; future new public tables must use explicit grants plus RLS.
+
+## 2026-09-29 completed-editor canonical-state fix
+- Foundation completed-editor locking must use the same canonical completion source as the app (`completed(i)` / `ex_history_B*` / `ex_history_C*` after cloud restore). `editor-lock.js` must never read legacy `bb_history_<array index>` directly.
+- After login/cloud restore, any exercise with a recorded `passed:true` is immediately read-only and Run becomes Edit. Clicking Edit intentionally unlocks that same editor; the next successful Run locks it again.
+- Preflight guards this ownership so display completion and editor locking cannot diverge again.

@@ -208,3 +208,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Deduplicate questions in the menu even when one question qualifies for several reasons.
 
 - Keep the Recommend menu concise: at most one **Practice again** item. Do not fill remaining menu space with completed questions. Include one **Random** action that chooses an eligible unlocked question from the active Basic-first pool, preferably excluding the current question.
+
+- Question wording must describe the required behavior/result without assuming the learner already knows the intended algorithm. Avoid putting solution-technique phrases such as “using two pointers,” “with DP,” “with memoization,” or “using backtracking” in the question unless the exercise is explicitly testing that technique. Prefer concrete ordering/behavior rules. Keep it concise; add detail only to resolve a real ambiguity.

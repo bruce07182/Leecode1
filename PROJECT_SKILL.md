@@ -147,3 +147,8 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Authentication depends on `assets/app.js` parsing completely. A syntax error anywhere in that file prevents login handlers from being installed even if the login card is visible.
 - Never insert escaped source separators such as a literal `\\n` between JavaScript statements. Use an actual newline.
 - After automated source edits, inspect the exact edited region and verify that the login handler (`signInWithPassword`) remains reachable in a parseable script. Login-card visibility alone is not a sufficient auth regression test.
+
+
+### Recommendation action labeling
+- Keep recommendation explanation out of the surrounding panel when the button can communicate the action.
+- The recommendation button must describe what clicking it does: e.g. `Review B4`, `Practice B12`, or `Practice again B7`; do not use a generic `Go` button with separate review/practice prose.

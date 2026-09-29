@@ -74,7 +74,7 @@ for(const id of [37,38,39,40,41,42,43,44,45])if(!foundationTitles[id])fail(`app.
 if(!app.includes('replace(/^\\d+\\.\\s*/,"")'))fail('app.js: displayTitle must strip legacy numeric title prefix');
 if(!app.includes('if(/^B\\d+$/.test(s))')||!app.includes('if(/^C\\d+$/.test(s))'))fail('app.js: canonical B/C cloud restore regex missing');
 if(!app.includes('getElementById("adminStatus")')||!app.includes('getElementById("adminUsers")'))fail('app.js: admin loader must target live admin DOM IDs');
-if(!htmls['leetcode.html'].includes('id="lcCloud"'))fail('leetcode.html: cloud sync status surface missing');
+if(!lcHtml.includes('id="lcCloud"'))fail('leetcode.html: cloud sync status surface missing');
 if(!lc.includes("const {error}=await db.from('solutions').upsert")||!lc.includes("const {data,error}=await db.from('solutions').select"))fail('leetcode-practice.js: database errors must be surfaced');
 if(!app.includes('if(merged!==false)await syncAllCloud()'))fail('app.js: failed merge must stop cloud restore');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}

@@ -75,8 +75,8 @@ function refreshOptions(){if(!groupSel)return;const current=Number(sel.value);se
 function implementationSpec(x,parts){
  const input=(parts[1]||"").trim(),output=(parts[2]||"").trim();
  const notes=[];
- if(/non-empty|sorted|exactly one|adjacency|\[value, next\]|\[value, left, right\]|None|operations|grid/i.test(input))notes.push("# "+input);
- if(output)notes.push("# returns: "+output.replace(/[.]$/,""));
+ if(/non-empty|sorted|exactly one|adjacency|\[value, next\]|\[value, left, right\]|None|operations|grid/i.test(input))notes.push("# "+input.replace(/[.]$/,""));
+ if(/-1|None|empty|index|indexes|coordinates|dictionary|node|head|True|False/i.test(output))notes.push("# returns: "+output.replace(/[.]$/,""));
  return [x.sig,...notes].join("\n");
 }
 function resetQuestionView(){

@@ -85,10 +85,10 @@ function reviewDue(i){const h=getHistory(i).filter(a=>a.passed);if(!h.length)ret
 function recommendation(){
  const eligible=qs.map((_,i)=>i).filter(i=>unlocked(i));
  const due=eligible.find(i=>reviewDue(i));
- if(due!==undefined)return {i:due,reason:"Review due — strengthen it before it fades."};
- const fresh=eligible.find(i=>!completed(i));if(fresh!==undefined)return {i:fresh,reason:"Unlocked and not passed yet."};
+ if(due!==undefined)return {i:due,action:"Review"};
+ const fresh=eligible.find(i=>!completed(i));if(fresh!==undefined)return {i:fresh,action:"Practice"};
  const learning=eligible.find(i=>masteryOf(i)!=="Mastered");
- if(learning!==undefined)return {i:learning,reason:"Passed once — practice again toward mastery."};
+ if(learning!==undefined)return {i:learning,action:"Practice again"};
  return null;
 }
 function nextUnsolved(){
@@ -105,8 +105,8 @@ function renderRecommendation(){
  const box=document.getElementById("recommendation"),title=document.getElementById("recommendTitle"),reason=document.getElementById("recommendReason"),btn=document.getElementById("recommendBtn"),nextBtn=document.getElementById("nextUnsolvedBtn");
  if(!box||!title||!reason||!btn)return;
  const rec=recommendation(),next=nextUnsolved();
- if(!rec){title.textContent="All available questions mastered";reason.textContent=next?"Continue with the next unfinished question.":"Nice work — use the question list for targeted practice.";btn.hidden=true}
- else{title.textContent="Recommended: "+displayTitle(rec.i);reason.textContent=rec.reason;btn.hidden=false;btn.dataset.question=String(rec.i)}
+ if(!rec){title.textContent="All available questions mastered";reason.textContent="";btn.hidden=true}
+ else{title.textContent="Recommended: "+displayTitle(rec.i);reason.textContent="";btn.hidden=false;btn.dataset.question=String(rec.i);btn.textContent=rec.action+" "+exerciseId(rec.i)}
  if(nextBtn){nextBtn.hidden=next===null;if(next!==null){nextBtn.dataset.question=String(next);nextBtn.title=displayTitle(next)}}
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}

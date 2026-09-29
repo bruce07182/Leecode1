@@ -70,7 +70,7 @@ function queueSave(){
  },600);
 }
 async function loadCloud(){if(!user)return;$('lcCloud').textContent='Loading cloud…';lcState.clear();const {data,error}=await db.from('solutions').select('exercise_type,exercise_number,code,history,complexity').eq('user_id',user.id).eq('exercise_type','LC');if(error){$('lcCloud').textContent='Cloud error';return}rows=new Map();for(const r of (data||[]))rows.set('LC'+r.exercise_number,r);for(const p of problems){const r=rows.get(p.id);if(!r)continue;lcState.set(p.id,{code:r.code||"",history:Array.isArray(r.history)?r.history:[],complexity:r.complexity?{code:r.code||"",time:r.complexity.time,space:r.complexity.space}:null})}render();$('lcCloud').textContent='☁ Synced'}
-function gate(u){user=u;document.body.classList.toggle('auth-locked',!u);$('lcAuth').classList.toggle('hidden',!!u);if(u)loadCloud()}
+let practiceStarted=false;function gate(u){user=u;document.body.classList.toggle('auth-locked',!u);$('lcAuth').classList.toggle('hidden',!!u);if(u){loadCloud();if(!practiceStarted){practiceStarted=true;render();setEditorLocked(history(current).some(a=>a.passed));initPython()}}}
 $('lcRun').onclick=run;$('lcProblem').onchange=()=>{current=problems.find(p=>p.id===$('lcProblem').value)||current;render();setEditorLocked(history(current).some(a=>a.passed))};$('lcCode').oninput=()=>{state(current).code=$('lcCode').value;queueSave()};$('lcHint').onclick=()=>{usedHelp=true;$('lcHintBox').innerHTML='<b>Hint</b><br>'+esc(current.hint);$('lcHintBox').classList.toggle('show')};$('lcAnswer').onclick=()=>{usedHelp=true;$('lcAnswerBox').innerHTML='<b>Answer</b><pre>'+esc(current.answer)+'</pre>';$('lcAnswerBox').classList.toggle('show')};function lcConcept(p){const s=p.skills.toLowerCase();if(/hash|set|map/.test(s))return'Set & Map';if(/stack|queue/.test(s))return'Stack & Queue';if(/tree|graph|heap|dfs|bfs/.test(s))return'Tree, Graph & Heap';if(/array|string|linked list|two pointers|sliding|binary search|interval/.test(s))return'Array, String & Linked List';return null}
 function lcDeepDive(p){const name=lcConcept(p),d=name&&window.DSAConcepts?.get(name);return d?'<details class="deepDive"><summary>'+esc(name)+' · Inside / O()</summary><div class="dsTeachOne">'+esc(d.relationship)+'</div><pre class="dsDiagram">'+esc(d.model)+'</pre><div class="dsTeachOne"><b>Why the O()</b><br>'+esc(d.complexity)+'</div></details>':''}
 $('lcPattern').onclick=()=>{$('lcPatternBox').innerHTML='<b>Find the pattern</b><br>Before coding, ask: What repeats? What information must I remember? Can I avoid redoing work? Which data structure could hold that information?<br><br><span class="status">This reflection does not reveal the problem\'s pattern.</span>';$('lcPatternBox').classList.toggle('show')};$('lcWhy').onclick=()=>{$('lcWhyBox').innerHTML='<b>Pattern explained</b><br>'+esc(current.why)+lcDeepDive(current);$('lcWhyBox').classList.toggle('show')};
@@ -90,7 +90,7 @@ function startOA(){const pool=oaPool();if(!pool.length){$('lcOAStatus').classLis
 function nextOA(){if(!oa)return;if(oa.pos+1>=oa.ids.length){endOA('OA complete.');return}oa.pos++;current=problems.find(p=>p.id===oa.ids[oa.pos]);render();setEditorLocked(history(current).some(a=>a.passed));updateOA()}
 function endOA(message='OA ended.'){if(!oa)return;const done=oa.ids.filter(id=>completed(problems.find(p=>p.id===id))).length,total=oa.ids.length;clearInterval(oaTimer);oaTimer=null;oa=null;$('lcOAStart').classList.remove('hidden');$('lcOANext').classList.add('hidden');$('lcOAEnd').classList.add('hidden');$('lcOAStatus').classList.add('show');$('lcOAStatus').textContent=`${message} ${done}/${total} passed.`;render()}
 $('lcOAStart').onclick=startOA;$('lcOANext').onclick=nextOA;$('lcOAEnd').onclick=()=>endOA();
-$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};db.auth.getSession().then(({data})=>gate(data.session?.user||null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));render();setEditorLocked(history(current).some(a=>a.passed));
+$('lcLogin').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('lcEmail').value.trim(),password:$('lcPassword').value});$('lcAuthMsg').textContent=error?error.message:''};db.auth.getSession().then(({data})=>gate(data.session?.user||null)).catch(()=>gate(null));db.auth.onAuthStateChange((e,s)=>gate(s?.user||null));
 async function initPython(){
  $('lcOut').textContent='Loading Python…';
  $('lcRun').disabled=true;
@@ -103,5 +103,4 @@ async function initPython(){
   const retry=document.createElement('button');retry.textContent='Retry Python';retry.onclick=initPython;$('lcOut').appendChild(retry);
  }
 }
-initPython();
 })();

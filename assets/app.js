@@ -89,12 +89,23 @@ function recommendation(){
  if(learning!==undefined)return {i:learning,reason:"Passed once — practice again toward mastery."};
  return null;
 }
+function nextUnsolved(){
+ const eligible=qs.map((_,i)=>i).filter(i=>unlocked(i)&&!completed(i));
+ if(!eligible.length)return null;
+ const after=eligible.find(i=>i>idx);
+ return after??eligible[0];
+}
+function goToQuestion(target){
+ if(!Number.isInteger(target)||!unlocked(target))return;
+ idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud();
+}
 function renderRecommendation(){
- const box=document.getElementById("recommendation"),title=document.getElementById("recommendTitle"),reason=document.getElementById("recommendReason"),btn=document.getElementById("recommendBtn");
+ const box=document.getElementById("recommendation"),title=document.getElementById("recommendTitle"),reason=document.getElementById("recommendReason"),btn=document.getElementById("recommendBtn"),nextBtn=document.getElementById("nextUnsolvedBtn");
  if(!box||!title||!reason||!btn)return;
- const rec=recommendation();
- if(!rec){title.textContent="All available questions mastered";reason.textContent="Nice work — use the question list for targeted practice.";btn.hidden=true;return}
- title.textContent="Recommended: "+displayTitle(rec.i);reason.textContent=rec.reason;btn.hidden=false;btn.dataset.question=String(rec.i);
+ const rec=recommendation(),next=nextUnsolved();
+ if(!rec){title.textContent="All available questions mastered";reason.textContent=next?"Continue with the next unfinished question.":"Nice work — use the question list for targeted practice.";btn.hidden=true}
+ else{title.textContent="Recommended: "+displayTitle(rec.i);reason.textContent=rec.reason;btn.hidden=false;btn.dataset.question=String(rec.i)}
+ if(nextBtn){nextBtn.hidden=next===null;if(next!==null){nextBtn.dataset.question=String(next);nextBtn.title=displayTitle(next)}}
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}
 function reflectionFor(x){return ""}
@@ -130,7 +141,7 @@ function queueCloud(){
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
-document.getElementById("recommendBtn").onclick=()=>{const target=Number(document.getElementById("recommendBtn").dataset.question);if(!Number.isInteger(target)||!unlocked(target))return;idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud()};
+document.getElementById("recommendBtn").onclick=()=>goToQuestion(Number(document.getElementById("recommendBtn").dataset.question));\nconst nextUnsolvedBtn=document.getElementById("nextUnsolvedBtn");if(nextUnsolvedBtn)nextUnsolvedBtn.onclick=()=>goToQuestion(Number(nextUnsolvedBtn.dataset.question));
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{setState(idx,{code:code.value});queueCloud()};groupSel.value=questionGroup(idx);refreshOptions();load(false);
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){

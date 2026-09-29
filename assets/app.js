@@ -58,7 +58,7 @@ window.foundationReviewApi={questions:qs,state:foundationState,exerciseId,master
 
 const ADMIN_EMAIL="bruce0421@gmail.com";
 const db=supabase.createClient("https://eylaymrbyjjbvkgebvzv.supabase.co","sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9");
-const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),practiceMode=document.getElementById("practiceMode"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
+const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig");
 function completed(i){return getHistory(i).some(a=>a.passed)}
 window.foundationCompleted=completed;
 function unlocked(i){return qs[i].deps.every(completed)}
@@ -68,8 +68,8 @@ function showConcept(cat){const items=qs.map((x,i)=>({x,i})).filter(o=>o.x.categ
 function questionGroup(i){return qs[i].level==="basic"?"basic":"combination"}
 function displayTitle(i){const name=qs[i].title.replace(/^\d+\.\s*/,"");return exerciseId(i)+" · "+name}
 
-function syncQuestionGroup(){if(groupSel&&qs[idx]&&practiceMode?.value!=="review")groupSel.value=questionGroup(idx)}
-function refreshOptions(){if(!groupSel)return;const current=Number(sel.value),review=practiceMode?.value==="review";sel.innerHTML="";qs.forEach((x,i)=>{if(review?!completed(i):questionGroup(i)!==groupSel.value)return;const o=document.createElement("option");o.value=i;const ok=review||unlocked(i);o.disabled=!ok;o.textContent=(completed(i)?"✓ ":"")+displayTitle(i)+(masteryOf(i)==="Mastered"?" ★":"")+(ok?"":" 🔒");sel.appendChild(o)});document.getElementById("questionGroupLabel")?.classList.toggle("hidden",review);if([...sel.options].some(o=>Number(o.value)===current))sel.value=String(current);else{const first=[...sel.options].find(o=>!o.disabled)||sel.options[0];if(first)sel.value=first.value}renderRecommendation()}
+function syncQuestionGroup(){if(groupSel&&qs[idx])groupSel.value=questionGroup(idx)}
+function refreshOptions(){if(!groupSel)return;const current=Number(sel.value);sel.innerHTML="";qs.forEach((x,i)=>{if(questionGroup(i)!==groupSel.value)return;const o=document.createElement("option");o.value=i;const ok=unlocked(i);o.disabled=!ok;o.textContent=(completed(i)?"✓ ":"")+displayTitle(i)+(masteryOf(i)==="Mastered"?" ★":"")+(ok?"":" 🔒");sel.appendChild(o)});if([...sel.options].some(o=>Number(o.value)===current))sel.value=String(current);else{const first=[...sel.options].find(o=>!o.disabled)||sel.options[0];if(first)sel.value=first.value}renderRecommendation()}
 function resetQuestionView(){
  out.textContent=py?"Ready.":"Loading Python…";
  for(const id of ["hintBox","learnBox","answerBox","afterPass"]){const el=document.getElementById(id);if(!el)continue;el.classList.remove("show");el.innerHTML=""}
@@ -81,11 +81,10 @@ function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return 
 window.foundationReviewApi.masteryOf=masteryOf;
 function reviewDue(i){const h=getHistory(i).filter(a=>a.passed);if(!h.length)return false;const days=masteryOf(i)==="Mastered"?7:2;return Date.now()-new Date(h[h.length-1].time).getTime()>=days*86400000}
 function recommendation(){
- const reviewing=practiceMode?.value==="review";
- const eligible=qs.map((_,i)=>i).filter(i=>reviewing?completed(i):unlocked(i));
+ const eligible=qs.map((_,i)=>i).filter(i=>unlocked(i));
  const due=eligible.find(i=>reviewDue(i));
  if(due!==undefined)return {i:due,reason:"Review due — strengthen it before it fades."};
- if(!reviewing){const fresh=eligible.find(i=>!completed(i));if(fresh!==undefined)return {i:fresh,reason:"Unlocked and not passed yet."};}
+ const fresh=eligible.find(i=>!completed(i));if(fresh!==undefined)return {i:fresh,reason:"Unlocked and not passed yet."};
  const learning=eligible.find(i=>masteryOf(i)!=="Mastered");
  if(learning!==undefined)return {i:learning,reason:"Passed once — practice again toward mastery."};
  return null;
@@ -95,7 +94,7 @@ function renderRecommendation(){
  if(!box||!title||!reason||!btn)return;
  const rec=recommendation();
  if(!rec){title.textContent="All available questions mastered";reason.textContent="Nice work — use the question list for targeted practice.";btn.hidden=true;return}
- title.textContent=(practiceMode?.value==="review"?"Review: ":"Recommended: ")+displayTitle(rec.i);reason.textContent=rec.reason;btn.hidden=false;btn.dataset.question=String(rec.i);
+ title.textContent="Recommended: "+displayTitle(rec.i);reason.textContent=rec.reason;btn.hidden=false;btn.dataset.question=String(rec.i);
 }
 function oPicker(){const o='<option value="">?</option><option>1</option><option>log n</option><option>n</option><option>n log n</option><option>n^2</option><option>2^n</option><option>V + E</option>';return '<div class="interviewRow"><label>Time O(<select id="timePick">'+o+'</select>)</label><label>Space O(<select id="spacePick">'+o+'</select>)</label><button id="checkComplexity">Check</button></div><div id="complexityResult" class="checkResult"></div>'}
 function reflectionFor(x){return ""}
@@ -131,8 +130,7 @@ function queueCloud(){
   if(user?.id===userId&&idx===problemIndex)document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced";
  },800);
 }
-document.getElementById("recommendBtn").onclick=()=>{const target=Number(document.getElementById("recommendBtn").dataset.question),reviewing=practiceMode?.value==="review";if(!Number.isInteger(target)||!(reviewing?completed(target):unlocked(target)))return;idx=target;if(!reviewing)groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud()};
-practiceMode.onchange=()=>{refreshOptions();if(sel.options.length){load();loadCloud()}else{resetQuestionView();descEl.textContent="No completed questions yet.";sigEl.textContent="";code.value=""}};
+document.getElementById("recommendBtn").onclick=()=>{const target=Number(document.getElementById("recommendBtn").dataset.question);if(!Number.isInteger(target)||!unlocked(target))return;idx=target;groupSel.value=questionGroup(target);refreshOptions();sel.value=String(target);load();loadCloud()};
 groupSel.onchange=()=>{refreshOptions();load();loadCloud();if(!document.getElementById("mapCard").classList.contains("hidden"))renderConceptMap()};sel.onchange=()=>{load();loadCloud()};code.oninput=()=>{setState(idx,{code:code.value});queueCloud()};groupSel.value=questionGroup(idx);refreshOptions();load(false);
 function isAdmin(){return !!user&&String(user.email||"").toLowerCase()===ADMIN_EMAIL}
 async function loadAdminProgress(){

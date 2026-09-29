@@ -15,7 +15,10 @@ for(const page of pages){
 const assets=path.join(root,'assets');
 for(const name of fs.readdirSync(assets).filter(x=>x.endsWith('.js'))){
   const file=path.join(assets,name),src=fs.readFileSync(file,'utf8');
-  try{new vm.Script(src,{filename:name})}catch(e){fail(`${name}: JavaScript syntax error: ${e.message}`)}
+  try{
+    if(name==='page-init.js')new vm.SourceTextModule(src,{identifier:name});
+    else new vm.Script(src,{filename:name});
+  }catch(e){fail(`${name}: JavaScript syntax error: ${e.message}`)}
 }
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 if(index.includes('dsa-data-init.js'))fail('index.html: obsolete dsa-data-init.js reference');

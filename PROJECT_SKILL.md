@@ -326,3 +326,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - The live Supabase cutover is complete. `solutions` now uses primary key `(user_id, exercise_type, exercise_number)`; legacy `problem_id` has been dropped after validating all real rows and consolidating the duplicate legacy/current LC1 record.
 - Application cloud reads/writes and the admin read-only viewer use only `exercise_type + exercise_number`. Numeric cloud compatibility must not be reintroduced.
 - User-facing IDs are a single canonical label such as `B1`, `C2`, or `LC217`; never show an old numeric storage ID beside it.
+
+## 2026-09-29 post-cutover audit
+- Re-reviewed active Foundation, LeetCode, admin, preflight, README, project skill, and live Supabase schema after removing legacy cloud IDs.
+- Live `solutions` has 71 mapped rows, zero duplicate canonical keys, zero unmapped rows, RLS enabled, and only the composite primary-key index for identity. The redundant pre-cutover unique index was removed.
+- `solutions` ownership RLS uses `(select auth.uid()) = user_id` for read/insert/update/delete; update includes both USING and WITH CHECK.
+- Legacy `bb*` and numeric LC browser-local keys may remain only as read/copy migration sources so an old device can recover unsynced work. They must not be used as cloud identity or displayed to users.
+- Supabase's current breaking-change review found no migration-specific action required for this app. Existing `solutions` Data API grants are not affected by the Oct. 30, 2026 new-table exposure change; future new public tables must use explicit grants plus RLS.

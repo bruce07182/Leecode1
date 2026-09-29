@@ -43,6 +43,8 @@ const foundationTitles=[...app.matchAll(/title:"([^"]+)"/g)].map(m=>m[1]);
 if(foundationTitles.length<26)fail('app.js: Foundation curriculum unexpectedly shrank below 26 problems');
 if(foundationTitles[20]!=='21. Two Sum'||foundationTitles[22]!=='23. Valid parentheses')fail('app.js: existing Foundation problem IDs shifted');
 if(!foundationTitles.includes('25. String membership')||!foundationTitles.includes('26. Map lookup & store'))fail('app.js: atomic membership/map prerequisites missing');
+if(!app.includes("function displayTitle(i)"))fail('app.js: Basic/Combination display numbering missing');
+if(!app.includes("?'B':'C'"))fail('app.js: Basic/Combination display prefixes missing');
 if(!app.includes('title:"21. Two Sum",category:"Advanced Hash Map",difficulty:"Medium",deps:[5,25]'))fail('app.js: Two Sum must depend on map lookup/store basic');
 if(!app.includes('title:"23. Valid parentheses",category:"Stack",difficulty:"Easy",deps:[7,24,25]'))fail('app.js: Valid parentheses must depend on stack + membership + map lookup basics');
 const dsa=fs.readFileSync(path.join(assets,'python-dsa.js'),'utf8');

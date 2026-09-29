@@ -282,3 +282,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 
 - OA selection should prefer diversity across problem families before repeating a family; keep randomness within eligible unlocked/unmastered problems.
 - DSA map Set & Map teaching: both are closely related hash-based lookup structures. Explain a set conceptually as key → present (unique membership), versus a map/dict as unique key → associated value. Avoid saying a set is literally a map or “max 1 data”; Python exposes them as distinct types.
+
+## Data-structure deep dives
+- Keep related structures grouped for comparison: Array/String/Linked List; Set/Map; Stack/Queue; Tree/Graph/Heap.
+- Teach the relationship explicitly: strings are sequence-like/indexed but not literally C++ arrays or Python lists; linked lists contrast contiguous/indexed storage; trees are restricted graphs; binary heaps add complete-tree shape + heap order.
+- Each data-structure group may expose an optional **Inside / Deep dive · interview + O()** section.
+- Deep dives should show a tiny implementation model or C++-like pseudocode only when it explains memory/layout/pointers or operation cost. The goal is not a parallel C++ course.
+- Always connect implementation mechanics directly to complexity: e.g. address arithmetic -> O(1) array index; following links -> O(n) linked-list indexing; hash bucket lookup -> expected O(1); complete heap height -> O(log n).

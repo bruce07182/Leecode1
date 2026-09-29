@@ -57,6 +57,7 @@ $('pyReset').onclick=()=>{localStorage.removeItem(`py_code_${level}_${current}`)
 $('pyAnswer').onclick=()=>{const box=$('pyAnswerBox'),x=visible()[current];if(box.classList.contains('show')){box.classList.remove('show');box.innerHTML='';return}box.innerHTML='<b>Answer</b><pre>'+esc(x.answer)+'</pre>';box.classList.add('show')};
 $('pyNext').onclick=()=>{if(current<visible().length-1){current++;render();$('pyLesson').scrollIntoView({behavior:'smooth',block:'start'})}};
 $('pyLogin').onclick=async()=>{const {error}=await pydb.auth.signInWithPassword({email:$('pyEmail').value.trim(),password:$('pyPassword').value});$('pyAuthMsg').textContent=error?error.message:''};
-function gate(user){document.body.classList.toggle('auth-locked',!user);$('pyAuth').classList.toggle('hidden',!!user)}
-pydb.auth.getSession().then(({data})=>gate(data.session?.user||null));pydb.auth.onAuthStateChange((e,s)=>gate(s?.user||null));
-render();initPython();
+let trainingStarted=false;
+function startTraining(){if(trainingStarted)return;trainingStarted=true;render();initPython()}
+function gate(user){document.body.classList.toggle('auth-locked',!user);$('pyAuth').classList.toggle('hidden',!!user);if(user)startTraining()}
+pydb.auth.getSession().then(({data})=>gate(data.session?.user||null)).catch(()=>gate(null));pydb.auth.onAuthStateChange((e,s)=>gate(s?.user||null));

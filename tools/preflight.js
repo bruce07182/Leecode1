@@ -77,5 +77,8 @@ if(!app.includes('getElementById("adminStatus")')||!app.includes('getElementById
 if(!lcHtml.includes('id="lcCloud"'))fail('leetcode.html: cloud sync status surface missing');
 if(!lc.includes("const {error}=await db.from('solutions').upsert")||!lc.includes("const {data,error}=await db.from('solutions').select"))fail('leetcode-practice.js: database errors must be surfaced');
 if(!app.includes('if(merged!==false)await syncAllCloud()'))fail('app.js: failed merge must stop cloud restore');
+const lock=fs.readFileSync(path.join(assets,'editor-lock.js'),'utf8');
+if(lock.includes("bb_history_")||!lock.includes("window.foundationCompleted"))fail('editor-lock.js: completed lock must use canonical Foundation progress state');
+if(!app.includes('window.foundationCompleted=completed'))fail('app.js: canonical completion state is not exposed to editor lock');
 if(errors.length){console.error('PRE-FLIGHT FAILED\n- '+errors.join('\n- '));process.exit(1)}
 console.log('Preflight OK: local assets, JS syntax, startup contract, and persistence namespaces.');

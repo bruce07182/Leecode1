@@ -51,6 +51,7 @@ function migrateLegacyLocal(){
     for(const [prefix,key] of [['lc_code_',codeKey(p)],['lc_history_',histKey(p)],['lc_complexity_',complexKey(p)]]){
       for(const legacy of [p.lc,old].filter(Boolean))if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+legacy)!=null)localStorage.setItem(key,localStorage.getItem(prefix+legacy));
     }
+    for(const [prefix,key] of [['lc_master_',masterKey(p)],['lc_review_',reviewKey(p)]])if(localStorage.getItem(key)==null&&localStorage.getItem(prefix+p.lc)!=null)localStorage.setItem(key,localStorage.getItem(prefix+p.lc));
   }
 }
 const literal=PythonRuntime.literal;

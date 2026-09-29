@@ -37,3 +37,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 .questionSpec{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-top:8px;line-height:1.5}
 .questionSpec code{font-weight:700;white-space:nowrap}
 .ioSpec{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted)}
+
+.questionSection p{margin:6px 0 12px}
+.implementationSection{margin-top:4px}
+.implementationSpec{margin:6px 0 0;padding:10px 12px;white-space:pre-wrap}

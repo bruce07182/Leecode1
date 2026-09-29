@@ -1,69 +1,54 @@
--- Canonical exercise ID migration: numeric Foundation/LeetCode IDs -> B*/C*/LC*
--- Run once in Supabase SQL Editor with the matching app release.
--- Only problem_id changes; saved code/history/complexity remain in the same rows.
+-- Canonical exercise identity migration
+-- Final model: (exercise_type, exercise_number), e.g. (B,1), (C,2), (LC,217).
+-- problem_id is intentionally retained during rollout as a rollback/compatibility field.
 BEGIN;
-ALTER TABLE public.solutions
-ALTER COLUMN problem_id TYPE text
-USING (CASE
-  WHEN 0 THEN 'B1'
-  WHEN 1 THEN 'B2'
-  WHEN 2 THEN 'B3'
-  WHEN 3 THEN 'B4'
-  WHEN 4 THEN 'B5'
-  WHEN 5 THEN 'B6'
-  WHEN 6 THEN 'B7'
-  WHEN 7 THEN 'B8'
-  WHEN 8 THEN 'B9'
-  WHEN 9 THEN 'B10'
-  WHEN 10 THEN 'B11'
-  WHEN 11 THEN 'B12'
-  WHEN 12 THEN 'B13'
-  WHEN 13 THEN 'B14'
-  WHEN 14 THEN 'B15'
-  WHEN 15 THEN 'B16'
-  WHEN 16 THEN 'B17'
-  WHEN 17 THEN 'B18'
-  WHEN 18 THEN 'B19'
-  WHEN 19 THEN 'C1'
-  WHEN 20 THEN 'C2'
-  WHEN 21 THEN 'C3'
-  WHEN 22 THEN 'C4'
-  WHEN 23 THEN 'C5'
-  WHEN 24 THEN 'C6'
-  WHEN 25 THEN 'C7'
-  WHEN 26 THEN 'C8'
-  WHEN 27 THEN 'C9'
-  WHEN 28 THEN 'C10'
-  WHEN 29 THEN 'C11'
-  WHEN 30 THEN 'C12'
-  WHEN 31 THEN 'C13'
-  WHEN 32 THEN 'C14'
-  WHEN 33 THEN 'C15'
-  WHEN 34 THEN 'C16'
-  WHEN 35 THEN 'C17'
-  WHEN 36 THEN 'C18'
-  WHEN 37 THEN 'B20'
-  WHEN 38 THEN 'B21'
-  WHEN 39 THEN 'B22'
-  WHEN 40 THEN 'B23'
-  WHEN 41 THEN 'B24'
-  WHEN 42 THEN 'B25'
-  WHEN 43 THEN 'B26'
-  WHEN 44 THEN 'B27'
-  WHEN 45 THEN 'B28'
-  WHEN 10001 THEN 'LC1'
-  WHEN 10002 THEN 'LC217'
-  WHEN 10003 THEN 'LC125'
-  ELSE CASE WHEN problem_id BETWEEN 100001 AND 199999
-    THEN 'LC' || (problem_id - 100000)::text
-    ELSE problem_id::text END
-END);
-DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM public.solutions WHERE problem_id ~ '^[0-9]+$')
-  THEN RAISE EXCEPTION 'Unmapped numeric problem_id remains in solutions';
+
+ALTER TABLE public.solutions ADD COLUMN IF NOT EXISTS exercise_type text;
+ALTER TABLE public.solutions ADD COLUMN IF NOT EXISTS exercise_number integer;
+
+UPDATE public.solutions SET
+  exercise_type = CASE
+    WHEN problem_id BETWEEN 0 AND 18 OR problem_id BETWEEN 37 AND 45 THEN 'B'
+    WHEN problem_id BETWEEN 19 AND 36 THEN 'C'
+    WHEN problem_id BETWEEN 10001 AND 10999 OR problem_id BETWEEN 100001 AND 199999 THEN 'LC'
+    ELSE exercise_type
+  END,
+  exercise_number = CASE
+    WHEN problem_id BETWEEN 0 AND 18 THEN problem_id + 1
+    WHEN problem_id BETWEEN 19 AND 36 THEN problem_id - 18
+    WHEN problem_id BETWEEN 37 AND 45 THEN problem_id - 17
+    WHEN problem_id = 10001 THEN 1
+    WHEN problem_id = 10002 THEN 217
+    WHEN problem_id = 10003 THEN 125
+    WHEN problem_id BETWEEN 100001 AND 199999 THEN problem_id - 100000
+    ELSE exercise_number
+  END
+WHERE exercise_type IS NULL OR exercise_number IS NULL;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.solutions
+    WHERE exercise_type IS NULL OR exercise_number IS NULL
+  ) THEN
+    RAISE EXCEPTION 'Unmapped solution row remains; migration rolled back';
   END IF;
 END $$;
+
+ALTER TABLE public.solutions
+  ADD CONSTRAINT solutions_exercise_type_check
+  CHECK (exercise_type IN ('B','C','LC','P','CPP'));
+
+ALTER TABLE public.solutions ALTER COLUMN exercise_type SET NOT NULL;
+ALTER TABLE public.solutions ALTER COLUMN exercise_number SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS solutions_user_exercise_uidx
+  ON public.solutions (user_id, exercise_type, exercise_number);
+
 COMMIT;
 
--- Verify after migration:
--- select problem_id,count(*) from public.solutions group by problem_id order by problem_id;
+-- Verify before removing legacy problem_id in a later release:
+-- SELECT exercise_type, exercise_number, count(*)
+-- FROM public.solutions
+-- GROUP BY exercise_type, exercise_number
+-- ORDER BY exercise_type, exercise_number;

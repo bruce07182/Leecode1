@@ -2,6 +2,15 @@
 (()=>{
 const URL='https://eylaymrbyjjbvkgebvzv.supabase.co',KEY='sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9',db=supabase.createClient(URL,KEY),$=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const P=(id,deps,title,slug,difficulty,skills,desc,sig,fn,starter,tests,time,space,hint,why,answer)=>({id,lc:id,deps,title,slug,difficulty,skills,desc,sig,fn,starter,tests,time,space,hint,why,answer});
+// Foundation Basic IDs that explicitly drill each LeetCode problem's atomic building blocks.
+// These are curriculum cross-references only; LeetCode keeps its own progression/unlock graph.
+const foundationBasicCoverage=Object.freeze({
+  1:[5,38],217:[6],242:[3,5],125:[3,4,39],121:[2,40],704:[11],35:[11],
+  3:[38,41],20:[7,37,38],155:[7,40],206:[14,42],141:[14,43],
+  104:[15,16],226:[15,16],102:[12,16],200:[12,13,44],733:[12,13,44],
+  215:[17],703:[17],70:[18],198:[18,40],78:[15,45],46:[15,45],
+  347:[5,17],56:[1,8,40]
+});
 const problems=[
 P(1,[],'Two Sum','two-sum','Easy','Array · Hash Map','Return indexes of two different values whose sum equals target.','def two_sum(nums, target):','two_sum','def two_sum(nums, target):\n    pass',[[[[2,7,11,15],9],[0,1]],[[[3,2,4],6],[1,2]]],'n','n','Remember values you have already seen.','Introduces the core one-pass hash-map lookup pattern.','def two_sum(nums, target):\n    seen={}\n    for i,x in enumerate(nums):\n        if target-x in seen:return [seen[target-x],i]\n        seen[x]=i'),
 P(217,[1],'Contains Duplicate','contains-duplicate','Easy','Array · Hash Set','Return whether any value appears more than once.','def contains_duplicate(nums):','contains_duplicate','def contains_duplicate(nums):\n    pass',[[[[1,2,3,1]],true],[[[1,2,3,4]],false]],'n','n','Track what you have already seen.','Separates set membership from key/value hash-map use.','def contains_duplicate(nums):\n    seen=set()\n    for x in nums:\n        if x in seen:return True\n        seen.add(x)\n    return False'),

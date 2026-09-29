@@ -317,3 +317,10 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - Audited all current Foundation Combinations against their prerequisite Basics. Combination dependencies should point to independently practiced building blocks before the combined exercise.
 - `leetcode-practice.js` owns `foundationBasicCoverage`, an informational cross-reference mapping every curated LeetCode problem to the Foundation Basics that drill its atomic building blocks. This does not alter LeetCode's own unlock graph. Preflight requires every curated LC ID to have coverage.
 - Preflight also protects the exact original 0–36 title mapping and requires extension Basic IDs 37–45 to exist.
+
+## 2026-09-29 canonical exercise-ID migration
+- Canonical curriculum identity is now semantic: Foundation Basics use `B1...`, Combinations use `C1...`, and LeetCode uses `LC<official number>`. Array positions and old numeric cloud IDs are legacy migration coordinates, not identity.
+- Foundation browser progress migrates from legacy `bb*` keys to `ex_*_B*` / `ex_*_C*` keys without deleting the old keys. LeetCode migrates code/history/complexity plus mastery/review state from numeric local keys to `LC*` keys.
+- During rollout, both Foundation and LeetCode probe the Supabase `problem_id` type and support either the old integer schema or the canonical text schema. This allows the compatibility app to deploy before the DB transaction.
+- `supabase/migrate_problem_ids_to_canonical.sql` is the one-time DB migration. It transforms existing Foundation 0–45 and LeetCode legacy/current numeric IDs in place to B/C/LC IDs while preserving code/history/complexity rows; it aborts if an unmapped numeric ID remains.
+- Do not remove numeric compatibility until the live Supabase migration has been run and verified on real user rows.

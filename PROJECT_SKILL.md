@@ -115,3 +115,7 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Completed questions can be searched and filtered by topic and Basics/Combinations, and sorted by question order, recent completion, or attempts.
 - Each compact row expands inline to show the problem, saved final code, saved Time/Space complexity, reference answer, attempts, last pass, and learning notes.
 - Do not reintroduce a Review-done mode into the normal question picker. Practice remains one-question-at-a-time; Review is optimized for scanning many completed questions.
+
+- The main Foundations page has no Practice/Review mode selector; solving is always Practice.
+- Review defaults to only the user's saved code and saved Time/Space complexity.
+- Problem statement, reference answer, learning notes, and attempt history are secondary opt-in details under collapsed More options.

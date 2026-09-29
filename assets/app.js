@@ -82,17 +82,23 @@ function getHistory(i){return stateFor(i).history||[]}
 function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return passes.length>=2&&passes.slice(1).some(a=>a.help===false)?"Mastered":passes.length?"Learning":"New"}
 window.foundationReviewApi.masteryOf=masteryOf;
 function reviewDue(i){const h=getHistory(i).filter(a=>a.passed);if(!h.length)return false;const days=masteryOf(i)==="Mastered"?7:2;return Date.now()-new Date(h[h.length-1].time).getTime()>=days*86400000}
+function activeFoundationPool(){
+ const unfinishedBasics=basicIndexes().filter(i=>!completed(i));
+ return unfinishedBasics.length?basicIndexes():qs.map((_,i)=>i);
+}
 function recommendation(){
- const eligible=qs.map((_,i)=>i).filter(i=>unlocked(i));
+ const eligible=activeFoundationPool().filter(i=>unlocked(i));
  const due=eligible.find(i=>reviewDue(i));
  if(due!==undefined)return {i:due,action:"Review"};
- const fresh=eligible.find(i=>!completed(i));if(fresh!==undefined)return {i:fresh,action:"Practice"};
+ const fresh=eligible.find(i=>!completed(i));
+ if(fresh!==undefined)return {i:fresh,action:"Practice"};
  const learning=eligible.find(i=>masteryOf(i)!=="Mastered");
  if(learning!==undefined)return {i:learning,action:"Practice again"};
  return null;
 }
+window.foundationRecommendation=recommendation;
 function nextUnsolved(){
- const eligible=qs.map((_,i)=>i).filter(i=>unlocked(i)&&!completed(i));
+ const eligible=activeFoundationPool().filter(i=>unlocked(i)&&!completed(i));
  if(!eligible.length)return null;
  const after=eligible.find(i=>i>idx);
  return after??eligible[0];

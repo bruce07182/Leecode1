@@ -65,7 +65,7 @@ function saveAttempt(passed){const h=getHistory(idx);h.push({time:new Date().toI
 async function saveCloud(){if(!user)return;document.getElementById("cloudState").textContent="Saving…";let complexity=null;try{const saved=JSON.parse(localStorage.getItem("bb_complexity_"+idx)||"null");if(saved&&saved.code===code.value)complexity={time:saved.time,space:saved.space}}catch(e){}const {error}=await db.from("solutions").upsert({user_id:user.id,problem_id:idx,code:code.value,history:getHistory(idx),complexity,updated_at:new Date().toISOString()},{onConflict:"user_id,problem_id"});document.getElementById("cloudState").textContent=error?"Cloud save failed":"☁ Synced"}
 async function mergeLocalToCloud(){
  if(!user)return;
- const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id);
+ const {data,error}=await db.from("solutions").select("problem_id,code,history,complexity").eq("user_id",user.id).gte("problem_id",0).lte("problem_id",36);
  if(error){document.getElementById("cloudState").textContent="Cloud error";return}
  const cloud=new Map((data||[]).map(r=>[Number(r.problem_id),r]));
  for(let i=0;i<qs.length;i++){

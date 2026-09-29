@@ -38,7 +38,7 @@ if(!mapSrc.includes('window.DSAConcepts?.get(name)'))fail('dsa-map-v6.js: must c
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 if(index.includes('dsa-data-init.js'))fail('index.html: obsolete dsa-data-init.js reference');
 const app=fs.readFileSync(path.join(assets,'app.js'),'utf8');
-if(!app.includes('function exerciseId(i)')||!app.includes('"B":"C"'))fail('app.js: canonical B/C identity contract missing');
+if(!app.includes('function exerciseIdentity(i)')||!app.includes('"B":"C"'))fail('app.js: canonical B/C type+number identity contract missing');
 const foundationTitles=[...app.matchAll(/title:"([^"]+)"/g)].map(m=>m[1]);
 if(foundationTitles.length<26)fail('app.js: Foundation curriculum unexpectedly shrank below 26 problems');
 const originalFoundationTitles=['1. Count positives','2. Build a list','3. Find maximum','4. Reverse string','5. Two pointer movement','6. Frequency map','7. Contains duplicate','8. Stack basics','9. Sorting basics','10. Slide a fixed window','11. Prefix sums','12. Binary search boundaries','13. Queue basics','14. Graph neighbors','15. Linked list traversal','16. Recursion basics','17. Tree preorder','18. Heap basics','19. 1-D DP basics','20. Palindrome','21. Two Sum','22. First unique char','23. Valid parentheses','24. Min stack','25. Merge intervals','26. Greedy activity selection','27. Binary search','28. Lower bound','29. Graph BFS','30. Tree max depth','31. Tree level order','32. K largest','33. Backtracking subsets','34. Climbing stairs','35. Coin change','36. 2-D DP grid paths','37. Fibonacci memo'];
@@ -62,9 +62,9 @@ for(const m of lc.matchAll(/\$\(['"]([A-Za-z][\w-]*)['"]\)/g)){
 if(!lcHtml.includes('id="lcPattern"')||!lcHtml.includes('id="lcOANext"')||!lcHtml.includes('id="lcOAEnd"'))fail('leetcode.html: pattern/OA controls missing');
 if(!lc.includes('function nextOA()')||!lc.includes('function endOA(')||!lc.includes('setInterval(updateOA,1000)'))fail('leetcode-practice.js: OA session workflow incomplete');
 if(!lc.includes('const masterKey=')||!lc.includes('reviewKey=p=>'))fail('leetcode-practice.js: mastery/review storage key contract missing');
-if(!lc.includes('id:`LC${lc}`')||!lc.includes('legacyCloudId=p=>100000+p.lc'))fail('leetcode-practice.js: canonical LC identity or legacy migration bridge missing');
+if(!lc.includes('id:`LC${lc}`')||!lc.includes("exerciseIdentity=p=>({type:'LC',number:p.lc})")||!lc.includes('legacyCloudId=p=>100000+p.lc'))fail('leetcode-practice.js: canonical LC type+number identity or legacy bridge missing');
 if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');
-const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');if(!lc.includes("'__schema_probe__'"))fail('leetcode-practice.js: canonical DB migration detection missing');
+const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');if(!lc.includes("select('exercise_type,exercise_number')"))fail('leetcode-practice.js: type/number DB migration detection missing');
 const coverageMatch=lc.match(/const foundationBasicCoverage=Object\.freeze\(\{([\s\S]*?)\}\);/);
 if(!coverageMatch)fail('leetcode-practice.js: missing Foundation Basic coverage map');
 else for(const id of catalogIds)if(!new RegExp('(?:^|[,\\s])'+id+':\\[').test(coverageMatch[1]))fail(`leetcode-practice.js: LC${id} has no Foundation Basic coverage`);

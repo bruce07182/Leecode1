@@ -129,3 +129,9 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Interactive entry points that can bypass ordinary card visibility (Run, Review, roadmap popups/question navigation, recommendation navigation) must call `foundationRequireUser()` / `requireUser()` before doing work.
 - Signed-out state must never be a usable local-practice mode. Progress is cloud/Supabase authoritative; no offline/local practice mode exists.
 - Regression check after UI/auth changes: fresh/incognito load => only auth UI; signed-in load => cloud hydrate before normal work; sign-out => practice UI immediately locks; auth lookup failure => remains locked.
+
+
+### Secondary-page auth startup
+- `python.html` and `leetcode.html` are direct-entry pages and must independently enforce authentication; never assume the user arrived through `index.html`.
+- Their training UI and Python runtime must not initialize until an authenticated Supabase session is confirmed. Auth lookup failure remains signed-out/locked.
+- Regression review note: Python Training currently has legacy localStorage-backed lesson code/completion. Do not copy this pattern into Foundations or new features; migrate it deliberately to Supabase before treating Python Training progress as cross-device/cloud authoritative.

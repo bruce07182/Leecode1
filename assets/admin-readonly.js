@@ -17,4 +17,24 @@
  async function enter(){const p=document.getElementById('adminUserSelect');if(!p?.value)return;selected=p.value;const b=document.getElementById('adminROOpen');b.disabled=true;b.textContent='Loading…';const {data,error}=await db.rpc('admin_progress');b.disabled=false;b.textContent='View as user · read only';if(error){document.getElementById('adminStatus').textContent='Could not load read-only user view: '+error.message;return}rows=data||[];renderUser()}
  function attach(){const p=document.getElementById('adminUserSelect');if(!p||document.getElementById('adminROOpen'))return;const b=document.createElement('button');b.id='adminROOpen';b.type='button';b.textContent='View as user · read only';b.title='See the selected user’s saved workspace without changing any data';p.parentElement.appendChild(b);b.onclick=enter;p.addEventListener('change',()=>document.getElementById('adminReadOnlyViewer')?.classList.add('hidden'))}
  new MutationObserver(attach).observe(card,{childList:true,subtree:true});attach();
+
+ const dbProgressTab=document.getElementById('adminProgressTab'),dbTab=document.getElementById('adminDbTab');
+ const progressPanel=document.getElementById('adminProgressPanel'),dbPanel=document.getElementById('adminDbPanel');
+ function renderDbStructure(data){
+   const host=document.getElementById('adminDbStructure');if(!host)return;
+   const tables=Array.isArray(data?.tables)?data.tables:[],functions=Array.isArray(data?.functions)?data.functions:[];
+   host.innerHTML=tables.map(t=>'<details class="status" open><summary><b>'+esc(t.table)+'</b> · RLS '+(t.rls?'on':'OFF')+'</summary>'+
+     '<div><b>Columns</b></div><pre>'+esc((t.columns||[]).map(x=>x.name+' · '+x.type+(x.nullable?' · nullable':' · NOT NULL')+(x.default?' · default '+x.default:'')).join('\n'))+'</pre>'+
+     '<div><b>Constraints</b></div><pre>'+esc((t.constraints||[]).map(x=>x.name+' · '+x.definition).join('\n')||'None')+'</pre>'+
+     '<div><b>Indexes</b></div><pre>'+esc((t.indexes||[]).map(x=>x.name+' · '+x.definition).join('\n')||'None')+'</pre>'+
+     '<div><b>RLS policies</b></div><pre>'+esc((t.policies||[]).map(x=>x.name+' · '+x.command+' · roles '+(x.roles||[]).join(', ')+'\nUSING: '+(x.using||'—')+'\nCHECK: '+(x.check||'—')).join('\n\n')||'None')+'</pre></details>').join('')+
+     '<details class="status"><summary><b>Public functions</b></summary><pre>'+esc(functions.map(x=>x.name+'('+x.arguments+') → '+x.result+(x.security_definer?' · SECURITY DEFINER':'')).join('\n')||'None')+'</pre></details>';
+ }
+ async function loadDbStructure(){
+   const status=document.getElementById('adminDbStatus');if(!status)return;status.textContent='Loading database structure…';
+   const {data,error}=await db.rpc('admin_db_structure');
+   if(error){status.textContent='Could not load DB structure: '+error.message;return}
+   status.textContent='Read-only metadata · tables, columns, keys, indexes, RLS policies, and public functions.';renderDbStructure(data);
+ }
+ if(dbProgressTab&&dbTab){dbProgressTab.onclick=()=>{progressPanel?.classList.remove('hidden');dbPanel?.classList.add('hidden')};dbTab.onclick=()=>{progressPanel?.classList.add('hidden');dbPanel?.classList.remove('hidden');loadDbStructure()}}
 })();

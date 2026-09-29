@@ -54,6 +54,7 @@ const foundationState=new Map();
 function stateFor(i){const id=exerciseId(i);if(!foundationState.has(id))foundationState.set(id,{code:"",history:[],complexity:null,usedHelp:false});return foundationState.get(id)}
 function setState(i,patch){Object.assign(stateFor(i),patch)}
 window.foundationState=foundationState;
+window.foundationReviewApi={questions:qs,state:foundationState,exerciseId,masteryOf:null};
 
 const ADMIN_EMAIL="bruce0421@gmail.com";
 const db=supabase.createClient("https://eylaymrbyjjbvkgebvzv.supabase.co","sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9");
@@ -77,6 +78,7 @@ function resetQuestionView(){
 function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx];descEl.textContent=x.desc;sigEl.textContent=x.sig;code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
 function getHistory(i){return stateFor(i).history||[]}
 function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return passes.length>=2&&passes.slice(1).some(a=>a.help===false)?"Mastered":passes.length?"Learning":"New"}
+window.foundationReviewApi.masteryOf=masteryOf;
 function reviewDue(i){const h=getHistory(i).filter(a=>a.passed);if(!h.length)return false;const days=masteryOf(i)==="Mastered"?7:2;return Date.now()-new Date(h[h.length-1].time).getTime()>=days*86400000}
 function recommendation(){
  const reviewing=practiceMode?.value==="review";

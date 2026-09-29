@@ -151,4 +151,4 @@ Use Git history and small commits for recovery. Never discard current user progr
 
 ### Recommendation action labeling
 - Keep recommendation explanation out of the surrounding panel when the button can communicate the action.
-- The recommendation button must describe what clicking it does: e.g. `Review B4`, `Practice B12`, or `Practice again B7`; do not use a generic `Go` button with separate review/practice prose.
+- The recommendation button must be the complete recommendation: action + exercise ID + question name, e.g. `Review B4 · Reverse string`, `Practice B12 · Binary search boundaries`, or `Practice again B7 · Contains duplicate`. Do not duplicate the question in a separate `Recommended:` heading. `Next not solved` should likewise show its target question.

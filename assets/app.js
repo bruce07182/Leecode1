@@ -60,7 +60,7 @@ window.foundationReviewApi={questions:qs,state:foundationState,exerciseId,master
 
 const ADMIN_EMAIL="bruce0421@gmail.com";
 const db=supabase.createClient("https://eylaymrbyjjbvkgebvzv.supabase.co","sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9");
-const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),sigEl=document.getElementById("sig"),ioEl=document.getElementById("ioSpec");
+const sel=document.getElementById("q"),groupSel=document.getElementById("questionGroup"),code=document.getElementById("code"),out=document.getElementById("out"),descEl=document.getElementById("desc"),implementationEl=document.getElementById("implementationSpec");
 function completed(i){return getHistory(i).some(a=>a.passed)}
 window.foundationCompleted=completed;
 function unlocked(i){return qs[i].deps.every(completed)}
@@ -72,12 +72,19 @@ function displayTitle(i){const name=qs[i].title.replace(/^\d+\.\s*/,"");return e
 
 function syncQuestionGroup(){if(groupSel&&qs[idx])groupSel.value=questionGroup(idx)}
 function refreshOptions(){if(!groupSel)return;const current=Number(sel.value);sel.innerHTML="";qs.forEach((x,i)=>{if(questionGroup(i)!==groupSel.value)return;const o=document.createElement("option");o.value=i;const ok=unlocked(i);o.disabled=!ok;o.textContent=(completed(i)?"✓ ":"")+displayTitle(i)+(masteryOf(i)==="Mastered"?" ★":"")+(ok?"":" 🔒");sel.appendChild(o)});if([...sel.options].some(o=>Number(o.value)===current))sel.value=String(current);else{const first=[...sel.options].find(o=>!o.disabled)||sel.options[0];if(first)sel.value=first.value}renderRecommendation()}
+function implementationSpec(x,parts){
+ const input=(parts[1]||"").trim(),output=(parts[2]||"").trim();
+ const notes=[];
+ if(/non-empty|sorted|exactly one|adjacency|\[value, next\]|\[value, left, right\]|None|operations|grid/i.test(input))notes.push("# "+input);
+ if(output)notes.push("# returns: "+output.replace(/[.]$/,""));
+ return [x.sig,...notes].join("\n");
+}
 function resetQuestionView(){
  out.textContent=py?"Ready.":"Loading Python…";
  for(const id of ["hintBox","learnBox","answerBox","afterPass"]){const el=document.getElementById(id);if(!el)continue;el.classList.remove("show");el.innerHTML=""}
  const mainO=document.getElementById("mainOBox");if(mainO){mainO.classList.remove("show");mainO.innerHTML=""}
 }
-function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx],parts=x.desc.split(/\s+Input:\s+|\s+Output:\s+/);descEl.textContent=parts[0]||x.desc;sigEl.textContent=x.sig;ioEl.innerHTML="<span><b>Input:</b> "+(parts[1]||"See function parameters.")+"</span><span><b>Output:</b> "+(parts[2]||"See problem description.")+"</span>";code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
+function load(remember=true){idx=+sel.value;syncQuestionGroup();if(remember)localStorage.setItem("bb_last_question",idx);setState(idx,{usedHelp:false});resetQuestionView();const x=qs[idx],parts=x.desc.split(/\s+Input:\s+|\s+Output:\s+/);descEl.textContent=parts[0]||x.desc;implementationEl.textContent=implementationSpec(x,parts);code.value=stateFor(idx).code||x.starter;renderProgress();refreshOptions()}
 function getHistory(i){return stateFor(i).history||[]}
 function masteryOf(i){const h=getHistory(i),passes=h.filter(a=>a.passed);return passes.length>=2&&passes.slice(1).some(a=>a.help===false)?"Mastered":passes.length?"Learning":"New"}
 window.foundationReviewApi.masteryOf=masteryOf;

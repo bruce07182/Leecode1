@@ -64,7 +64,7 @@ if(!lc.includes('function nextOA()')||!lc.includes('function endOA(')||!lc.inclu
 if(!lc.includes('const masterKey=')||!lc.includes('reviewKey=p=>'))fail('leetcode-practice.js: mastery/review storage key contract missing');
 if(!lc.includes('id:`LC${lc}`')||!lc.includes('legacyCloudId=p=>100000+p.lc'))fail('leetcode-practice.js: canonical LC identity or legacy migration bridge missing');
 if(!/P\(1,/.test(lc)||!/P\(125,/.test(lc)||!/P\(217,/.test(lc))fail('leetcode-practice.js: core official LeetCode IDs changed');
-const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');if(!lc.includes("typeof data[0].problem_id==='string'"))fail('leetcode-practice.js: canonical DB migration detection missing');
+const catalogIds=[...lc.matchAll(/P\((\d+),/g)].map(m=>Number(m[1]));if(catalogIds.length<20)fail('leetcode-practice.js: curated catalog unexpectedly shrank below 20 problems');if(new Set(catalogIds).size!==catalogIds.length)fail('leetcode-practice.js: duplicate LeetCode IDs');if(!lc.includes("'__schema_probe__'"))fail('leetcode-practice.js: canonical DB migration detection missing');
 const coverageMatch=lc.match(/const foundationBasicCoverage=Object\.freeze\(\{([\s\S]*?)\}\);/);
 if(!coverageMatch)fail('leetcode-practice.js: missing Foundation Basic coverage map');
 else for(const id of catalogIds)if(!new RegExp('(?:^|[,\\s])'+id+':\\[').test(coverageMatch[1]))fail(`leetcode-practice.js: LC${id} has no Foundation Basic coverage`);

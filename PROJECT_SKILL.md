@@ -279,3 +279,6 @@ Multi-solution comparison has been applied to examples including Find Maximum, R
 - LeetCode has an optional pre-code **Find pattern** reflection. It asks generic recognition questions only and must not reveal the specific problem pattern before pass.
 - After pass, **Pattern explained** may reveal the problem-specific pattern/rationale.
 - OA practice is assessment mode: choose up to 3 randomized unlocked/unmastered problems, run a 75-minute countdown, provide Next and End controls, and show a passed/total summary. Hide Hint, Find pattern, Answer, and Pattern explained for the entire OA session.
+
+- OA selection should prefer diversity across problem families before repeating a family; keep randomness within eligible unlocked/unmastered problems.
+- DSA map Set & Map teaching: both are closely related hash-based lookup structures. Explain a set conceptually as key → present (unique membership), versus a map/dict as unique key → associated value. Avoid saying a set is literally a map or “max 1 data”; Python exposes them as distinct types.

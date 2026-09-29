@@ -50,8 +50,6 @@ const basicIndexes=()=>qs.map((q,i)=>q.level==="basic"?i:-1).filter(i=>i>=0);
 const combinationIndexes=()=>qs.map((q,i)=>q.level==="combination"?i:-1).filter(i=>i>=0);
 function exerciseIdentity(i){const type=qs[i].level==="basic"?"B":"C",list=type==="B"?basicIndexes():combinationIndexes();return {type,number:list.indexOf(i)+1}}
 function exerciseId(i){const x=exerciseIdentity(i);return x.type+x.number}
-function localKey(kind,i){const id=exerciseId(i);return kind==="code"?"ex_code_"+id:kind==="history"?"ex_history_"+id:kind==="complexity"?"ex_complexity_"+id:kind==="hints"?"ex_hints_"+id:"ex_help_"+id}
-window.foundationLocalKey=localKey;
 const foundationState=new Map();
 function stateFor(i){const id=exerciseId(i);if(!foundationState.has(id))foundationState.set(id,{code:"",history:[],complexity:null,usedHelp:false});return foundationState.get(id)}
 function setState(i,patch){Object.assign(stateFor(i),patch)}

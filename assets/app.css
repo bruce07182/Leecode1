@@ -48,3 +48,5 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 .recommendMenu button:hover{background:#f3f6fa}
 .recommendMenu small{opacity:.65;white-space:nowrap}
 @media(max-width:600px){.recommendMenu{position:fixed;left:16px;right:16px;top:auto;bottom:16px;min-width:0;max-height:55vh}.recommendMenu button{align-items:flex-start}.recommendMenu small{white-space:normal}}
+
+.reviewSubmission{margin-top:8px;border:1px solid #e1e6ed;border-radius:8px;background:#fff}.reviewSubmission>summary{cursor:pointer;padding:8px 10px;font-size:13px;font-weight:650}.reviewSubmissionBody{padding:0 10px 10px}.reviewSubmissionMeta,.reviewNoDiff{font-size:12px;color:#667085;margin:4px 0 7px}.reviewDiff{margin:0;overflow:auto;background:#f7f8fa;border:1px solid #e1e6ed;border-radius:7px;padding:6px 0;font-size:12px;line-height:1.45}.reviewDiffLine{display:block;padding:0 8px;white-space:pre}.reviewDiffLine.added{background:#e6ffec}.reviewDiffLine.removed{background:#ffebe9}.reviewDiffLine.same{color:#667085}

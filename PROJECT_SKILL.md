@@ -222,3 +222,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 
 - DSA map grouping can use ordinary existing-style Mermaid text nodes as visual parent concepts. Keep separately tracked concepts as separate nodes (for example, `Hash` → `Set` and `Hash` → `Map`), with each node retaining the existing mastery/status color system. Do not introduce a special container/box style just for grouping.
 - The visible implementation/function contract is signature-only, matching starter code. Do not auto-generate explanatory comments beneath the function signature; ambiguity belongs in the question text, while solution guidance belongs in Hint/Learn.
+
+- The live DSA map is owned by `assets/dsa-map-v6.js`, with `assets/dsa-map-guidance.js` decorating it. Do not add a second map renderer to `app.js`. Mermaid is not used by the main DSA map and should not be reintroduced unless a live feature explicitly needs it.

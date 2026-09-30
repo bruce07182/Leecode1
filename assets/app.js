@@ -74,13 +74,7 @@ function displayTitle(i){const name=qs[i].title.replace(/^\d+\.\s*/,"");return e
 
 function syncQuestionGroup(){if(groupSel&&qs[idx])groupSel.value=questionGroup(idx)}
 function refreshOptions(){if(!groupSel)return;const current=Number(sel.value);sel.innerHTML="";qs.forEach((x,i)=>{if(questionGroup(i)!==groupSel.value)return;const o=document.createElement("option");o.value=i;const ok=unlocked(i);o.disabled=!ok;o.textContent=(completed(i)?"✓ ":"")+displayTitle(i)+(masteryOf(i)==="Mastered"?" ★":"")+(ok?"":" 🔒");sel.appendChild(o)});if([...sel.options].some(o=>Number(o.value)===current))sel.value=String(current);else{const first=[...sel.options].find(o=>!o.disabled)||sel.options[0];if(first)sel.value=first.value}renderRecommendation()}
-function implementationSpec(x,parts){
- const input=(parts[1]||"").trim(),output=(parts[2]||"").trim();
- const notes=[];
- if(/non-empty|sorted|exactly one|adjacency|\[value, next\]|\[value, left, right\]|None|operations|grid/i.test(input))notes.push("# "+input.replace(/[.]$/,""));
- if(/-1|None|empty|index|indexes|coordinates|dictionary|node|head|True|False/i.test(output))notes.push("# returns: "+output.replace(/[.]$/,""));
- return [x.sig,...notes].join("\n");
-}
+function implementationSpec(x){return x.sig}
 function resetQuestionView(){
  out.textContent=py?"Ready.":"Loading Python…";
  for(const id of ["hintBox","learnBox","answerBox","afterPass"]){const el=document.getElementById(id);if(!el)continue;el.classList.remove("show");el.innerHTML=""}

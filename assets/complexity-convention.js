@@ -1,4 +1,6 @@
-// Space O(...) includes returned output unless a question explicitly says otherwise.
+// Complexity convention: Space O(...) means total extra space including returned output.
+// Auxiliary Space O(...) excludes the required returned output. Lessons teach the distinction
+// generically; question-specific complexity remains in Answer/review so Learn basics does not leak it.
 (()=>{
   const api=window.foundationReviewApi;
   if(!api?.questions)return;
@@ -6,7 +8,10 @@
   if(b5){
     b5.lesson=b5.lesson.replace(
       'A full inward traversal is <b>Time: O(n)</b> and <b>Space: O(1)</b> auxiliary because only two indexes are stored.',
-      'A full inward traversal is <b>Time: O(n)</b>. The returned list stores about n/2 pairs, so <b>Space: O(n)</b> under this app\'s convention. Excluding the returned output, auxiliary space is O(1) because only two indexes are stored.'
+      '<b>Space vs auxiliary space:</b> Space O(...) counts memory created by the solution, including returned output. Auxiliary Space O(...) counts only working memory and excludes the required output. When analyzing code, check both the variables used while solving and whether the returned result grows with the input.'
+    ).replace(
+      'A full inward traversal is <b>Time: O(n)</b>. The returned list stores about n/2 pairs, so <b>Space: O(n)</b> under this app\'s convention. Excluding the returned output, auxiliary space is O(1) because only two indexes are stored.',
+      '<b>Space vs auxiliary space:</b> Space O(...) counts memory created by the solution, including returned output. Auxiliary Space O(...) counts only working memory and excludes the required output. When analyzing code, check both the variables used while solving and whether the returned result grows with the input.'
     );
   }
   const original=window.bindInterview;

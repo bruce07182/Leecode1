@@ -224,3 +224,5 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The visible implementation/function contract is signature-only, matching starter code. Do not auto-generate explanatory comments beneath the function signature; ambiguity belongs in the question text, while solution guidance belongs in Hint/Learn.
 
 - The live DSA map is owned by `assets/dsa-map-v6.js`, with `assets/dsa-map-guidance.js` decorating it. Do not add a second map renderer to `app.js`. Mermaid is not used by the main DSA map and should not be reintroduced unless a live feature explicitly needs it.
+
+- Submission history remains snapshot-based in Supabase (currently up to 20 attempts/question). Review computes Git-style line diffs on demand: each submission compares with the previous submission, and the first compares with starter code. Do not replace snapshots with delta-only storage; snapshots keep sync/recovery simple. GitHub may be added later as an optional successful-submission/export archive, not as the primary progress database.

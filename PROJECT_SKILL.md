@@ -212,3 +212,10 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Question wording must describe the required behavior/result without assuming the learner already knows the intended algorithm. Avoid putting solution-technique phrases such as “using two pointers,” “with DP,” “with memoization,” or “using backtracking” in the question unless the exercise is explicitly testing that technique. Prefer concrete ordering/behavior rules. Keep it concise; add detail only to resolve a real ambiguity.
 
 - Starter editor content must contain only the required Python function definition plus an indented blank line. Do not put `pass`, `# your code`, algorithm hints, data-structure hints, setup variables, or solution scaffolding in starter code. Hints belong only in the Hint/Learn surfaces.
+
+## Cross-chat repo editing workflow
+- This file is the handoff/source of truth for future ChatGPT chats working on this project.
+- When the user asks to change the DSA trainer, make the requested change directly in `bruce07182/Leecode1` with the GitHub connector when available; do not stop at instructions or sample code unless the user asks for that.
+- At the start of a new project chat, read this `PROJECT_SKILL.md` and inspect the current relevant repo files before editing. Treat the current repository as source of truth rather than relying on an older chat summary.
+- After each change, verify the affected code/content, preserve existing behavior outside the requested scope, commit the edit, and update this skill whenever a new durable design rule or workflow lesson is established.
+- For Supabase/database changes, read the installed Supabase skill first and inspect the current schema/policies before modifying them.

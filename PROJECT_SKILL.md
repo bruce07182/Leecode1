@@ -219,3 +219,6 @@ Use Git history and small commits for recovery. Never discard current user progr
 - At the start of a new project chat, read this `PROJECT_SKILL.md` and inspect the current relevant repo files before editing. Treat the current repository as source of truth rather than relying on an older chat summary.
 - After each change, verify the affected code/content, preserve existing behavior outside the requested scope, commit the edit, and update this skill whenever a new durable design rule or workflow lesson is established.
 - For Supabase/database changes, read the installed Supabase skill first and inspect the current schema/policies before modifying them.
+
+- DSA map grouping can use ordinary existing-style Mermaid text nodes as visual parent concepts. Keep separately tracked concepts as separate nodes (for example, `Hash` → `Set` and `Hash` → `Map`), with each node retaining the existing mastery/status color system. Do not introduce a special container/box style just for grouping.
+- The visible implementation/function contract is signature-only, matching starter code. Do not auto-generate explanatory comments beneath the function signature; ambiguity belongs in the question text, while solution guidance belongs in Hint/Learn.

@@ -14,6 +14,27 @@
     );
   }
 
+  // Present input/output types as part of the Python function signature, not as comments.
+  // Runtime still calls the same functions; annotations are informational and valid Python.
+  const typed={
+    count_positive:'def count_positive(nums: list[int]) -> int:',
+    keep_evens:'def keep_evens(nums: list[int]) -> list[int]:',
+    find_max:'def find_max(nums: list[int]) -> int:',
+    reverse_string:'def reverse_string(s: str) -> str:',
+    inward_pairs:'def inward_pairs(nums: list[int]) -> list[list[int]]:',
+    frequency:'def frequency(nums: list[int]) -> dict[int, int]:',
+    contains_duplicate:'def contains_duplicate(nums: list[int]) -> bool:',
+    stack_order:'def stack_order(items: list[int]) -> list[int]:',
+    sort_by_second:'def sort_by_second(pairs: list[list[int]]) -> list[list[int]]:'
+  };
+  api.questions.forEach(q=>{
+    const sig=typed[q.fn];
+    if(!sig)return;
+    q.sig=sig;
+    const body=(q.starter||'').split('\n').slice(1).join('\n');
+    q.starter=sig+'\n'+(body||'    ');
+  });
+
   // Make the complexity selector unambiguous everywhere without changing saved DB shape.
   const relabel=()=>{
     const sp=document.getElementById('spacePick');

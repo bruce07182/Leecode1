@@ -4,13 +4,18 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Complexity — LeetCode Foundations</title>
 <link rel="stylesheet" href="assets/app.css"><link rel="stylesheet" href="assets/site-shell.css">
-<style>.lesson{max-width:820px;margin:28px auto;padding:0 16px 48px}.lesson h2{margin-top:30px}.lesson pre{padding:14px;overflow:auto;border-radius:8px;background:#111827;color:#f9fafb;border:1px solid #374151;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;line-height:1.55}.rule{padding:14px;border:1px solid rgba(127,127,127,.35);border-radius:10px;margin:18px 0}.back{display:inline-block;margin-bottom:12px}</style>
+<style>
+.lesson{max-width:860px;margin:28px auto;padding:0 16px 48px}.lesson h2{margin-top:34px}.lesson h3{margin-top:24px}.lesson pre{padding:14px;overflow:auto;border-radius:8px;background:#111827;color:#f9fafb;border:1px solid #374151;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;line-height:1.55}.rule,.level{padding:14px;border:1px solid rgba(127,127,127,.35);border-radius:10px;margin:16px 0}.back{display:inline-block;margin-bottom:12px}.levelTag{font-size:.8rem;font-weight:700;opacity:.75;text-transform:uppercase;letter-spacing:.04em}.compare{width:100%;border-collapse:collapse;margin:12px 0}.compare th,.compare td{padding:8px 10px;border-bottom:1px solid rgba(127,127,127,.25);text-align:left}.lesson details{margin:16px 0;border:1px solid rgba(127,127,127,.3);border-radius:10px;padding:10px 14px}.lesson summary{cursor:pointer;font-weight:700}.nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.nav a{padding:7px 11px;border:1px solid rgba(127,127,127,.35);border-radius:8px;text-decoration:none}
+</style>
 </head><body><main class="lesson">
 <a class="pythonLink back" href="index.html">← Back to practice</a>
 <h1>Complexity</h1>
-<p>Complexity tells you how your code grows when the input gets bigger. Let <b>n</b> be the input size.</p>
-<h2>Time O(...): how much work?</h2>
-<p>Look at the code and ask: <b>How many times can this work run as n grows?</b></p>
+<p>Complexity asks two separate questions as the input gets bigger:</p>
+<div class="nav"><a href="#time">Time — how much work?</a><a href="#space">Auxiliary Space — how much extra memory?</a></div>
+<p>Let <b>n</b> mean the input size. Start with the Basics. Open the deeper sections only when you need them.</p>
+
+<h2 id="time">Time Complexity</h2>
+<div class="level"><div class="levelTag">Level 1 · Basics</div><h3>Count how the work grows</h3>
 <pre>x = nums[0]                 # O(1)
 
 for x in nums:              # O(n)
@@ -18,41 +23,111 @@ for x in nums:              # O(n)
 
 for x in nums:              # O(n²)
     for y in nums:
-        ...
+        ...</pre>
+<p><b>Quick rule:</b> one lookup → O(1), one full scan → O(n), nested full scans → O(n²).</p>
+<p>Ignore constants and smaller terms: O(2n) → O(n), O(n + 10) → O(n), O(n² + n) → O(n²).</p></div>
 
-# Repeatedly cut the problem roughly in half: O(log n)
-# Sorting: usually O(n log n)</pre>
-<p>Ignore constants and smaller-growing terms: O(2n) → O(n), O(n + 10) → O(n), O(n² + n) → O(n²).</p>
-<h2>Auxiliary Space O(...): how much extra working memory?</h2>
-<p>For this trainer, <b>Auxiliary Space</b> means extra working memory the algorithm needs as input grows. Do not count the required input or required return/output buffer.</p>
+<details><summary>Level 2 · Function calls — add or multiply?</summary>
+<p>A function call is <b>not automatically O(1)</b>. Use the complexity of the work inside it.</p>
+<pre>nums.sort()                 # O(n log n)</pre>
+<p>Even though this is one line and one function call, sorting n values takes O(n log n).</p>
+<h3>Calls one after another → add</h3>
+<pre>helper(nums)                # O(n)
+helper(nums)                # O(n)
+# O(n) + O(n) = O(n)</pre>
+<h3>A call repeated inside a loop → multiply</h3>
+<pre>for x in nums:              # n times
+    helper(nums)            # O(n) each time
+# n × n = O(n²)</pre>
+<div class="rule"><b>Remember:</b> sequential work → add. Nested/repeated work → multiply. Then keep the fastest-growing term.</div>
+</details>
+
+<details><summary>Level 3 · Recursion — count the calls</summary>
+<p>For recursive code, ask: <b>How many calls are made, and how much work does each call do?</b></p>
+<pre>def countdown(n: int):
+    if n == 0:
+        return
+    countdown(n - 1)
+# One chain of n calls → O(n) time</pre>
+<p>One recursive call that reduces n by 1 usually creates one chain of about n calls.</p>
+<pre>def fib(n: int) -> int:
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+# Calls branch repeatedly → exponential time</pre>
+<p>Here one call can create two more calls, which create more calls. Without memoization, the work grows roughly exponentially: O(2ⁿ) is a useful simple upper bound.</p>
+</details>
+
+<details><summary>Level 4 · Why DP can make recursion much faster</summary>
+<p>Many recursive problems repeatedly solve the same smaller problem. Dynamic programming saves or builds those results instead of recalculating them.</p>
+<table class="compare"><tr><th>Approach</th><th>Time</th><th>Auxiliary Space</th></tr><tr><td>Plain branching recursion</td><td>O(2ⁿ)</td><td>O(n) call stack</td></tr><tr><td>Memoization</td><td>O(n)</td><td>O(n)</td></tr><tr><td>1D DP array</td><td>O(n)</td><td>O(n)</td></tr><tr><td>Optimized rolling variables</td><td>O(n)</td><td>O(1)</td></tr></table>
+<p>The exact complexity depends on the problem, but this is the common pattern for problems such as Fibonacci or Climbing Stairs.</p>
+<h3>Why O(2ⁿ) gets bad quickly</h3>
+<table class="compare"><tr><th>n</th><th>n</th><th>n²</th><th>2ⁿ</th></tr><tr><td>10</td><td>10</td><td>100</td><td>1,024</td></tr><tr><td>20</td><td>20</td><td>400</td><td>1,048,576</td></tr><tr><td>50</td><td>50</td><td>2,500</td><td>over 1 quadrillion</td></tr></table>
+<p>That is why removing repeated recursive work can completely change whether a solution is practical.</p>
+</details>
+
+<h2 id="space">Auxiliary Space Complexity</h2>
+<div class="level"><div class="levelTag">Level 1 · Basics</div><h3>Count extra working memory</h3>
+<p>For this trainer, <b>Auxiliary Space</b> means extra working memory used by the algorithm as n grows. We exclude the required input and required return/output buffer.</p>
 <pre>count = 0
 for x in nums:
     if x > 0:
         count += 1
-# A few variables: O(1) auxiliary space</pre>
+# A few variables → O(1) auxiliary space</pre>
 <pre>seen = set()
 for x in nums:
     seen.add(x)
-# seen can grow with n: O(n) auxiliary space</pre>
-<p>Temporary lists, sets, dictionaries, stacks, queues, copies, and the recursion call stack count when they grow with n.</p>
-<h2>What about returned output?</h2>
+# seen can grow to n items → O(n) auxiliary space</pre>
+<div class="rule"><b>Quick rule:</b> a fixed number of variables → O(1). An extra list/set/dict that can grow with n → O(n).</div></div>
+
+<details><summary>Level 2 · Input, output, and temporary memory</summary>
+<h3>Required output is described separately</h3>
 <pre>def keep_evens(nums: list[int]) -> list[int]:
     result = []
     for x in nums:
         if x % 2 == 0:
             result.append(x)
     return result</pre>
-<p>The required returned result can grow to O(n). We describe that separately as <b>output O(n)</b>. Under this trainer's convention, the return buffer itself is not auxiliary working memory.</p>
-<p>This distinction matters because the phrase <b>space complexity</b> is not used identically everywhere. In an interview, the safest wording is to state what you are counting, for example: “O(1) auxiliary space, excluding the required output.”</p>
-<h2>Recursion counts too</h2>
-<pre>def factorial(n: int) -> int:
-    if n <= 1:
-        return 1
-    return n * factorial(n - 1)</pre>
-<p>There may be n unfinished calls on the call stack, so the recursion uses O(n) auxiliary space.</p>
-<div class="rule"><b>Quick check</b><br><br><b>Time:</b> What work grows as n grows?<br><b>Auxiliary Space:</b> What extra working memory grows as n grows?<br><b>Output:</b> How large is the required returned result?</div>
+<p>The returned result can contain n values, so <b>output size is O(n)</b>. Under this trainer's convention, that required output buffer is excluded from Auxiliary Space.</p>
+<h3>Temporary memory still counts</h3>
+<pre>temp = nums.copy()          # extra n-sized copy
+return temp[0]
+# Auxiliary Space: O(n)</pre>
+<p><code>temp</code> is working memory rather than the required output, so it counts.</p>
+<p>Because “space complexity” is used differently by different sources, in an interview it is safest to say exactly what you mean: <b>“O(1) auxiliary space, excluding required input/output.”</b></p>
+</details>
+
+<details><summary>Level 3 · Recursion uses auxiliary space</summary>
+<p>Recursive calls stay on the call stack until they return. For space, count the <b>maximum number of calls alive at the same time</b>, not the total number of calls.</p>
+<pre>def countdown(n: int):
+    if n == 0:
+        return
+    countdown(n - 1)
+# Maximum stack depth ≈ n → O(n) auxiliary space</pre>
+<p>This is why code can use O(n) auxiliary space even when it creates no list, set, or dictionary.</p>
+<h3>Important: exponential time does not mean exponential stack space</h3>
+<p>The naive Fibonacci recursion makes exponentially many calls over time, but its deepest active chain is only about n calls. So its time is exponential while its recursion-stack auxiliary space is O(n).</p>
+</details>
+
+<details><summary>Level 4 · 1D DP space</summary>
+<pre>dp = [0] * (n + 1)
+# n-sized working table → O(n) auxiliary space</pre>
+<p>If each new state only needs a few previous states, the table can sometimes be replaced by a fixed number of variables:</p>
+<pre>prev2 = 1
+prev1 = 1
+for i in range(2, n + 1):
+    current = prev1 + prev2
+    prev2 = prev1
+    prev1 = current
+# Fixed number of variables → O(1) auxiliary space</pre>
+<p>This changes the auxiliary space from O(n) to O(1) while keeping O(n) time.</p>
+</details>
+
+<div class="rule"><b>Final checklist</b><br><br><b>Time:</b> What work repeats as n grows? If you call another function, include its cost.<br><br><b>Auxiliary Space:</b> What extra working memory grows with n? Include temporary structures and recursion stack; exclude required input/output.<br><br><b>Output:</b> If useful, state its size separately.</div>
+
 <h2>References</h2>
-<p>Terminology varies, so these references are useful for seeing the distinction in algorithm teaching and interview discussion:</p>
+<p>Terminology varies, so these references show common algorithm and interview treatments:</p>
 <ul>
 <li><a href="https://www.cs.cornell.edu/courses/cs2110/2026sp/lectures/lec05/" target="_blank" rel="noopener">Cornell CS 2110 — Analyzing Complexity</a></li>
 <li><a href="https://algs4.cs.princeton.edu/22mergesort/" target="_blank" rel="noopener">Princeton Algorithms — Mergesort and auxiliary space</a></li>

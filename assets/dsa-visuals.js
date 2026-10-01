@@ -30,7 +30,7 @@ const visuals={
 'Backtracking':`<svg viewBox="0 0 520 190"><path d="M260 35L160 90 M260 35L360 90 M160 90L110 150 M160 90L210 150" class="edge"/>${[[260,35,'start'],[160,90,'choose'],[360,90,'other'],[110,150,'✓'],[210,150,'undo']].map(n=>box(n[0]-38,n[1]-18,76,36,n[2],n[2]==='choose'?'nodeActive':'node')).join('')}</svg>`,
 'Dynamic Programming':`<svg viewBox="0 0 520 145">${[0,1,1,2,3,5].map((v,i)=>box(38+i*74,48,62,40,v,i===5?'nodeGood':'node')).join('')}<text x="260" y="120" text-anchor="middle" class="small">reuse stored smaller answers</text></svg>`
 };
-function lessonName(pre){const lesson=pre.closest('.pyLesson');if(lesson){const h=lesson.querySelector('h2');if(h)return h.textContent.trim()}const shared=pre.closest('.dsaSharedLevel3');if(shared){const code=shared.querySelector('.dsTeachOne');const all=window.DSA_LEVEL3||[];const found=all.find(x=>code&&code.innerHTML===x.tip);if(found)return found.t}return null}
+function lessonName(pre){const h=pre.closest('.pyLesson')?.querySelector('h2');return h?h.textContent.trim():null}
 function upgrade(root=document){root.querySelectorAll('pre.dsDiagram:not([data-svg-upgraded])').forEach(pre=>{const name=lessonName(pre),svg=visuals[name];if(!svg)return;pre.dataset.svgUpgraded='1';const el=document.createElement('div');el.className='dsaVisual';el.innerHTML=svg;pre.replaceWith(el)})}
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)upgrade(n.matches?.('pre.dsDiagram')?n.parentElement:n)}))).observe(document.documentElement,{childList:true,subtree:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>upgrade());else upgrade();

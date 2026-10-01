@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Complexity — LeetCode Foundations</title>
+<link rel="stylesheet" href="assets/app.css"><link rel="stylesheet" href="assets/site-shell.css">
+<style>.lesson{max-width:820px;margin:28px auto;padding:0 16px 48px}.lesson h2{margin-top:30px}.lesson pre{padding:14px;overflow:auto;border-radius:8px;background:rgba(127,127,127,.12)}.rule{padding:14px;border:1px solid rgba(127,127,127,.35);border-radius:10px;margin:18px 0}.back{display:inline-block;margin-bottom:12px}</style>
+</head><body><main class="lesson">
+<a class="pythonLink back" href="index.html">← Back to practice</a>
+<h1>Complexity</h1>
+<p>Complexity tells you how your code grows when the input gets bigger. Let <b>n</b> be the input size.</p>
+<h2>Time O(...): how much work?</h2>
+<p>Look at the code and ask: <b>How many times can this work run as n grows?</b></p>
+<pre>x = nums[0]                 # O(1)
+
+for x in nums:              # O(n)
+    ...
+
+for x in nums:              # O(n²)
+    for y in nums:
+        ...
+
+# Repeatedly cut the problem roughly in half: O(log n)
+# Sorting: usually O(n log n)</pre>
+<p>Ignore constants and smaller-growing terms: O(2n) → O(n), O(n + 10) → O(n), O(n² + n) → O(n²).</p>
+<h2>Auxiliary Space O(...): how much extra working memory?</h2>
+<p>For this trainer, <b>Auxiliary Space</b> means extra working memory the algorithm needs as input grows. Do not count the required input or required return/output buffer.</p>
+<pre>count = 0
+for x in nums:
+    if x > 0:
+        count += 1
+# A few variables: O(1) auxiliary space</pre>
+<pre>seen = set()
+for x in nums:
+    seen.add(x)
+# seen can grow with n: O(n) auxiliary space</pre>
+<p>Temporary lists, sets, dictionaries, stacks, queues, copies, and the recursion call stack count when they grow with n.</p>
+<h2>What about returned output?</h2>
+<pre>def keep_evens(nums: list[int]) -> list[int]:
+    result = []
+    for x in nums:
+        if x % 2 == 0:
+            result.append(x)
+    return result</pre>
+<p>The required returned result can grow to O(n). We describe that separately as <b>output O(n)</b>. Under this trainer's convention, the return buffer itself is not auxiliary working memory.</p>
+<p>This distinction matters because the phrase <b>space complexity</b> is not used identically everywhere. In an interview, the safest wording is to state what you are counting, for example: “O(1) auxiliary space, excluding the required output.”</p>
+<h2>Recursion counts too</h2>
+<pre>def factorial(n: int) -> int:
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)</pre>
+<p>There may be n unfinished calls on the call stack, so the recursion uses O(n) auxiliary space.</p>
+<div class="rule"><b>Quick check</b><br><br><b>Time:</b> What work grows as n grows?<br><b>Auxiliary Space:</b> What extra working memory grows as n grows?<br><b>Output:</b> How large is the required returned result?</div>
+<h2>References</h2>
+<p>Terminology varies, so these references are useful for seeing the distinction in algorithm teaching and interview discussion:</p>
+<ul>
+<li><a href="https://www.cs.cornell.edu/courses/cs2110/2026sp/lectures/lec05/" target="_blank" rel="noopener">Cornell CS 2110 — Analyzing Complexity</a></li>
+<li><a href="https://algs4.cs.princeton.edu/22mergesort/" target="_blank" rel="noopener">Princeton Algorithms — Mergesort and auxiliary space</a></li>
+<li><a href="https://leetcode.com/discuss/post/719926/does-space-complexity-analysis-usually-include-output-space/" target="_blank" rel="noopener">LeetCode discussion — Does space complexity include output space?</a></li>
+<li><a href="https://blog.stackademic.com/understanding-space-complexity-and-auxiliary-space-a-beginner-friendly-guide-c75bcb9778d2" target="_blank" rel="noopener">Space Complexity and Auxiliary Space — beginner-friendly discussion</a></li>
+</ul>
+</main></body></html>

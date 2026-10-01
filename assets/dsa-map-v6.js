@@ -1,4 +1,4 @@
-// DSA roadmap/navigation only. All teaching content lives in Python Level 3.
+// DSA roadmap/navigation only. Teaching content lives in the shared Python DSA curriculum.
 (()=>{
   const DS=['Sequence','Hash','Linear','Hierarchy'];
   const ALG=['Traversal','Two Pointers','Sorting','Sliding Window','Prefix Sum','Binary Search','Search','Math & Bitwise','Recursion','DFS / BFS','Divide & Conquer','Greedy','Backtracking','Dynamic Programming'];
@@ -19,7 +19,7 @@
     let p=document.getElementById('dsaFocusPopup');
     if(!p){p=document.createElement('div');p.id='dsaFocusPopup';p.className='dsMiniPopup hidden';document.body.appendChild(p)}
     const rels=relationsFor(name),items=idsFor(name).map(i=>({x:qs[i],i}));
-    p.innerHTML='<div class="dsMiniInner dsaFocusInner"><button class="dsMiniClose" aria-label="Close">×</button><div class="dsTeachTitle">'+name+'</div><div class="focusLessons"><a class="runPrimary" href="'+learnUrl(name)+'">Learn / practice in Python Level 3 →</a></div><div class="focusRelated"><b>Related</b><div class="focusChips">'+(rels.length?rels.map(x=>'<button class="focusChip" data-concept="'+x+'">'+x+'</button>').join(''):'<span class="status">No direct relationships listed.</span>')+'</div></div><div class="focusQuestions"><b>Practice</b><div>'+(items.length?items.map(o=>'<button data-q="'+o.i+'" '+(unlocked(o.i)?'':'disabled')+'>'+(completed(o.i)?'✓ ':'')+(typeof displayTitle==='function'?displayTitle(o.i):o.x.title)+(unlocked(o.i)?'':' 🔒')+'</button>').join(''):'<span class="status">No exercise yet.</span>')+'</div></div></div>';
+    p.innerHTML='<div class="dsMiniInner dsaFocusInner"><button class="dsMiniClose" aria-label="Close">×</button><div class="dsTeachTitle"><a href="'+learnUrl(name)+'" title="Open this lesson in Python Training">'+name+' ↗</a></div><div class="focusRelated"><b>Related</b><div class="focusChips">'+(rels.length?rels.map(x=>'<button class="focusChip" data-concept="'+x+'">'+x+'</button>').join(''):'<span class="status">No direct relationships listed.</span>')+'</div></div><div class="focusQuestions"><b>Practice</b><div>'+(items.length?items.map(o=>'<button data-q="'+o.i+'" '+(unlocked(o.i)?'':'disabled')+'>'+(completed(o.i)?'✓ ':'')+(typeof displayTitle==='function'?displayTitle(o.i):o.x.title)+(unlocked(o.i)?'':' 🔒')+'</button>').join(''):'<span class="status">No exercise yet.</span>')+'</div></div></div>';
     p.classList.remove('hidden');
     p.querySelector('.dsMiniClose').onclick=()=>p.classList.add('hidden');
     p.onclick=e=>{if(e.target===p)p.classList.add('hidden')};
@@ -29,7 +29,7 @@
   window.showDsaConcept=openFocus;
   window.renderConceptMap=function(){
     const host=document.getElementById('conceptMap');if(!host)return;
-    document.getElementById('mapModeLabel').innerHTML='<b>Data Structures</b> + <b>Algorithms / Patterns</b> · learning opens the shared Python Level 3 lesson';
+    document.getElementById('mapModeLabel').innerHTML='<b>Data Structures</b> + <b>Algorithms / Patterns</b>';
     const group=children=>'<div class="dsaStructureGroup">'+children.map(child=>'<button class="dsaRoadNode '+state(child)+'" data-concept="'+child+'">'+child+'</button>').join('')+'</div>';
     const node=name=>name==='Sequence'?group(['Array','String','Linked List']):name==='Hash'?group(['Hashing','Set','Map']):name==='Linear'?group(['Stack','Queue']):name==='Hierarchy'?group(['Tree','Graph','Heap']):'<button class="dsaRoadNode '+state(name)+'" data-concept="'+name+'">'+name+'</button>';
     host.innerHTML='<div class="dsaTwoCol"><section class="dsaRoadCol"><div class="dsaColTitle">DATA STRUCTURES</div>'+DS.map(node).join('')+'</section><section class="dsaRoadCol"><div class="dsaColTitle">ALGORITHMS / PATTERNS</div>'+ALG.map(node).join('')+'</section></div>';

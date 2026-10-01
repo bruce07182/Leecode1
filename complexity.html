@@ -1,25 +1,25 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Complexity — LeetCode Foundations</title><link rel="stylesheet" href="assets/app.css"><link rel="stylesheet" href="assets/site-shell.css"><style>
-.lesson{max-width:860px;margin:28px auto;padding:0 16px 48px}.lesson h2{margin:26px 0 8px}.lesson h3{margin:22px 0 8px}.lesson pre{padding:14px;overflow:auto;border-radius:8px;background:#111827;color:#f9fafb;border:1px solid #374151;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;line-height:1.55}.rule,.levelCard{padding:14px;border:1px solid rgba(127,127,127,.35);border-radius:10px;margin:14px 0}.back{display:inline-block;margin-bottom:12px}.tabs,.levels{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tabs button,.levels button{padding:9px 13px;border-radius:8px;border:1px solid rgba(127,127,127,.4);cursor:pointer;background:transparent;color:inherit}.tabs button.active,.levels button.active{font-weight:700;outline:2px solid currentColor}.panel{display:none}.panel.active{display:block}.depth{display:none}.depth.active{display:block}.compare{width:100%;border-collapse:collapse;margin:12px 0}.compare th,.compare td{padding:8px 10px;border-bottom:1px solid rgba(127,127,127,.25);text-align:left}.hint{opacity:.75;font-size:.92rem}.levelTitle{font-size:.82rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.04em}
-</style></head><body><main class="lesson">
-<a class="pythonLink back" href="index.html">← Back to practice</a><h1>Complexity</h1><p>Pick <b>Time</b> or <b>Auxiliary Space</b>, then choose how deep you want to go. The page stays in place when you switch.</p>
-<div class="tabs"><button class="tab active" data-tab="time">Time</button><button class="tab" data-tab="space">Auxiliary Space</button></div>
-
-<section id="time" class="panel active"><h2>Time Complexity</h2><p>How does the amount of work grow when the input grows?</p><div class="levels" data-for="time"><button class="active" data-level="1">1 · Basics</button><button data-level="2">2 · Function calls</button><button data-level="3">3 · Recursion</button><button data-level="4">4 · DP</button></div>
-<div class="depth active" data-level="1"><div class="levelCard"><div class="levelTitle">Level 1 · Basics</div><pre>x = nums[0]                 # O(1)
+*{box-sizing:border-box}.page{max-width:1100px;margin:24px auto;padding:0 18px 50px}.back{display:inline-block;margin-bottom:16px}.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:34px;align-items:start}.toc{position:sticky;top:20px;border-right:1px solid rgba(127,127,127,.28);padding-right:18px}.tocTitle{font-size:.82rem;font-weight:700;opacity:.65;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.tocGroup{font-weight:700;margin:16px 0 5px}.toc a{display:block;padding:6px 9px;margin:1px 0;border-radius:6px;text-decoration:none;color:inherit;opacity:.78}.toc a:hover,.toc a.active{opacity:1;background:rgba(127,127,127,.13)}.toc .sub{padding-left:18px;font-size:.94rem}.content{min-width:0;max-width:800px}.content h1{margin-top:0}.content h2{margin-top:42px;padding-top:4px}.content h3{margin-top:30px}.content pre{padding:14px;overflow:auto;border-radius:8px;background:#111827;color:#f9fafb;border:1px solid #374151;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;line-height:1.55}.rule{padding:14px;border:1px solid rgba(127,127,127,.35);border-radius:10px;margin:16px 0}.compare{width:100%;border-collapse:collapse;margin:12px 0}.compare th,.compare td{padding:8px 10px;border-bottom:1px solid rgba(127,127,127,.25);text-align:left}.stage{font-size:.78rem;font-weight:700;opacity:.58;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}.mobileToc{display:none;width:100%;padding:10px;margin:10px 0 20px;border-radius:8px;background:transparent;color:inherit;border:1px solid rgba(127,127,127,.4)}section{scroll-margin-top:18px}
+@media(max-width:760px){.page{margin-top:16px}.layout{display:block}.toc{display:none}.mobileToc{display:block}.content h2{margin-top:34px}}
+</style></head><body><main class="page"><a class="pythonLink back" href="index.html">← Back to practice</a><div class="layout">
+<nav class="toc" aria-label="Complexity contents"><div class="tocTitle">Contents</div><div class="tocGroup">Time Complexity</div><a class="sub active" href="#time-basics">Basics</a><a class="sub" href="#time-functions">Function calls</a><a class="sub" href="#time-recursion">Recursion</a><a class="sub" href="#time-dp">Dynamic programming</a><div class="tocGroup">Auxiliary Space</div><a class="sub" href="#space-basics">Basics</a><a class="sub" href="#space-output">Output vs temporary</a><a class="sub" href="#space-recursion">Recursion</a><a class="sub" href="#space-dp">Dynamic programming</a><div class="tocGroup">Summary</div><a class="sub" href="#checklist">Quick checklist</a><a class="sub" href="#references">References</a></nav>
+<article class="content"><h1>Complexity</h1><p>Complexity asks how <b>work</b> and <b>extra memory</b> grow as the input gets bigger. Let <b>n</b> mean the input size.</p>
+<select class="mobileToc" aria-label="Contents"><option value="#time-basics">Time · Basics</option><option value="#time-functions">Time · Function calls</option><option value="#time-recursion">Time · Recursion</option><option value="#time-dp">Time · Dynamic programming</option><option value="#space-basics">Auxiliary Space · Basics</option><option value="#space-output">Auxiliary Space · Output vs temporary</option><option value="#space-recursion">Auxiliary Space · Recursion</option><option value="#space-dp">Auxiliary Space · Dynamic programming</option><option value="#checklist">Quick checklist</option><option value="#references">References</option></select>
+<section id="time-basics"><div class="stage">Time · Basics</div><h2>Count how the work grows</h2><pre>x = nums[0]                 # O(1)
 
 for x in nums:              # O(n)
     ...
 
 for x in nums:              # O(n²)
     for y in nums:
-        ...</pre><p><b>Quick rule:</b> one lookup → O(1), one full scan → O(n), nested full scans → O(n²).</p><p>Ignore constants and smaller terms: O(2n) → O(n), O(n + 10) → O(n), O(n² + n) → O(n²).</p></div></div>
-<div class="depth" data-level="2"><div class="levelCard"><div class="levelTitle">Level 2 · Function calls</div><p>A function call is not automatically O(1). Count the work inside it.</p><pre>nums.sort()                 # O(n log n)</pre><h3>One after another → add</h3><pre>helper(nums)                # O(n)
+        ...</pre><p><b>Quick rule:</b> one lookup → O(1), one full scan → O(n), nested full scans → O(n²).</p><p>Ignore constants and smaller terms: O(2n) → O(n), O(n + 10) → O(n), O(n² + n) → O(n²).</p></section>
+<section id="time-functions"><div class="stage">Time · Next</div><h2>Function calls: include the work inside</h2><p>One function call is not automatically O(1).</p><pre>nums.sort()                 # O(n log n)</pre><h3>One after another → add</h3><pre>helper(nums)                # O(n)
 helper(nums)                # O(n)
 # O(n) + O(n) = O(n)</pre><h3>Repeated inside a loop → multiply</h3><pre>for x in nums:              # n times
     helper(nums)            # O(n) each
-# n × n = O(n²)</pre><div class="rule"><b>Remember:</b> sequential → add. Nested/repeated → multiply. Keep the fastest-growing term.</div></div></div>
-<div class="depth" data-level="3"><div class="levelCard"><div class="levelTitle">Level 3 · Recursion</div><p>Ask: <b>How many calls are made, and how much work does each call do?</b></p><pre>def countdown(n: int):
+# n × n = O(n²)</pre><div class="rule"><b>Remember:</b> sequential → add. Nested/repeated → multiply. Keep the fastest-growing term.</div></section>
+<section id="time-recursion"><div class="stage">Time · Deeper</div><h2>Recursion: count the calls</h2><p>Ask: <b>How many calls are made, and how much work does each call do?</b></p><pre>def countdown(n: int):
     if n == 0:
         return
     countdown(n - 1)
@@ -27,42 +27,39 @@ helper(nums)                # O(n)
     if n <= 1:
         return n
     return fib(n - 1) + fib(n - 2)
-# branching calls → exponential time</pre><p>Without memoization, Fibonacci repeatedly solves the same smaller problems. O(2ⁿ) is a useful simple upper bound.</p></div></div>
-<div class="depth" data-level="4"><div class="levelCard"><div class="levelTitle">Level 4 · DP</div><p>DP avoids recalculating the same smaller problems.</p><table class="compare"><tr><th>Approach</th><th>Time</th><th>Auxiliary Space</th></tr><tr><td>Plain branching recursion</td><td>O(2ⁿ)</td><td>O(n)</td></tr><tr><td>Memoization</td><td>O(n)</td><td>O(n)</td></tr><tr><td>1D DP</td><td>O(n)</td><td>O(n)</td></tr><tr><td>Rolling variables</td><td>O(n)</td><td>O(1)</td></tr></table><h3>Why exponential gets bad quickly</h3><table class="compare"><tr><th>n</th><th>O(n)</th><th>O(n²)</th><th>O(2ⁿ)</th></tr><tr><td>10</td><td>10</td><td>100</td><td>1,024</td></tr><tr><td>20</td><td>20</td><td>400</td><td>1,048,576</td></tr><tr><td>50</td><td>50</td><td>2,500</td><td>&gt; 1 quadrillion</td></tr></table></div></div></section>
-
-<section id="space" class="panel"><h2>Auxiliary Space Complexity</h2><p>How much extra working memory grows with the input? Here we exclude required input and required output.</p><div class="levels" data-for="space"><button class="active" data-level="1">1 · Basics</button><button data-level="2">2 · Output vs temp</button><button data-level="3">3 · Recursion</button><button data-level="4">4 · DP</button></div>
-<div class="depth active" data-level="1"><div class="levelCard"><div class="levelTitle">Level 1 · Basics</div><pre>count = 0
+# branching calls → exponential time</pre><p>Without memoization, Fibonacci repeatedly solves the same smaller problems. O(2ⁿ) is a useful simple upper bound.</p></section>
+<section id="time-dp"><div class="stage">Time · Deeper</div><h2>Why dynamic programming helps</h2><p>DP avoids recalculating the same smaller problems.</p><table class="compare"><tr><th>Approach</th><th>Time</th><th>Auxiliary Space</th></tr><tr><td>Plain branching recursion</td><td>O(2ⁿ)</td><td>O(n)</td></tr><tr><td>Memoization</td><td>O(n)</td><td>O(n)</td></tr><tr><td>1D DP</td><td>O(n)</td><td>O(n)</td></tr><tr><td>Rolling variables</td><td>O(n)</td><td>O(1)</td></tr></table><h3>Why exponential gets bad quickly</h3><table class="compare"><tr><th>n</th><th>O(n)</th><th>O(n²)</th><th>O(2ⁿ)</th></tr><tr><td>10</td><td>10</td><td>100</td><td>1,024</td></tr><tr><td>20</td><td>20</td><td>400</td><td>1,048,576</td></tr><tr><td>50</td><td>50</td><td>2,500</td><td>&gt; 1 quadrillion</td></tr></table></section>
+<section id="space-basics"><div class="stage">Auxiliary Space · Basics</div><h2>Count extra working memory</h2><p>For this trainer, Auxiliary Space means extra working memory used by the algorithm as n grows. We exclude required input and required output.</p><pre>count = 0
 for x in nums:
     if x > 0:
         count += 1
 # fixed variables → O(1)</pre><pre>seen = set()
 for x in nums:
     seen.add(x)
-# extra set can grow to n → O(n)</pre><div class="rule"><b>Quick rule:</b> fixed number of variables → O(1). Extra list/set/dict growing with n → O(n).</div></div></div>
-<div class="depth" data-level="2"><div class="levelCard"><div class="levelTitle">Level 2 · Output vs temporary memory</div><pre>def keep_evens(nums: list[int]) -> list[int]:
+# extra set can grow to n → O(n)</pre><div class="rule"><b>Quick rule:</b> fixed variables → O(1). Extra list/set/dict growing with n → O(n).</div></section>
+<section id="space-output"><div class="stage">Auxiliary Space · Next</div><h2>Required output vs temporary memory</h2><pre>def keep_evens(nums: list[int]) -> list[int]:
     result = []
     for x in nums:
         if x % 2 == 0:
             result.append(x)
     return result</pre><p><b>Output: O(n).</b> The required returned result is not counted in our Auxiliary Space.</p><pre>temp = nums.copy()
 return temp[0]
-# temp is working memory → O(n) auxiliary space</pre><p>In an interview, be explicit: <b>“O(1) auxiliary space, excluding required input/output.”</b></p></div></div>
-<div class="depth" data-level="3"><div class="levelCard"><div class="levelTitle">Level 3 · Recursion</div><p>Count the <b>maximum calls alive at the same time</b>, not total calls.</p><pre>def countdown(n: int):
+# temp is working memory → O(n) auxiliary space</pre><p>In an interview, be explicit: <b>“O(1) auxiliary space, excluding required input/output.”</b></p></section>
+<section id="space-recursion"><div class="stage">Auxiliary Space · Deeper</div><h2>Recursion uses stack space</h2><p>Count the <b>maximum calls alive at the same time</b>, not total calls.</p><pre>def countdown(n: int):
     if n == 0:
         return
     countdown(n - 1)
-# stack depth n → O(n) auxiliary space</pre><p>Naive Fibonacci can take exponential time but still has only O(n) maximum recursion depth.</p></div></div>
-<div class="depth" data-level="4"><div class="levelCard"><div class="levelTitle">Level 4 · 1D DP</div><pre>dp = [0] * (n + 1)
+# stack depth n → O(n) auxiliary space</pre><p>Naive Fibonacci can take exponential time but still has only O(n) maximum recursion depth.</p></section>
+<section id="space-dp"><div class="stage">Auxiliary Space · Deeper</div><h2>1D DP space</h2><pre>dp = [0] * (n + 1)
 # n-sized working table → O(n)</pre><p>If each state only needs a few previous states:</p><pre>prev2 = 1
 prev1 = 1
 for i in range(2, n + 1):
     current = prev1 + prev2
     prev2 = prev1
     prev1 = current
-# fixed variables → O(1)</pre><p>Same O(n) time, but auxiliary space drops from O(n) to O(1).</p></div></div></section>
-
-<div class="rule"><b>Quick checklist</b><br><br><b>Time:</b> What work repeats? Include the cost of called functions.<br><br><b>Auxiliary Space:</b> What extra working memory grows? Include temporary structures and recursion stack; exclude required input/output.</div>
-<h2>References</h2><ul><li><a href="https://www.cs.cornell.edu/courses/cs2110/2026sp/lectures/lec05/" target="_blank" rel="noopener">Cornell CS 2110 — Analyzing Complexity</a></li><li><a href="https://algs4.cs.princeton.edu/22mergesort/" target="_blank" rel="noopener">Princeton Algorithms — Mergesort and auxiliary space</a></li><li><a href="https://leetcode.com/discuss/post/719926/does-space-complexity-analysis-usually-include-output-space/" target="_blank" rel="noopener">LeetCode discussion — output space</a></li><li><a href="https://blog.stackademic.com/understanding-space-complexity-and-auxiliary-space-a-beginner-friendly-guide-c75bcb9778d2" target="_blank" rel="noopener">Space Complexity and Auxiliary Space</a></li></ul>
-</main><script>
-(()=>{let tab='time',levels={time:'1',space:'1'};const render=()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===tab));const panel=document.getElementById(tab),lv=levels[tab];panel.querySelectorAll('.levels button').forEach(b=>b.classList.toggle('active',b.dataset.level===lv));panel.querySelectorAll('.depth').forEach(d=>d.classList.toggle('active',d.dataset.level===lv));};document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});document.querySelectorAll('.levels button').forEach(b=>b.onclick=()=>{const p=b.closest('.panel');levels[p.id]=b.dataset.level;render()});render()})();
+# fixed variables → O(1)</pre><p>Same O(n) time, but auxiliary space drops from O(n) to O(1).</p></section>
+<section id="checklist"><h2>Quick checklist</h2><div class="rule"><b>Time:</b> What work repeats? Include the cost of called functions.<br><br><b>Auxiliary Space:</b> What extra working memory grows? Include temporary structures and recursion stack; exclude required input/output.</div></section>
+<section id="references"><h2>References</h2><ul><li><a href="https://www.cs.cornell.edu/courses/cs2110/2026sp/lectures/lec05/" target="_blank" rel="noopener">Cornell CS 2110 — Analyzing Complexity</a></li><li><a href="https://algs4.cs.princeton.edu/22mergesort/" target="_blank" rel="noopener">Princeton Algorithms — Mergesort and auxiliary space</a></li><li><a href="https://leetcode.com/discuss/post/719926/does-space-complexity-analysis-usually-include-output-space/" target="_blank" rel="noopener">LeetCode discussion — output space</a></li><li><a href="https://blog.stackademic.com/understanding-space-complexity-and-auxiliary-space-a-beginner-friendly-guide-c75bcb9778d2" target="_blank" rel="noopener">Space Complexity and Auxiliary Space</a></li></ul></section>
+</article></div></main><script>
+(()=>{const links=[...document.querySelectorAll('.toc a')],sections=[...document.querySelectorAll('section')],sel=document.querySelector('.mobileToc');links.forEach(a=>a.onclick=()=>{links.forEach(x=>x.classList.remove('active'));a.classList.add('active')});sel.onchange=()=>document.querySelector(sel.value)?.scrollIntoView({behavior:'smooth',block:'start'});const obs=new IntersectionObserver(es=>{const visible=es.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];if(!visible)return;links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+visible.target.id));sel.value='#'+visible.target.id},{rootMargin:'-10% 0px -72% 0px',threshold:0});sections.forEach(s=>obs.observe(s))})();
 </script></body></html>

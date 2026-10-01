@@ -50,13 +50,30 @@ Keep separate because responsibilities differ:
 
 Single owners:
 - `progressive-solutions-v1.js`: all progressive solution data/rendering until that data migrates to DB.
-- `dsa-teaching-details.js`: Level 3 teaching refinements until DB migration.
+- `dsa-teaching-details.js`: DSA teaching refinements until DB migration.
 - Static question corrections belong in the canonical exercise data, never patch scripts.
 
 Retired files must not return:
 - `graph-question-clarity.js`
 - `progressive-solutions-extra.js`
 - `curriculum-clarity-v9.js`
+
+## DSA curriculum contract — 2026-10-01
+Python Training keeps Essentials, Core Python, and DSA Python, then exposes **Data Structures** and **Algorithms / Patterns** as separate top-level curriculum tabs. Do not mix algorithm lessons into the Data Structures tab or vice versa.
+
+Canonical Data Structures order/names:
+`Array → String → Linked List → Hashing → Set → Map / dict → Stack → Queue → Tree → Graph → Heap / Priority Queue`.
+
+Canonical Algorithms / Patterns order/names:
+`Traversal → Two Pointers → Sorting → Sliding Window → Prefix Sum → Binary Search → Search → Math & Bitwise → Recursion → DFS → BFS → Divide & Conquer → Greedy → Backtracking → Dynamic Programming`.
+
+`Hashing` teaches only the hash-table foundation and may point to Set and Map / dict; detailed Set/Map behavior stays in those lessons. Recursion and Backtracking are separate lessons. DFS and BFS are separate lessons.
+
+The DSA roadmap must use these exact canonical names and its topic links must resolve to the matching Python lesson. Do not maintain stale aliases such as `Array patterns`, `Binary tree`, `Graph representation`, `Recursion & backtracking`, `Dynamic programming`, or combined `DFS / BFS` in the visible curriculum/map.
+
+Each DSA lesson should be visual-first and concise: **short basic concept → diagram → tiny code/example → expandable Deep discussion → practice**. Keep the initial explanation brief; move implementation details, tradeoffs, complexity reasoning, and relationships into the embedded expandable Deep discussion. Prefer a diagram over extra prose when the diagram communicates the concept clearly.
+
+`assets/dsa-visuals.js` owns presentation diagrams for every canonical DSA lesson. Preserve semantic accuracy: arrays/strings are contiguous indexed cells, linked lists show explicit links, stack is LIFO, queue FIFO, tree/heap hierarchy is accurate, graph edges are explicit, traversal/search/pattern diagrams reflect the actual operation. When canonical lesson names change, update visual keys and DSA-map links in the same change so diagrams and navigation do not silently disappear.
 
 ## Teaching contract
 Teach concrete problem → tiny example → visual/state → discover pattern → name/explain DSA → Python implementation → complexity.
@@ -107,7 +124,6 @@ Preflight must protect local asset existence, JS syntax, shared Python runtime o
 ## Recovery
 Use Git history and small commits for recovery. Never discard current user progress to fix a code issue. Compatibility/migration code may be removed only after the relevant old state has been migrated and verified in real use.
 
-
 ## Review browser
 - Review is a separate read-only browsing experience, not the Practice solver UI.
 - The top-level Review control opens a compact catalog of completed Foundation questions.
@@ -115,13 +131,10 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Completed questions can be searched and filtered by topic and Basics/Combinations, and sorted by question order, recent completion, or attempts.
 - Each compact row expands inline to show the problem, saved final code, saved Time/Space complexity, reference answer, attempts, last pass, and learning notes.
 - Do not reintroduce a Review-done mode into the normal question picker. Practice remains one-question-at-a-time; Review is optimized for scanning many completed questions.
-
 - The main Foundations page has no Practice/Review mode selector; solving is always Practice.
 - Review defaults to only the user's saved code and saved Time/Space complexity.
 - Problem statement, reference answer, learning notes, and attempt history are secondary opt-in details under collapsed More options.
-
 - Recommendation also exposes a separate `Next not solved` action when an unlocked unfinished question exists. It selects the next unfinished unlocked question after the current position, wrapping to the first unfinished unlocked question when needed; locked questions are never selected.
-
 
 ## Authentication invariants (regression-critical)
 - The application is **fail closed**. Until Supabase confirms an authenticated session, `body.auth-locked` remains active and only the sign-in/create-account card may be usable.
@@ -132,30 +145,24 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Signed-out state must never be a usable local-practice mode. Progress is cloud/Supabase authoritative; no offline/local practice mode exists.
 - Regression check after UI/auth changes: fresh/incognito load => only auth UI; signed-in load => cloud hydrate before normal work; sign-out => practice UI immediately locks; auth lookup failure => remains locked.
 
-
 ### Secondary-page auth startup
 - `python.html` and `leetcode.html` are direct-entry pages and must independently enforce authentication; never assume the user arrived through `index.html`.
 - Their training UI and Python runtime must not initialize until an authenticated Supabase session is confirmed. Auth lookup failure remains signed-out/locked.
 - Regression review note: Python Training currently has legacy localStorage-backed lesson code/completion. Do not copy this pattern into Foundations or new features; migrate it deliberately to Supabase before treating Python Training progress as cross-device/cloud authoritative.
-
 
 ### Login visibility invariant
 - The primary login card must be visible from initial HTML/CSS whenever `body.auth-locked` is active. Do not depend on successful JavaScript startup, `getSession()`, or `setUser()` to reveal the sign-in controls.
 - `authCard` therefore starts visible in markup; authenticated `setUser()` hides it. CSS for `body.auth-locked #authCard` must override ordinary visibility so auth failures still leave a usable login form.
 - Regression test: disable/block a late script or Mermaid import and reload signed out; email/password/Sign in must still be visible and usable.
 
-
 ### JavaScript parse integrity (regression-critical)
 - Authentication depends on `assets/app.js` parsing completely. A syntax error anywhere in that file prevents login handlers from being installed even if the login card is visible.
-- Never insert escaped source separators such as a literal `\
-` between JavaScript statements. Use an actual newline.
+- Never insert escaped source separators such as a literal `\n` between JavaScript statements. Use an actual newline.
 - After automated source edits, inspect the exact edited region and verify that the login handler (`signInWithPassword`) remains reachable in a parseable script. Login-card visibility alone is not a sufficient auth regression test.
-
 
 ### Recommendation action labeling
 - Keep recommendation explanation out of the surrounding panel when the button can communicate the action.
 - The recommendation button must be the complete recommendation: action + exercise ID + question name, e.g. `Review B4 · Reverse string`, `Practice B12 · Binary search boundaries`, or `Practice again B7 · Contains duplicate`. Do not duplicate the question in a separate `Recommended:` heading. `Next not solved` should likewise show its target question.
-
 
 ## Current DB optimization state — 2026-09-29
 - Public app tables: `solutions` and `intern_prep`; both use RLS.
@@ -165,13 +172,11 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Live hardening SQL is recorded in `supabase/security_hardening_2026-09-29.sql`.
 - Leaked-password protection remains a Supabase project-setting recommendation, not an application-schema change.
 
-
 ### Authenticated startup visibility
 - After Supabase confirms a user, keep the practice workspace hidden with `body.app-loading` until the authoritative `solutions` hydration finishes.
 - Do not reveal stale/default question, recommendation, editor, or map state before hydration. Signed-out users still see the login card immediately.
 - Do not make startup hydration wait for optional/heavy presentation work such as Mermaid rendering or Pyodide loading; those may finish asynchronously after authoritative progress is ready.
 - Review is a separate completed-question browsing feature and stays in the top navigation. It must not be grouped with question navigation. Only Recommended and Next not solved belong immediately above the question.
-
 
 ### Canonical Foundation recommendation
 - There is one recommendation rule owned by `app.js` and exposed as `window.foundationRecommendation`. The question UI and DSA map must consume the same result; feature modules must not implement private recommenders.
@@ -179,16 +184,13 @@ Use Git history and small commits for recovery. Never discard current user progr
 - After all Basics have been passed, Combinations may enter the recommendation pool.
 - Never recommend a locked unfinished question as a fallback.
 
-
 ### Question description format
 - Keep every exercise description compact and non-duplicative: **task → Input → Output**.
 - Describe the expected transformation/behavior first, then name the input shape/type, then state exactly what the function returns.
 - Do not repeat concrete sample inputs/outputs in the description; tests/examples already own those.
 - Preserve only constraints that affect correctness (for example: non-empty, sorted, exactly one answer, allowed movement, or missing-node behavior).
 - Teaching rationale, implementation suggestions, complexity, and Python alternatives belong in Learn/Hint/sample content, not the question description.
-
 - Present the required function signature and compact task/Input/Output contract as one question-spec line/block. Do not render the signature as a separate standalone `<pre>` below the description. Keep `sig` in question data because runtime validation and AI-review prompts depend on it.
-
 
 ### Question vs Implementation
 - Treat **Question** and **Implementation** as separate concepts.
@@ -196,9 +198,7 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Implementation is a formal Python contract: show the required `def ...:` exactly as the learner must implement it.
 - Add Python comment lines only when they add information not obvious from the parameter name/signature: special representations (linked list/tree/graph), sorted/non-empty constraints, operation formats, special sentinel returns, indexes/coordinates, or similarly important contracts.
 - Do not mechanically comment obvious parameters or returns. Avoid comments equivalent to “nums is the input list.”
-
 - In the exercise UI, do not display literal "Question" or "Implementation" headings. The visual order itself communicates the distinction: short problem description first, Python function contract directly below.
-
 
 ### Recommendation menu
 - Practice navigation uses one expandable **Recommend** control, not separate Recommended / Next-not-solved buttons.
@@ -206,23 +206,14 @@ Use Git history and small commits for recovery. Never discard current user progr
 - The first menu item is the canonical recommendation exposed through `window.foundationRecommendation`; the DSA map must use that same item.
 - Preserve Basic-first phase gating and never offer a locked question. While any Basic remains unfinished, recommendation choices stay within the Basic pool.
 - Deduplicate questions in the menu even when one question qualifies for several reasons.
-
 - Keep the Recommend menu concise: at most one **Practice again** item. Do not fill remaining menu space with completed questions. Include one **Random** action that chooses an eligible unlocked question from the active Basic-first pool, preferably excluding the current question.
-
 - Question wording must describe the required behavior/result without assuming the learner already knows the intended algorithm. Avoid putting solution-technique phrases such as “using two pointers,” “with DP,” “with memoization,” or “using backtracking” in the question unless the exercise is explicitly testing that technique. Prefer concrete ordering/behavior rules. Keep it concise; add detail only to resolve a real ambiguity.
-
 - Starter editor content must contain only the required Python function definition plus an indented blank line. Do not put `pass`, `# your code`, algorithm hints, data-structure hints, setup variables, or solution scaffolding in starter code. Hints belong only in the Hint/Learn surfaces.
 
 ## Cross-chat repo editing workflow
 - This file is the handoff/source of truth for future ChatGPT chats working on this project.
 - When the user asks to change the DSA trainer, make the requested change directly in `bruce07182/Leecode1` with the GitHub connector when available; do not stop at instructions or sample code unless the user asks for that.
-- At the start of a new project chat, read this `PROJECT_SKILL.md` and inspect the current relevant repo files before editing. Treat the current repository as source of truth rather than relying on an older chat summary.
-- After each change, verify the affected code/content, preserve existing behavior outside the requested scope, commit the edit, and update this skill whenever a new durable design rule or workflow lesson is established.
-- For Supabase/database changes, read the installed Supabase skill first and inspect the current schema/policies before modifying them.
-
-- DSA map grouping can use ordinary existing-style Mermaid text nodes as visual parent concepts. Keep separately tracked concepts as separate nodes (for example, `Hash` → `Set` and `Hash` → `Map`), with each node retaining the existing mastery/status color system. Do not introduce a special container/box style just for grouping.
-- The visible implementation/function contract is signature-only, matching starter code. Do not auto-generate explanatory comments beneath the function signature; ambiguity belongs in the question text, while solution guidance belongs in Hint/Learn.
-
-- The live DSA map is owned by `assets/dsa-map-v6.js`, with `assets/dsa-map-guidance.js` decorating it. Do not add a second map renderer to `app.js`. Mermaid is not used by the main DSA map and should not be reintroduced unless a live feature explicitly needs it.
-
-- Submission history remains snapshot-based in Supabase (currently up to 20 attempts/question). Review computes Git-style line diffs on demand: each submission compares with the previous submission, and the first compares with starter code. Do not replace snapshots with delta-only storage; snapshots keep sync/recovery simple. GitHub may be added later as an optional successful-submission/export archive, not as the primary progress database.
+- Fetch the latest relevant file immediately before each edit and use its current SHA.
+- Keep changes small and sequential. Never parallel-write the same file or dependency chain.
+- After risky source edits, inspect the exact edited region and verify JavaScript parse integrity before claiming success.
+- Keep the DSA map, Python DSA curriculum, visuals, and this skill synchronized when canonical lesson names or teaching structure changes.

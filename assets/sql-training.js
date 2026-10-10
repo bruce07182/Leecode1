@@ -39,6 +39,24 @@ const explanations={
 'DELETE':['Remove rows','DELETE removes matching rows. Without WHERE, it removes every row in the table.','DELETE FROM orders WHERE id = 104;'],
 'ALTER TABLE':['Change a table design','ALTER TABLE modifies an existing table structure. This example adds a column.','ALTER TABLE customers ADD COLUMN email TEXT;']
 };
+const visuals={
+'SELECT':{before:'customers: id | name | city',after:'result: name → Amy, Ben, Cara, Dan',note:'Choose columns'},
+'WHERE':{before:'customers: Amy · Seattle | Ben · Portland | Cara · Seattle',after:'result: Amy, Cara',note:'Keep matching rows'},
+'ORDER BY':{before:'orders: $75, $50, $120, $40',after:'result: $120, $75, $50, $40',note:'Sort rows'},
+'LIMIT':{before:'orders: 101, 102, 103, 104',after:'result: 101, 102',note:'Keep first two'},
+'COUNT / SUM':{before:'orders: $75 + $50 + $120 + $40',after:'result: 4 orders · $285',note:'Count and total'},
+'GROUP BY':{before:'orders: Amy $75 + $50 | Ben $120 | Cara $40',after:'result: customer 1 → $125; 2 → $120; 3 → $40',note:'Combine matching groups'},
+'JOIN':{before:'customers: id → name | orders: customer_id → total',after:'result: Amy → $75, Amy → $50, Ben → $120, Cara → $40',note:'Match IDs across tables'},
+'HAVING':{before:'group totals: 1 → $125; 2 → $120; 3 → $40',after:'result: customers 1 and 2',note:'Filter group totals'},
+'LEFT JOIN':{before:'customers: Amy, Ben, Cara, Dan | orders: Amy, Ben, Cara',after:'result includes Dan → NULL',note:'Keep unmatched customers'},
+'Subquery':{before:'orders: $75, $50, $120, $40 | average: $71.25',after:'result: $75, $120',note:'Use one query inside another'},
+'CREATE TABLE':{before:'design: products → id, name, price',after:'new table: products (id PK, name, price)',note:'Define table structure'},
+'INSERT':{before:'customers: 4 rows',after:'customers: 5 rows · Eva added',note:'Add a record'},
+'UPDATE':{before:'Ben → Portland',after:'Ben → Seattle',note:'Change matching record'},
+'DELETE':{before:'orders: 101, 102, 103, 104',after:'orders: 101, 102, 103',note:'Remove matching record'},
+'ALTER TABLE':{before:'customers: id, name, city',after:'customers: id, name, city, email',note:'Add a column'}
+};
+function lessonDiagram(topic){const v=visuals[topic];return '<div class="sqlFlow" role="img" aria-label="'+esc(v.note)+': '+esc(v.before)+' becomes '+esc(v.after)+'"><div class="sqlFlowBox"><small>Before</small><div>'+esc(v.before)+'</div></div><div class="sqlFlowMiddle">→<small>'+esc(v.note)+'</small></div><div class="sqlFlowBox"><small>After</small><div>'+esc(v.after)+'</div></div></div>'}
 const keywords=/\b(SELECT|FROM|WHERE|ORDER|BY|LIMIT|ASC|DESC|AS|COUNT|SUM|AVG|GROUP|JOIN|LEFT|ON|HAVING|AND|OR|NOT|DISTINCT|NULL|INSERT|UPDATE|DELETE|CREATE|TABLE|PRIMARY|KEY|FOREIGN|REFERENCES|INTEGER|TEXT|REAL|SET|VALUES|INTO|ALTER|ADD|COLUMN|DEFAULT|UNIQUE)\b/gi;
 function highlight(sql){return esc(sql).replace(keywords,'<strong class="sqlKeyword">$1</strong>')}
 function esc(v){return String(v??'NULL').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -50,7 +68,7 @@ function render(){
  $('sqlModeBasic').classList.toggle('active',mode==='basic');$('sqlModeAdvanced').classList.toggle('active',mode==='advanced');$('sqlModeDesign').classList.toggle('active',mode==='design');$('sqlDesignGuide').hidden=mode!=='design';
  $('sqlTopics').innerHTML=visible.map(({l,i})=>'<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(visible.findIndex(v=>v.i===i)+1)+'. '+esc(l[0])+'</button>').join('');
  $('sqlTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});
- $('sqlLesson').innerHTML='<h3>'+esc(info[0])+'</h3><p>'+esc(info[1])+'</p><p class="muted">Example:</p><pre class="sqlHighlighted">'+highlight(info[2])+'</pre>';
+ $('sqlLesson').innerHTML='<h3>'+esc(info[0])+'</h3><p>'+esc(info[1])+'</p>'+lessonDiagram(x[0])+'<p class="muted"><b>SQL command</b></p><pre class="sqlHighlighted">'+highlight(info[2])+'</pre>';
  $('sqlTask').textContent=x[1];$('sqlCode').value=x[2];$('sqlExample').classList.add('hidden');$('sqlResult').innerHTML='';preview();
 }
 function preview(){$('sqlHighlight').innerHTML=highlight($('sqlCode').value)}

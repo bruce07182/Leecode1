@@ -21,6 +21,7 @@ const lessons=[
 ['ALTER TABLE','Add an email column to customers.','ALTER TABLE customers ADD COLUMN email TEXT;']
 ];
 const beginner=['SELECT','WHERE','ORDER BY','LIMIT'];
+const design=['CREATE TABLE','INSERT','UPDATE','DELETE','ALTER TABLE'];
 const explanations={
 'SELECT':['Pick columns','SELECT chooses what information to display. * means all columns.','SELECT name FROM customers;'],
 'WHERE':['Filter rows','WHERE keeps only rows that match a condition. Text values use quotes.',"SELECT name FROM customers WHERE city = 'Seattle';"],
@@ -43,10 +44,10 @@ function highlight(sql){return esc(sql).replace(keywords,'<strong class="sqlKeyw
 function esc(v){return String(v??'NULL').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function reset(){if(db)db.close();db=new SQL.Database();db.run("CREATE TABLE customers(id INTEGER PRIMARY KEY,name TEXT,city TEXT); INSERT INTO customers VALUES(1,'Amy','Seattle'),(2,'Ben','Portland'),(3,'Cara','Seattle'),(4,'Dan','Tacoma'); CREATE TABLE orders(id INTEGER PRIMARY KEY,customer_id INTEGER,total REAL,FOREIGN KEY(customer_id) REFERENCES customers(id)); INSERT INTO orders VALUES(101,1,75),(102,1,50),(103,2,120),(104,3,40);");$('sqlStatus').textContent='Sample database ready: customers (4 rows), orders (4 rows).'}
 function render(){
- const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='advanced'?!beginner.includes(x.l[0]):beginner.includes(x.l[0]));
- if(!visible.some(x=>x.i===current))current=0;
+ const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='basic'?beginner.includes(x.l[0]):mode==='advanced'?!beginner.includes(x.l[0])&&!design.includes(x.l[0]):design.includes(x.l[0]));
+ if(!visible.some(x=>x.i===current))current=visible[0]?.i??0;
  const x=lessons[current],info=explanations[x[0]];
- $('sqlModeBasic').classList.toggle('active',mode==='basic');$('sqlModeAdvanced').classList.toggle('active',mode==='advanced');
+ $('sqlModeBasic').classList.toggle('active',mode==='basic');$('sqlModeAdvanced').classList.toggle('active',mode==='advanced');$('sqlModeDesign').classList.toggle('active',mode==='design');$('sqlDesignGuide').hidden=mode!=='design';
  $('sqlTopics').innerHTML=visible.map(({l,i})=>'<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(visible.findIndex(v=>v.i===i)+1)+'. '+esc(l[0])+'</button>').join('');
  $('sqlTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});
  $('sqlLesson').innerHTML='<h3>'+esc(info[0])+'</h3><p>'+esc(info[1])+'</p><p class="muted">Example:</p><pre class="sqlHighlighted">'+highlight(info[2])+'</pre>';
@@ -56,6 +57,7 @@ function preview(){$('sqlHighlight').innerHTML=highlight($('sqlCode').value)}
 $('sqlCode').addEventListener('input',preview);
 $('sqlModeBasic').onclick=()=>{mode='basic';current=0;render()};
 $('sqlModeAdvanced').onclick=()=>{mode='advanced';current=4;render()};
+$('sqlModeDesign').onclick=()=>{mode='design';current=10;render()};
 
 $('sqlRun').onclick=()=>{if(!db)return;const query=$('sqlCode').value.trim();if(!query)return;try{const result=db.exec(query);$('sqlResult').innerHTML=result.length?result.map(r=>'<table><thead><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join(''):'Query completed (no result rows). Use SELECT to inspect the changes.';$('sqlStatus').textContent='Executed successfully. Compare your output to the task.'}catch(e){$('sqlStatus').textContent='SQL error: '+e.message}};
 $('sqlReset').onclick=()=>{if(SQL){reset();$('sqlResult').innerHTML=''}};

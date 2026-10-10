@@ -40,10 +40,10 @@ const explanations={
 'ALTER TABLE':['Change a table design','ALTER TABLE modifies an existing table structure. This example adds a column.','ALTER TABLE customers ADD COLUMN email TEXT;']
 };
 const visuals={
-'SELECT':{before:'customers: id | name | city',after:'result: name → Amy, Ben, Cara, Dan',note:'Choose columns'},
+'SELECT':{before:'customers: id | name | city',after:'result: 4 rows with id, name and city',note:'Show all columns'},
 'WHERE':{before:'customers: Amy · Seattle | Ben · Portland | Cara · Seattle',after:'result: Amy, Cara',note:'Keep matching rows'},
 'ORDER BY':{before:'orders: $75, $50, $120, $40',after:'result: $120, $75, $50, $40',note:'Sort rows'},
-'LIMIT':{before:'orders: 101, 102, 103, 104',after:'result: 101, 102',note:'Keep first two'},
+'LIMIT':{before:'orders by total: $120, $75, $50, $40',after:'result: $120, $75',note:'Keep two largest'},
 'COUNT / SUM':{before:'orders: $75 + $50 + $120 + $40',after:'result: 4 orders · $285',note:'Count and total'},
 'GROUP BY':{before:'orders: Amy $75 + $50 | Ben $120 | Cara $40',after:'result: customer 1 → $125; 2 → $120; 3 → $40',note:'Combine matching groups'},
 'JOIN':{before:'customers: id → name | orders: customer_id → total',after:'result: Amy → $75, Amy → $50, Ben → $120, Cara → $40',note:'Match IDs across tables'},
@@ -69,7 +69,8 @@ function render(){
  $('sqlTopics').innerHTML=visible.map(({l,i})=>'<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(visible.findIndex(v=>v.i===i)+1)+'. '+esc(l[0])+'</button>').join('');
  $('sqlTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});
  $('sqlLesson').innerHTML='<h3>'+esc(info[0])+'</h3><p>'+esc(info[1])+'</p>'+lessonDiagram(x[0])+'<p class="muted"><b>SQL command</b></p><pre class="sqlHighlighted">'+highlight(info[2])+'</pre>';
- $('sqlTask').textContent=x[1];$('sqlCode').value=x[2];$('sqlExample').classList.add('hidden');$('sqlResult').innerHTML='';preview();
+ $('sqlMoreBody').textContent=({SELECT:'SELECT picks which columns to show. * means all columns. FROM names the table.',WHERE:'WHERE filters rows. Try city = \'Seattle\' or city = \'Portland\'.', 'ORDER BY':'DESC means largest first; ASC means smallest first.',LIMIT:'Use ORDER BY with LIMIT to select the largest or smallest values.'})[x[0]]||'Try changing the example query and compare the results.';$('sqlMore').open=false;
+ $('sqlTask').textContent=x[1];$('sqlCode').value=x[2];$('sqlStatus').textContent=db?'Ready — press Run SQL.':'Loading SQL…';$('sqlExample').classList.add('hidden');$('sqlResult').innerHTML='';preview();
 }
 function preview(){$('sqlHighlight').innerHTML=highlight($('sqlCode').value)}
 $('sqlCode').addEventListener('input',preview);
@@ -77,7 +78,7 @@ $('sqlModeBasic').onclick=()=>{mode='basic';current=0;render()};
 $('sqlModeAdvanced').onclick=()=>{mode='advanced';current=4;render()};
 $('sqlModeDesign').onclick=()=>{mode='design';current=10;render()};
 
-$('sqlRun').onclick=()=>{if(!db)return;const query=$('sqlCode').value.trim();if(!query)return;try{const result=db.exec(query);$('sqlResult').innerHTML=result.length?result.map(r=>'<table><thead><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join(''):'Query completed (no result rows). Use SELECT to inspect the changes.';$('sqlStatus').textContent='Executed successfully. Compare your output to the task.'}catch(e){$('sqlStatus').textContent='SQL error: '+e.message}};
+$('sqlRun').onclick=()=>{if(!db){$('sqlStatus').textContent='Database is still loading. Please wait.';return;}const query=$('sqlCode').value.trim();if(!query)return;try{const result=db.exec(query);$('sqlResult').innerHTML=result.length?result.map(r=>'<table><thead><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join(''):'Query completed (no result rows). Use SELECT to inspect the changes.';$('sqlStatus').textContent='Executed successfully. Compare your output to the task.'}catch(e){$('sqlStatus').textContent='SQL error: '+e.message}};
 $('sqlReset').onclick=()=>{if(SQL){reset();$('sqlResult').innerHTML=''}};
 $('sqlAnswer').onclick=()=>{const p=$('sqlExample');p.textContent=lessons[current][2];p.classList.toggle('hidden')};
 $('sqlLogin').onclick=async()=>{const {error}=await client.auth.signInWithPassword({email:$('sqlEmail').value,password:$('sqlPassword').value});$('sqlAuthMsg').textContent=error?error.message:'Signing in…'};

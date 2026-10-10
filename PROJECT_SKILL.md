@@ -217,3 +217,12 @@ Use Git history and small commits for recovery. Never discard current user progr
 - Keep changes small and sequential. Never parallel-write the same file or dependency chain.
 - After risky source edits, inspect the exact edited region and verify JavaScript parse integrity before claiming success.
 - Keep the DSA map, Python DSA curriculum, visuals, and this skill synchronized when canonical lesson names or teaching structure changes.
+
+
+## SQL Training — initial implementation (2026-10-10)
+- SQL is a separate direct-entry page `sql.html`, linked from Foundations. It must fail closed until Supabase authentication succeeds.
+- Teach visually and briefly: file → JSON → database, tables/rows/columns, relationships/keys, SQL query flow, and how Supabase/Postgres differs from a local SQLite practice sandbox. Use concise examples and expandable deep dives.
+- SQL practice executes only against a disposable in-browser SQLite WASM sample database; never run arbitrary learner SQL against Supabase production. Browser reload resets sample data.
+- The initial SQL page has an introductory playground and illustrative query examples, **not graded exercises**; do not display completion checks or claim durable progress yet.
+- Before adding graded SQL exercises, establish DB-backed curriculum and tests (new distinct SQL exercise family, e.g. `SQL` with numeric IDs) and cloud-backed per-user attempts/progress with RLS, following `docs/DATABASE_DESIGN_LESSONS.md`. Do not hard-code new durable lesson/exercise catalogs in JS. Migrate the initial illustrative examples into DB when implementing that phase.
+- Preserve all existing Python/DSA/LC identities and progress. Verify auth, browser runtime, navigation, and CI separately.

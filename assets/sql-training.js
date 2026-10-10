@@ -2,7 +2,7 @@
 'use strict';
 const URL='https://eylaymrbyjjbvkgebvzv.supabase.co',KEY='sb_publishable_SXbGa-hEOpxjEpk3bvsJEw_AByTO9I9';
 const client=supabase.createClient(URL,KEY),$=id=>document.getElementById(id);
-let db=null,SQL=null,current=0;
+let db=null,SQL=null,current=0,mode='basic';
 const lessons=[
 ['SELECT','Show all customers.','SELECT * FROM customers;'],
 ['WHERE','Find customers in Seattle.','SELECT * FROM customers WHERE city = \'Seattle\';'],
@@ -15,9 +15,38 @@ const lessons=[
 ['LEFT JOIN','Include customers even when they have no orders.','SELECT customers.name, orders.total FROM customers LEFT JOIN orders ON customers.id = orders.customer_id;'],
 ['Subquery','Find orders larger than the average order total.','SELECT * FROM orders WHERE total > (SELECT AVG(total) FROM orders);']
 ];
+const beginner=['SELECT','WHERE','ORDER BY','LIMIT'];
+const explanations={
+'SELECT':['Pick columns','SELECT chooses what information to display. * means all columns.','SELECT name FROM customers;'],
+'WHERE':['Filter rows','WHERE keeps only rows that match a condition. Text values use quotes.',"SELECT name FROM customers WHERE city = 'Seattle';"],
+'ORDER BY':['Sort results','ORDER BY sorts rows. DESC means largest first; ASC means smallest first.','SELECT * FROM orders ORDER BY total DESC;'],
+'LIMIT':['Show fewer rows','LIMIT returns only the first N rows. Combine with ORDER BY for top results.','SELECT * FROM orders LIMIT 2;'],
+'COUNT / SUM':['Calculate totals','COUNT counts rows; SUM adds numbers. AS gives the result a friendly column name.','SELECT COUNT(*) AS total_orders FROM orders;'],
+'GROUP BY':['Summarize groups','GROUP BY combines rows with the same value before aggregate calculations.','SELECT customer_id, SUM(total) FROM orders GROUP BY customer_id;'],
+'JOIN':['Connect tables','JOIN matches rows across tables using shared keys.','SELECT customers.name, orders.total FROM customers JOIN orders ON customers.id = orders.customer_id;'],
+'HAVING':['Filter groups','HAVING filters aggregated groups; WHERE filters individual rows.','SELECT customer_id, SUM(total) FROM orders GROUP BY customer_id HAVING SUM(total)>100;'],
+'LEFT JOIN':['Keep unmatched rows','LEFT JOIN keeps every row from the left table even without a match.','SELECT customers.name, orders.total FROM customers LEFT JOIN orders ON customers.id=orders.customer_id;'],
+'Subquery':['Query inside query','A subquery provides a value or result set to the outer query.','SELECT * FROM orders WHERE total > (SELECT AVG(total) FROM orders);']
+};
+const keywords=/\\b(SELECT|FROM|WHERE|ORDER|BY|LIMIT|ASC|DESC|AS|COUNT|SUM|AVG|GROUP|JOIN|LEFT|ON|HAVING|AND|OR|NOT|DISTINCT|NULL|INSERT|UPDATE|DELETE)\\b/gi;
+function highlight(sql){return esc(sql).replace(keywords,'<strong class="sqlKeyword">$1</strong>')}
 function esc(v){return String(v??'NULL').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function reset(){if(db)db.close();db=new SQL.Database();db.run("CREATE TABLE customers(id INTEGER PRIMARY KEY,name TEXT,city TEXT); INSERT INTO customers VALUES(1,'Amy','Seattle'),(2,'Ben','Portland'),(3,'Cara','Seattle'),(4,'Dan','Tacoma'); CREATE TABLE orders(id INTEGER PRIMARY KEY,customer_id INTEGER,total REAL,FOREIGN KEY(customer_id) REFERENCES customers(id)); INSERT INTO orders VALUES(101,1,75),(102,1,50),(103,2,120),(104,3,40);");$('sqlStatus').textContent='Sample database ready: customers (4 rows), orders (4 rows).'}
-function render(){const x=lessons[current];$('sqlTopics').innerHTML=lessons.map((l,i)=>'<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(i+1)+'. '+esc(l[0])+'</button>').join('');$('sqlTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});$('sqlTask').textContent=x[1];$('sqlCode').value=x[2];$('sqlExample').classList.add('hidden');$('sqlResult').innerHTML=''}
+function render(){
+ const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='advanced'||beginner.includes(x.l[0]));
+ if(!visible.some(x=>x.i===current))current=0;
+ const x=lessons[current],info=explanations[x[0]];
+ $('sqlModeBasic').classList.toggle('active',mode==='basic');$('sqlModeAdvanced').classList.toggle('active',mode==='advanced');
+ $('sqlTopics').innerHTML=visible.map(({l,i})=>'<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(visible.findIndex(v=>v.i===i)+1)+'. '+esc(l[0])+'</button>').join('');
+ $('sqlTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{current=+b.dataset.i;render()});
+ $('sqlLesson').innerHTML='<h3>'+esc(info[0])+'</h3><p>'+esc(info[1])+'</p><p class="muted">Example:</p><pre class="sqlHighlighted">'+highlight(info[2])+'</pre>';
+ $('sqlTask').textContent=x[1];$('sqlCode').value=x[2];$('sqlExample').classList.add('hidden');$('sqlResult').innerHTML='';preview();
+}
+function preview(){$('sqlHighlight').innerHTML=highlight($('sqlCode').value)}
+$('sqlCode').addEventListener('input',preview);
+$('sqlModeBasic').onclick=()=>{mode='basic';current=0;render()};
+$('sqlModeAdvanced').onclick=()=>{mode='advanced';current=4;render()};
+
 $('sqlRun').onclick=()=>{if(!db)return;const query=$('sqlCode').value.trim();if(!query)return;try{const result=db.exec(query);$('sqlResult').innerHTML=result.length?result.map(r=>'<table><thead><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join(''):'Query completed (no result rows).';$('sqlStatus').textContent='Executed successfully. Compare your output to the task.'}catch(e){$('sqlStatus').textContent='SQL error: '+e.message}};
 $('sqlReset').onclick=()=>{if(SQL){reset();$('sqlResult').innerHTML=''}};
 $('sqlAnswer').onclick=()=>{const p=$('sqlExample');p.textContent=lessons[current][2];p.classList.toggle('hidden')};

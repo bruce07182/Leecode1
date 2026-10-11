@@ -72,6 +72,9 @@ let guidedDb=null;
 let step=0;
 function showStep(){const item=steps[step];$('sqlGuidedTask').textContent=item[0];$('sqlGuidedCode').value=item[1];$('sqlGuidedHighlight').innerHTML=highlight(item[1]);$('sqlGuidedResult').innerHTML='';$('sqlGuidedStatus').textContent='Step '+(step+1)+' of 5';$('sqlGuidedNext').disabled=true;$('sqlGuidedSteps').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('active',i===step))}
 
+function resultHtml(results){return results.map(r=>'<table><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</table>').join('')}
+$('sqlGuidedCode').oninput=()=>{$('sqlGuidedHighlight').innerHTML=highlight($('sqlGuidedCode').value)};
+$('sqlGuidedRun').onclick=()=>{if(!guidedDb)return;try{const rows=guidedDb.exec($('sqlGuidedCode').value);$('sqlGuidedResult').innerHTML=rows.length?resultHtml(rows):'SQL executed successfully.';$('sqlGuidedStatus').textContent='Success. Continue to the next step.';$('sqlGuidedNext').disabled=false}catch(e){$('sqlGuidedStatus').textContent='SQL error: '+e.message}};
 function render(){
  const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='basic'?beginner.includes(x.l[0]):mode==='advanced'?!beginner.includes(x.l[0])&&!design.includes(x.l[0]):design.includes(x.l[0]));
  if(!visible.some(x=>x.i===current))current=visible[0]?.i??0;

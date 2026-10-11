@@ -69,6 +69,9 @@ const steps=[
 ['Connect two tables','SELECT customers.name,orders.id,orders.total FROM customers JOIN orders ON customers.id=orders.customer_id;']
 ];
 let guidedDb=null;
+let step=0;
+function showStep(){const item=steps[step];$('sqlGuidedTask').textContent=item[0];$('sqlGuidedCode').value=item[1];$('sqlGuidedHighlight').innerHTML=highlight(item[1]);$('sqlGuidedResult').innerHTML='';$('sqlGuidedStatus').textContent='Step '+(step+1)+' of 5';$('sqlGuidedNext').disabled=true;$('sqlGuidedSteps').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('active',i===step))}
+
 function render(){
  const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='basic'?beginner.includes(x.l[0]):mode==='advanced'?!beginner.includes(x.l[0])&&!design.includes(x.l[0]):design.includes(x.l[0]));
  if(!visible.some(x=>x.i===current))current=visible[0]?.i??0;
@@ -90,6 +93,6 @@ $('sqlRun').onclick=()=>{if(!db){$('sqlStatus').textContent='Database is still l
 $('sqlReset').onclick=()=>{if(SQL){reset();$('sqlResult').innerHTML=''}};
 $('sqlAnswer').onclick=()=>{const p=$('sqlExample');p.textContent=lessons[current][2];p.classList.toggle('hidden')};
 $('sqlLogin').onclick=async()=>{const {error}=await client.auth.signInWithPassword({email:$('sqlEmail').value,password:$('sqlPassword').value});$('sqlAuthMsg').textContent=error?error.message:'Signing in…'};
-async function auth(){try{const {data,error}=await client.auth.getSession();if(error||!data.session){document.body.classList.add('auth-locked');return}document.body.classList.remove('auth-locked');if(!SQL){try{SQL=await initSqlJs({locateFile:file=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/'+file});reset();render();guidedDb=new SQL.Database()}catch(e){$('sqlStatus').textContent='SQL runtime failed to load: '+e.message}}}catch(e){document.body.classList.add('auth-locked');$('sqlAuthMsg').textContent='Could not verify session.'}}
+async function auth(){try{const {data,error}=await client.auth.getSession();if(error||!data.session){document.body.classList.add('auth-locked');return}document.body.classList.remove('auth-locked');if(!SQL){try{SQL=await initSqlJs({locateFile:file=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/'+file});reset();render();guidedDb=new SQL.Database();showStep()}catch(e){$('sqlStatus').textContent='SQL runtime failed to load: '+e.message}}}catch(e){document.body.classList.add('auth-locked');$('sqlAuthMsg').textContent='Could not verify session.'}}
 client.auth.onAuthStateChange(()=>{setTimeout(auth,0)});auth();
 })();

@@ -78,6 +78,7 @@ $('sqlGuidedRun').onclick=()=>{if(!guidedDb)return;try{const rows=guidedDb.exec(
 $('sqlGuidedNext').onclick=()=>{if(step<4&&!$('sqlGuidedNext').disabled){step++;showStep()}};
 $('sqlGuidedReset').onclick=()=>{if(!SQL)return;if(guidedDb)guidedDb.close();guidedDb=new SQL.Database();step=0;showStep();$('sqlWebResults').innerHTML='';$('sqlWebStatus').textContent=''};
 $('sqlGuidedSteps').querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{if(i===step)showStep()});
+$('sqlWebDemo').onclick=()=>{if(!guidedDb)return;try{const rows=guidedDb.exec("SELECT orders.id AS order_id,orders.total FROM orders JOIN customers ON customers.id=orders.customer_id WHERE customers.name='Amy'");$('sqlWebResults').innerHTML=rows.length?resultHtml(rows):'No orders found.';$('sqlWebStatus').textContent='Coffee store website · Amy’s orders'}catch(e){$('sqlWebStatus').textContent='Complete the create and insert exercises first.'}};
 function render(){
  const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='basic'?beginner.includes(x.l[0]):mode==='advanced'?!beginner.includes(x.l[0])&&!design.includes(x.l[0]):design.includes(x.l[0]));
  if(!visible.some(x=>x.i===current))current=visible[0]?.i??0;

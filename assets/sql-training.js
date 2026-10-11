@@ -79,12 +79,13 @@ const guideExplain=[
 '<b>JOIN</b> combines two <b>tables</b>. <b>ON</b> matches customers.id to orders.customer_id.'
 ];
 const guideEffects=['Created an empty table with 3 columns.','Added 2 customer rows.','Returned 2 rows; the database is unchanged.','Created the orders table and added 3 rows.','Matched orders with customer names.'];
+function refreshGuidedViews(){if(!$('sqlGuidedBeforeAfter'))return;$('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();}
 function showStep(){
  $('sqlGuidedTask').textContent=(step+1)+'. '+steps[step][0];
  $('sqlGuidedProgress').textContent='Step '+(step+1)+' of 3';
  $('sqlGuidedCode').innerHTML=highlight(steps[step][1]);
  $('sqlGuidedExplain').innerHTML=guideExplain[step];
- $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+ refreshGuidedViews();
  $('sqlGuidedRun').textContent=done?'Continue →':'▶ Run SQL';
  $('sqlGuidedRun').disabled=done&&step===2;
  if(!done)$('sqlGuidedStatus').textContent='';
@@ -99,14 +100,15 @@ function showExtra(){
  $('sqlGuidedExtraExplain').innerHTML=guideExplain[extraStep];
  $('sqlGuidedExtraRun').textContent=extraDone&&extraStep===3?'Continue →':extraDone?'Finished ✓':'▶ Run SQL';
  $('sqlGuidedExtraRun').disabled=!unlocked||(extraDone&&extraStep===4);
- if(!unlocked)$('sqlGuidedExtraStatus').textContent='Finish the 3 basic steps first.';
+ if(!unlocked)$('sqlGuidedExtraStatus').textContent='Run the 3 basic SQL commands first; the same customers table will be used here.';
+ refreshGuidedViews();
 }
 $('sqlGuidedRun').onclick=()=>{
  if(!guidedDb){$('sqlGuidedStatus').textContent='Loading SQL database…';return}
  if(done){if(step<2){step++;done=false;showStep()}return}
  try{
   const result=guidedDb.exec(steps[step][1]);done=true;
-  $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+  refreshGuidedViews();
   $('sqlGuidedStatus').textContent=guideEffects[step];
   if(step===2)$('sqlGuidedResult').innerHTML='<b>SELECT result</b>'+resultHtml(result);
   $('sqlGuidedRun').textContent=step===2?'Finished ✓':'Continue →';
@@ -127,7 +129,7 @@ $('sqlGuidedExtraRun').onclick=()=>{
  try{
   const result=guidedDb.exec(steps[extraStep][1]);extraDone=true;
   $('sqlGuidedExtraStatus').textContent=guideEffects[extraStep];
-  $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+  refreshGuidedViews();
   $('sqlGuidedExtraResult').innerHTML=extraStep===4?'<b>JOIN result</b>'+resultHtml(result):'';
   showExtra()
  }catch(e){$('sqlGuidedExtraStatus').textContent='SQL error: '+e.message}
@@ -159,6 +161,6 @@ $('sqlRun').onclick=()=>{if(!db){$('sqlStatus').textContent='Database is still l
 $('sqlReset').onclick=()=>{if(SQL){reset();$('sqlResult').innerHTML=''}};
 $('sqlAnswer').onclick=()=>{const p=$('sqlExample');p.textContent=lessons[current][2];p.classList.toggle('hidden')};
 $('sqlLogin').onclick=async()=>{const {error}=await client.auth.signInWithPassword({email:$('sqlEmail').value,password:$('sqlPassword').value});$('sqlAuthMsg').textContent=error?error.message:'Signing in…'};
-async function auth(){try{const {data,error}=await client.auth.getSession();if(error||!data.session){document.body.classList.add('auth-locked');return}document.body.classList.remove('auth-locked');if(!SQL){try{SQL=await initSqlJs({locateFile:file=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/'+file});reset();render();guidedDb=new SQL.Database();showStep()}catch(e){$('sqlStatus').textContent='SQL runtime failed to load: '+e.message}}}catch(e){document.body.classList.add('auth-locked');$('sqlAuthMsg').textContent='Could not verify session.'}}
+async function auth(){try{const {data,error}=await client.auth.getSession();if(error||!data.session){document.body.classList.add('auth-locked');return}document.body.classList.remove('auth-locked');if(!SQL){try{SQL=await initSqlJs({locateFile:file=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/'+file});guidedDb=new SQL.Database();showStep();reset();render()}catch(e){$('sqlStatus').textContent='SQL runtime failed to load: '+e.message}}}catch(e){document.body.classList.add('auth-locked');$('sqlAuthMsg').textContent='Could not verify session.'}}
 client.auth.onAuthStateChange(()=>{setTimeout(auth,0)});auth();
 })();

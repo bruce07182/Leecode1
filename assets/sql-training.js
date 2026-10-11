@@ -68,15 +68,76 @@ const steps=[
 ['Add an orders table','CREATE TABLE orders(id INTEGER PRIMARY KEY,customer_id INTEGER,total REAL); INSERT INTO orders VALUES(101,1,75),(102,1,50),(103,2,120);'],
 ['Connect customers and orders','SELECT customers.name,orders.id,orders.total FROM customers JOIN orders ON customers.id=orders.customer_id;']
 ];
-let guidedDb=null,step=0;
+let guidedDb=null,step=0,extraStep=3,done=false,extraDone=false;
 function resultHtml(results){return results.map(r=>'<table><tr>'+r.columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr>'+r.values.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</table>').join('')}
-function snapshot(){if(!guidedDb)return '<p>No table yet.</p>';const names=guidedDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");if(!names.length)return '<p>No table yet.</p>';return names[0].values.map(v=>{const data=guidedDb.exec('SELECT * FROM '+v[0]);return '<h4>'+esc(v[0])+'</h4>'+(data.length?resultHtml(data):'<p>Empty table</p>')}).join('')}
-function showStep(){const titles=['Empty database','1. Create a table','2. Add two customers','3. Read the customers','4. Create orders','5. Connect the tables'];const effects=['No tables yet.','Created customers with three columns: id, name, city.','Added Amy and Ben as two rows.','Read all rows. The data stays unchanged.','Created orders and added three rows.','Combined customer names with their orders.'];const explanations=['SQL is the language used to work with a database.','CREATE TABLE makes a new table. INTEGER stores numbers; TEXT stores words.','INSERT INTO adds rows. VALUES supplies the information for each row.','SELECT * means all columns; FROM customers names the table to read.','CREATE TABLE makes orders; INSERT adds three purchases.','JOIN matches orders to customers using customer_id.'];$('sqlGuidedTask').textContent=titles[step];$('sqlGuidedProgress').textContent=step<4?'Step '+step+' of 3':'Deep dive';$('sqlGuidedCode').innerHTML=step?highlight(steps[step-1][1]):'Click Show step 1 to begin.';$('sqlGuidedExplain').textContent=explanations[step];$('sqlGuidedStatus').textContent=effects[step];$('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();$('sqlGuidedResult').innerHTML='';$('sqlGuidedRun').textContent=step<3?'Show step '+(step+1)+' →':'Finished ✓';$('sqlGuidedRun').disabled=step>=3}
-
-$('sqlGuidedRun').onclick=()=>{if(!guidedDb){$('sqlGuidedStatus').textContent='Database is loading. Please try again.';return}if(step>=3)return;try{const result=guidedDb.exec(steps[step][1]);step++;showStep();if(step===3)$('sqlGuidedResult').innerHTML='<b>Query result</b>'+resultHtml(result)}catch(e){$('sqlGuidedStatus').textContent='Could not run step: '+e.message}};
-$('sqlGuidedReset').onclick=()=>{if(!SQL)return;if(guidedDb)guidedDb.close();guidedDb=new SQL.Database();step=0;showStep();$('sqlWebResults').innerHTML='';$('sqlWebStatus').textContent=''};
-document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const target=Number(b.dataset.step);if(!guidedDb||step<3||target!==step)return;try{guidedDb.exec(steps[target][1]);step++;showStep();if(step===5)$('sqlGuidedResult').innerHTML='<b>Joined orders</b>'+resultHtml(guidedDb.exec(steps[4][1]))}catch(e){$('sqlGuidedStatus').textContent='Could not run extra step: '+e.message}});
-$('sqlWebDemo').onclick=()=>{if(!guidedDb)return;try{const rows=guidedDb.exec("SELECT orders.id AS order_id,orders.total FROM orders JOIN customers ON customers.id=orders.customer_id WHERE customers.name='Amy'");$('sqlWebResults').innerHTML=rows.length?resultHtml(rows):'No orders found.';$('sqlWebStatus').textContent='Coffee store website · Amy’s orders'}catch(e){$('sqlWebStatus').textContent='Open the optional orders lesson first.'}};
+function snapshot(){if(!guidedDb)return '<p>No tables yet.</p>';const names=guidedDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");if(!names.length)return '<p>No tables yet.</p>';return names[0].values.map(v=>{const data=guidedDb.exec('SELECT * FROM '+v[0]);const schema=guidedDb.exec('PRAGMA table_info('+v[0]+')');const cols=data.length?data:schema.length?[{columns:schema[0].values.map(x=>x[1]),values:[]}]:[];return '<h4>'+esc(v[0])+'</h4>'+(cols.length?resultHtml(cols):'<p>Empty table</p>')}).join('')}
+const guideExplain=[
+'<b>CREATE TABLE</b> creates a <b>table</b> named customers. <b>Columns</b> are id, name, city. <b>INTEGER</b> means number; <b>TEXT</b> means words. <b>PRIMARY KEY</b> makes each id unique.',
+'<b>INSERT INTO</b> adds <b>rows</b> (records). <b>VALUES</b> gives the id, name and city for Amy and Ben.',
+'<b>SELECT</b> reads data; <b>*</b> means every column; <b>FROM</b> identifies the table. Reading does not change stored data.',
+'<b>CREATE TABLE</b> makes orders. <b>customer_id</b> links an order to a customer. <b>INSERT</b> adds three orders.',
+'<b>JOIN</b> combines two <b>tables</b>. <b>ON</b> matches customers.id to orders.customer_id.'
+];
+const guideEffects=['Created an empty table with 3 columns.','Added 2 customer rows.','Returned 2 rows; the database is unchanged.','Created the orders table and added 3 rows.','Matched orders with customer names.'];
+function showStep(){
+ $('sqlGuidedTask').textContent=(step+1)+'. '+steps[step][0];
+ $('sqlGuidedProgress').textContent='Step '+(step+1)+' of 3';
+ $('sqlGuidedCode').innerHTML=highlight(steps[step][1]);
+ $('sqlGuidedExplain').innerHTML=guideExplain[step];
+ $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+ $('sqlGuidedRun').textContent=done?'Continue →':'▶ Run SQL';
+ $('sqlGuidedRun').disabled=done&&step===2;
+ if(!done)$('sqlGuidedStatus').textContent='';
+ $('sqlGuidedResult').innerHTML='';
+ showExtra();
+}
+function showExtra(){
+ const unlocked=done&&step===2;
+ $('sqlGuidedExtraTask').textContent=(extraStep-2)+'. '+steps[extraStep][0];
+ $('sqlGuidedExtraProgress').textContent='Deep dive · '+(extraStep-2)+' of 2';
+ $('sqlGuidedExtraCode').innerHTML=highlight(steps[extraStep][1]);
+ $('sqlGuidedExtraExplain').innerHTML=guideExplain[extraStep];
+ $('sqlGuidedExtraRun').textContent=extraDone&&extraStep===3?'Continue →':extraDone?'Finished ✓':'▶ Run SQL';
+ $('sqlGuidedExtraRun').disabled=!unlocked||(extraDone&&extraStep===4);
+ if(!unlocked)$('sqlGuidedExtraStatus').textContent='Finish the 3 basic steps first.';
+}
+$('sqlGuidedRun').onclick=()=>{
+ if(!guidedDb){$('sqlGuidedStatus').textContent='Loading SQL database…';return}
+ if(done){if(step<2){step++;done=false;showStep()}return}
+ try{
+  const result=guidedDb.exec(steps[step][1]);done=true;
+  $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+  $('sqlGuidedStatus').textContent=guideEffects[step];
+  if(step===2)$('sqlGuidedResult').innerHTML='<b>SELECT result</b>'+resultHtml(result);
+  $('sqlGuidedRun').textContent=step===2?'Finished ✓':'Continue →';
+  $('sqlGuidedRun').disabled=step===2;
+  showExtra();
+ }catch(e){$('sqlGuidedStatus').textContent='SQL error: '+e.message}
+};
+$('sqlGuidedReset').onclick=()=>{
+ if(!SQL)return;
+ if(guidedDb)guidedDb.close();
+ guidedDb=new SQL.Database();step=0;extraStep=3;done=false;extraDone=false;
+ $('sqlGuidedExtraStatus').textContent='';$('sqlGuidedExtraResult').innerHTML='';
+ $('sqlWebResults').innerHTML='';$('sqlWebStatus').textContent='';showStep()
+};
+$('sqlGuidedExtraRun').onclick=()=>{
+ if(!guidedDb||!done||step!==2)return;
+ if(extraDone){if(extraStep===3){extraStep=4;extraDone=false;showExtra()}return}
+ try{
+  const result=guidedDb.exec(steps[extraStep][1]);extraDone=true;
+  $('sqlGuidedExtraStatus').textContent=guideEffects[extraStep];
+  $('sqlGuidedBeforeAfter').innerHTML='<b>Database</b>'+snapshot();
+  $('sqlGuidedExtraResult').innerHTML=extraStep===4?'<b>JOIN result</b>'+resultHtml(result):'';
+  showExtra()
+ }catch(e){$('sqlGuidedExtraStatus').textContent='SQL error: '+e.message}
+};
+$('sqlWebDemo').onclick=()=>{
+ if(!guidedDb)return;
+ try{const rows=guidedDb.exec("SELECT orders.id AS order_id,orders.total FROM orders JOIN customers ON customers.id=orders.customer_id WHERE customers.name='Amy'");
+ $('sqlWebResults').innerHTML=rows.length?resultHtml(rows):'No orders found.';$('sqlWebStatus').textContent='Coffee store website · Amy’s orders'}
+ catch(e){$('sqlWebStatus').textContent='Run the optional orders lesson first.'}
+};
 function render(){
  const visible=lessons.map((l,i)=>({l,i})).filter(x=>mode==='basic'?beginner.includes(x.l[0]):mode==='advanced'?!beginner.includes(x.l[0])&&!design.includes(x.l[0]):design.includes(x.l[0]));
  if(!visible.some(x=>x.i===current))current=visible[0]?.i??0;

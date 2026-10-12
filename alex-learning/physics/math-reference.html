@@ -43,7 +43,7 @@ const lp=document.createElement('p');lp.textContent='Add contributions along a p
 const lf=document.createElement('div');lf.className='formula';lf.textContent='ΔV = −∫ E⃗ · dℓ⃗';
 line.append(lp,lf);integrals.append(line);
 integrals.append(topics[3]);topics[3].querySelector('summary').textContent='Surface integral';
-integrals.append(topics[4]);topics[4].querySelector('summary').textContent='Closed-surface integral';
+topics[3].append(topics[4]);topics[4].querySelector('summary').textContent='Closed-surface integral';
 calculus.append(integrals);
 const applications=make('Physics applications');
 applications.append(topics[5]);topics[5].querySelector('summary').textContent="Gauss’s law";
@@ -52,7 +52,7 @@ marker.remove();
 for(const t of topics)t.open=false;
 const header=main.querySelector('h2');if(header&&header.textContent.includes('From basic'))header.textContent='Math topics';
 const deep=Array.from(main.querySelectorAll('details')).find(d=>d.querySelector(':scope > summary')?.textContent?.includes('Deep dive · Understanding every part'));
-if(deep){integrals.append(deep);deep.querySelector('summary').textContent='Deep dive: surface integrals'}
+if(deep){topics[3].append(deep);deep.querySelector('summary').textContent='Deep dive · surface and closed-surface integrals'}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();

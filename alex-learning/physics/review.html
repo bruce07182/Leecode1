@@ -141,4 +141,40 @@ const count=document.getElementById('stepcount');new MutationObserver(render).ob
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+</script><style>
+#math-equation{cursor:pointer;border-bottom:1px dashed #285db3;display:inline-block;padding:5px 2px}
+#formula-help{background:#eef4ff;border-radius:8px;padding:12px;margin-top:9px;line-height:1.6}
+#sample-index{margin:10px 0 15px;padding:12px;border:1px solid #d9e3f0;border-radius:10px;background:white}
+#sample-index summary{cursor:pointer;font-weight:700;color:#285db3}
+#sample-index button{margin:5px;padding:8px}
+</style><script>
+(function(){
+const descriptions=[
+'Charge is quantized: q is net charge, n is a signed integer, and e is the elementary charge magnitude (1.602 × 10⁻¹⁹ C).',
+'Coulomb’s law: F is electric force magnitude, k=1/(4πε₀), q₁ and q₂ are source charges, and r is their separation. Doubling r reduces force to one-quarter.',
+'Electric field E is force per positive unit test charge q₀. For a point source charge Q, E=k|Q|/r²; direction is away from positive Q and toward negative Q.',
+'Fields obey superposition: find the field from each charge at the same observation point, resolve each into components, then add components. For continuous charge use an integral.',
+'Flux Φ measures field through a surface. For a flat uniform surface Φ=EA cosθ, where A is area and θ is measured from the surface normal, not from the plane.',
+'Gauss’s law: the closed-surface integral sums E·dA over every tiny outward-oriented surface patch. The result equals net enclosed charge Qenc divided by vacuum permittivity ε₀. Outside charges contribute zero net flux.',
+'Choose a Gaussian surface matched to symmetry. Spherical, cylindrical, and planar symmetry let E come outside the flux integral. Inside conductor material at electrostatic equilibrium E=0.',
+'Potential V is electric potential energy U per charge q. For an isolated point charge Q, V=kQ/r, taking V=0 at infinity. Unlike E, V is a scalar and can be negative.',
+'ΔV is final minus initial potential. The change in energy is ΔU=qΔV; work done by the electric field is −ΔU. Signs matter.',
+'Electric field points toward decreasing potential: Ex=−dV/dx, or in 3D E=−∇V. The minus sign means field points down the potential gradient.'
+];
+function init(){
+const equation=document.getElementById('math-equation');if(!equation)return;
+const help=document.createElement('details');help.id='formula-help';help.innerHTML='<summary>Explain this formula · symbols and when to use it</summary><p id="formula-help-text"></p>';
+const formula=equation.closest('details');formula.after(help);
+equation.setAttribute('role','button');equation.tabIndex=0;equation.title='Click to explain this formula';
+const toggle=()=>{help.open=!help.open};
+equation.addEventListener('click',toggle);
+equation.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+const samples=document.createElement('details');samples.id='sample-index';samples.innerHTML='<summary>Textbook sample problems · 3 available</summary><p>Select a problem to jump to its concept and open the question.</p><div><button type="button" data-sample-step="2">22.01 · Three charges</button><button type="button" data-sample-step="5">23.01 · Closed cylinder</button><button type="button" data-sample-step="7">24.03 · Four charges</button></div>';
+document.querySelector('.stage-card').before(samples);
+samples.querySelectorAll('[data-sample-step]').forEach(b=>b.onclick=()=>{const target=Number(b.dataset.sampleStep);const current=Number((document.getElementById('stepcount').textContent.match(/\d+/)||[])[0]||1)-1;const delta=target-current;const nav=document.getElementById(delta>=0?'next':'back');for(let j=0;j<Math.abs(delta);j++)nav.click();requestAnimationFrame(()=>{const item=document.getElementById('textbook-sample');if(item&&!item.hidden){item.open=true;item.scrollIntoView({behavior:'smooth',block:'center'})}})});
+function refresh(){const n=Number((document.getElementById('stepcount').textContent.match(/\d+/)||[])[0]||1)-1;document.getElementById('formula-help-text').textContent=descriptions[n]||'';help.open=false}
+new MutationObserver(refresh).observe(document.getElementById('stepcount'),{childList:true,subtree:true});refresh();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
 </script></body></html>

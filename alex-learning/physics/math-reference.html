@@ -17,31 +17,38 @@
 </details><p class="hint">Notation note: ordinary integrals ∫, surface integrals ∫ₛ, and closed-surface integrals ∮ₛ are related ideas, but they sum over different geometric objects.</p><div class="next"><a href="review.html">← Return to guided Physics C</a><a href="review.html#theory-6">Go to Gauss's law →</a></div></main><style>.math-group{background:#eaf1fb;border:1px solid #cad9ed;border-radius:14px;padding:15px;margin:18px 0}.math-group>summary{font-size:21px;font-weight:750;cursor:pointer;color:#172b49}.math-group .topic{margin:12px 0;background:#fff}.math-group .topic>summary{font-size:17px}.math-group .topic[open]{border-color:#adc8e9}.math-group-note{color:#536983;font-size:14px;margin:9px 0}.vector-example{font:normal 22px Georgia,serif;text-align:center;background:#f3f7ff;padding:15px;border-radius:9px}</style><script>
 (function(){
 function setup(){
-const main=document.querySelector('main'), topics=Array.from(main.querySelectorAll('details.topic'));
+const main=document.querySelector('main');
+const topics=Array.from(main.querySelectorAll('details.topic'));
 if(topics.length<7)return;
-const groups=[
-['Vectors and vector operations','Direction, components, and how two vectors interact.',[2]],
-['Calculus: rates and accumulated change','Derivatives, integrals, and spatial gradients.',[0,1,6]],
-['Surface integrals and electric flux','Adding field contributions across open and closed surfaces.',[3,4,5]]
-];
+const make=(title,cls='math-group',open=true)=>{
+const d=document.createElement('details');d.className=cls;d.open=open;
+const h=document.createElement('summary');h.textContent=title;d.append(h);return d};
 const anchor=topics[0];
-for(const [title,description,indices] of groups){
-const group=document.createElement('details');group.className='math-group';group.open=true;
-const heading=document.createElement('summary');heading.textContent=title;
-const note=document.createElement('p');note.className='math-group-note';note.textContent=description;
-group.append(heading,note);
-if(title.startsWith('Vectors')){
-const v=document.createElement('details');v.className='topic';
-const sum=document.createElement('summary');sum.textContent='1 · Vectors and components';
-const para=document.createElement('p');para.textContent='A vector has magnitude and direction. Split it into horizontal and vertical components before adding vectors.';
-const formula=document.createElement('div');formula.className='vector-example';formula.textContent='A⃗ = Aₓ î + Aᵧ ĵ';
-const eg=document.createElement('p');eg.textContent='Physics: the electric field is a vector, so fields from different charges add by components.';
-v.append(sum,para,formula,eg);group.append(v)
-}
-for(const i of indices){topics[i].open=false;group.append(topics[i])}
-anchor.parentNode.insertBefore(group,anchor)
-}
+const vectors=make('Vectors and vector operations');
+const vec=make('Vectors and components','topic',false);
+const vp=document.createElement('p');vp.textContent='A vector has magnitude and direction. Resolve vectors into components before adding them.';
+const vf=document.createElement('div');vf.className='vector-example';vf.textContent='A⃗ = Aₓ î + Aᵧ ĵ';
+vec.append(vp,vf);vectors.append(vec);
+vectors.append(topics[2]);topics[2].querySelector('summary').textContent='Dot product';
+const calculus=make('Calculus');
+calculus.append(topics[0]);topics[0].querySelector('summary').textContent='Derivatives';
+calculus.append(topics[6]);topics[6].querySelector('summary').textContent='Gradient';
+const integrals=make('Integrals','topic',false);
+integrals.append(topics[1]);topics[1].querySelector('summary').textContent='Ordinary integral';
+const line=make('Line integral','topic',false);
+const lp=document.createElement('p');lp.textContent='Add contributions along a path. For electric potential, only the electric-field component along each small displacement contributes.';
+const lf=document.createElement('div');lf.className='formula';lf.textContent='ΔV = −∫ E⃗ · dℓ⃗';
+line.append(lp,lf);integrals.append(line);
+integrals.append(topics[3]);topics[3].querySelector('summary').textContent='Surface integral';
+integrals.append(topics[4]);topics[4].querySelector('summary').textContent='Closed-surface integral';
+calculus.append(integrals);
+const applications=make('Physics applications');
+applications.append(topics[5]);topics[5].querySelector('summary').textContent="Gauss’s law";
+for(const g of [vectors,calculus,applications])anchor.parentNode.insertBefore(g,anchor);
+for(const t of topics)t.open=false;
 const header=main.querySelector('h2');if(header&&header.textContent.includes('From basic'))header.textContent='Math topics';
+const deep=Array.from(main.querySelectorAll('details')).find(d=>d.querySelector(':scope > summary')?.textContent?.includes('Deep dive · Understanding every part'));
+if(deep){integrals.append(deep);deep.querySelector('summary').textContent='Deep dive: surface integrals'}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();

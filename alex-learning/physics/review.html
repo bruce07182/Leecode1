@@ -79,4 +79,33 @@ $('practice-hint').onclick=()=>{$('practice-hint-text').textContent='Hint: '+ban
 $('practice-step').onclick=()=>{const steps=bank[topic][level][2];if(shown>=steps.length)return;const li=document.createElement('li');li.textContent=steps[shown++];$('practice-steps').append(li)};
 $('practice-reset').onclick=reset;document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{level=Number(b.dataset.level);reset()});
 new MutationObserver(state).observe($('stepcount'),{childList:true,subtree:true});state();
-})();</script></body></html>
+})();</script><style>
+/* Compact study card: term, diagram and equation first. */
+.stage-card>.keypoint{display:none}
+.stage-card>.deep-lesson{display:none}
+.stage-card>.practice-lab{display:none}
+.stage-card>.stage-actions{margin:12px 0}
+#stage-visual{margin:12px 0}
+.math-reveal{margin:10px 0}
+#math-equation{font-size:clamp(18px,3vw,24px);font-weight:650}
+#math-explanation{display:none}
+#theory,#deeper,#check,#ask-panel{margin-top:10px}
+</style><script>
+(function(){
+function simplify(){
+const card=document.querySelector('.stage-card');
+if(!card||document.getElementById('optional-details'))return;
+const details=document.createElement('details');details.id='optional-details';
+const summary=document.createElement('summary');summary.textContent='Detailed explanation and worked example';
+details.append(summary);
+const theory=document.getElementById('theory');
+const deep=card.querySelector('.deep-lesson');
+if(deep){deep.style.display='block';details.append(deep)}
+if(theory)theory.after(details);
+const practice=document.getElementById('practice-lab');
+if(practice){const wrap=document.createElement('details');wrap.id='optional-practice';const label=document.createElement('summary');label.textContent='Optional practice · three difficulty levels';wrap.append(label);practice.style.display='block';wrap.append(practice);details.after(wrap)}
+const formula=card.querySelector('.math-reveal');if(formula){formula.open=true;const head=formula.querySelector('summary');if(head)head.textContent='Formula'}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',simplify);else simplify();
+})();
+</script></body></html>

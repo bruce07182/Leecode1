@@ -56,4 +56,32 @@ if(deep){integrals.append(deep);deep.querySelector('summary').textContent='Deep 
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
+</script><style>.math-deep{margin-top:12px!important;background:#edf4ff!important;border:1px solid #cbdcf3;border-radius:10px}.math-deep>summary{font-weight:700!important;color:#285db3!important}.math-deep p{line-height:1.7}.math-deep .worked{padding:10px 12px;background:white;border-radius:8px;margin:8px 0}.math-deep .eqn{font:20px Georgia,serif;overflow-wrap:anywhere}</style><script>
+(function(){
+const content={
+'Vectors and components':['Think of a vector as an arrow. Its horizontal and vertical projections are components; these can be negative even when its magnitude is positive.','A 5 N arrow at 37° above +x has Aₓ=5cos37°≈4 N and Aᵧ=5sin37°≈3 N. To add another arrow, add x components together and y components together.','Physics connection: fields from different charges can point in different directions. Add their components before finding the total magnitude.'],
+'Dot product':['The dot product is a scalar, not another arrow. It selects the part of one vector parallel to another. A·B=|A||B|cosθ=AₓBₓ+AᵧBᵧ.','If a 10 N/C field makes 60° with a 2 m² surface normal, E·A=10×2×cos60°=10 N·m²/C. At 90°, the flux is zero.','Important: θ is measured from the normal (perpendicular to the surface), not the surface itself.'],
+'Derivatives':['A derivative is a local rate of change: the limit of a tiny output change divided by a tiny input change. It is the slope of the tangent line.','For V(x)=12−3x² volts (x in meters), dV/dx=−6x V/m. At x=2 m, the field Eₓ=−dV/dx=+12 V/m.','The minus sign means the electric field points toward decreasing potential.'],
+'Gradient':['The gradient collects partial derivatives into a vector pointing toward the steepest increase of a scalar field.','For V(x,y)=3x²+2y volts, ∇V=(6x)î+2ĵ V/m. Thus E=−∇V=−6x î−2ĵ V/m.','Unlike dV/dx, the gradient accounts for change in multiple spatial directions.'],
+'Ordinary integral':['Integration adds contributions from thin pieces. A definite integral is the signed accumulated total between two bounds; geometrically it is signed area under a curve.','For f(x)=2x, ∫ from 0 to 3 of 2x dx=[x²]₀³=9. Negative parts below the axis subtract rather than add.','Physics: integrate a varying charge density λ(x) to find total charge Q=∫λ(x)dx.'],
+'Line integral':['A line integral accumulates contributions along a path. In a vector line integral, dℓ is tangent to the path, so the dot product selects the field component along the motion.','For a constant E=200 N/C along +x, moving 0.30 m along +x gives ∫E·dℓ=60 V, so ΔV=−60 V. Moving perpendicular to E contributes zero.','In electrostatics, potential difference is independent of the chosen path, although the intermediate dot products may differ.'],
+'Surface integral':['Divide an open surface into tiny patches. Each patch has area dA and a chosen normal direction n̂. The oriented area vector is dA⃗=n̂ dA. Sum E·dA⃗ over all patches.','For a flat 2 m² sheet in a uniform 5 N/C field at 60° to its normal, Φ=EAcosθ=5×2×0.5=5 N·m²/C.','Curved surfaces require adding patches with changing normals; a surface integral is a two-dimensional accumulation.'],
+'Closed-surface integral':['A closed surface has no boundary edge: imagine a sealed box or sphere. Every tiny area vector points outward by convention. Field lines exiting count positive and entering count negative.','A uniform 4 N/C field passes through a closed box with opposite faces of area 3 m². Fluxes are +12 and −12 N·m²/C; other faces give zero. Net flux is zero.','The circle on ∮ indicates closed integration. Zero net flux does not mean the field is zero.'],
+'Gauss’s law':['Gauss’s law links the net electric flux through any closed surface to the net charge inside it. Outside charges can affect the field at the surface but not the net enclosed charge.','A point charge q=+2 nC inside a spherical Gaussian surface produces total flux Φ=q/ε₀≈226 N·m²/C, regardless of sphere radius. If centered, symmetry gives E·4πr²=q/ε₀.','Choose a Gaussian surface where symmetry makes E constant and parallel or perpendicular to the area normal. Gauss’s law is always true; it is easiest to solve for E with symmetry.']
+};
+function run(){
+const topics=document.querySelectorAll('details.topic');
+for(const t of topics){
+const name=t.querySelector(':scope > summary')?.textContent?.trim();
+if(!content[name])continue;
+const existing=Array.from(t.children).some(el=>el.classList?.contains('math-deep'));if(existing)continue;
+const d=document.createElement('details');d.className='math-deep';
+const h=document.createElement('summary');h.textContent='Deep dive · explanation and worked example';d.append(h);
+const labels=['How it works','Worked example','Connection / common mistake'];
+content[name].forEach((txt,i)=>{const p=document.createElement('p');p.className='worked';const b=document.createElement('strong');b.textContent=labels[i]+': ';p.append(b,document.createTextNode(txt));d.append(p)});
+t.append(d);
+}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
 </script></body></html>

@@ -108,4 +108,37 @@ const formula=card.querySelector('.math-reveal');if(formula){formula.open=true;c
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',simplify);else simplify();
 })();
+</script><style>
+#theory,#deeper,#optional-details{display:none!important}
+#textbook-sample{margin:13px 0;border:1px solid #d9e3f0;border-radius:12px;padding:13px;background:#f8fbff}
+#textbook-sample>summary{cursor:pointer;font-weight:700;color:#285db3}
+#textbook-sample svg{width:100%;max-height:210px;background:white;border-radius:8px}
+#textbook-sample p{line-height:1.6}
+#textbook-sample details{margin:10px 0}
+</style><script>
+(function(){
+const samples={
+2:{name:'Textbook Sample Problem 22.01 · Three charges',prompt:'Three point charges are all distance d from the origin: +2Q at 150°, −2Q at 210°, and −4Q at 30°, measured counterclockwise from +x. Find the net electric field at the origin in terms of k, Q, and d.',solution:'Set E0=kQ/d². The field from +2Q points away from its source (angle 330°), with magnitude 2E0. The fields from −2Q and −4Q point toward their sources (210° and 30°), with magnitudes 2E0 and 4E0. Add x and y components: Ex=(2√3−√3+2√3)E0=3√3 E0; Ey=(−1−1+2)E0=0. Thus E=3√3 kQ/d² toward +x.',svg:'<line x1="20" y1="100" x2="400" y2="100" stroke="#999"/><line x1="210" y1="12" x2="210" y2="195" stroke="#999"/><text x="395" y="90">x</text><text x="218" y="20">y</text><circle cx="106" cy="40" r="19" fill="#fee2e2"/><text x="94" y="45">+2Q</text><circle cx="106" cy="160" r="19" fill="#dbeafe"/><text x="95" y="165">−2Q</text><circle cx="314" cy="40" r="19" fill="#dbeafe"/><text x="302" y="45">−4Q</text><circle cx="210" cy="100" r="4"/><text x="216" y="116">O</text><text x="156" y="62">d</text><text x="154" y="149">d</text><text x="268" y="64">d</text>'},
+5:{name:'Textbook Sample Problem 23.01 · Closed cylinder',prompt:'A closed cylindrical Gaussian surface is placed in a uniform electric field parallel to its axis. Determine the electric flux through its left cap, curved side, right cap, and entire closed surface.',solution:'Outward normals point left on the left cap and right on the right cap. Therefore Φleft=−EA, Φright=+EA, and Φside=0 because the field is tangent to the curved wall. Net flux is zero. This agrees with Gauss’s law: no net charge is enclosed.',svg:'<ellipse cx="115" cy="100" rx="28" ry="65" fill="#e8f0ff" stroke="#285db3"/><rect x="115" y="35" width="170" height="130" fill="#e8f0ff" stroke="#285db3"/><ellipse cx="285" cy="100" rx="28" ry="65" fill="#e8f0ff" stroke="#285db3"/><path d="M20 65 H390 M20 100 H390 M20 135 H390" stroke="#d97706" stroke-width="2" stroke-dasharray="10 6"/><text x="190" y="28">E →</text><text x="75" y="190">Left cap</text><text x="275" y="190">Right cap</text>'},
+7:{name:'Textbook Sample Problem 24.03 · Four charges at a square',prompt:'Four charges occupy the corners of a square of side d=1.3 m: top-left +12 nC, top-right −24 nC, bottom-left +31 nC, bottom-right +17 nC. Find the electric potential at the square center, taking zero at infinity.',solution:'All corners are r=d/√2 from the center. Add potentials as scalars: V=k(12−24+31+17)×10⁻⁹/r = k(36×10⁻⁹)/(1.3/√2) ≈ 352 V (about +350 V). Directions do not enter a potential sum.',svg:'<rect x="125" y="25" width="170" height="150" fill="none" stroke="#285db3" stroke-dasharray="5 4"/><text x="75" y="24">+12 nC</text><text x="305" y="24">−24 nC</text><text x="75" y="185">+31 nC</text><text x="305" y="185">+17 nC</text><circle cx="210" cy="100" r="5" fill="#d97706"/><text x="220" y="96">P</text><text x="195" y="194">d = 1.3 m</text>'}
+};
+function render(){
+const n=Number((document.getElementById('stepcount')?.textContent.match(/\d+/)||[])[0]||1)-1;
+const host=document.getElementById('textbook-sample');if(!host)return;
+const item=samples[n];host.hidden=!item;if(!item)return;
+host.querySelector('.sample-name').textContent=item.name;
+host.querySelector('.sample-prompt').textContent=item.prompt;
+host.querySelector('.sample-solution').textContent=item.solution;
+host.querySelector('svg').innerHTML=item.svg;
+host.open=false;
+}
+function init(){
+const card=document.querySelector('.stage-card');if(!card||document.getElementById('textbook-sample'))return;
+const sample=document.createElement('details');sample.id='textbook-sample';
+sample.innerHTML='<summary class="sample-name"></summary><p class="note">Adapted from the textbook sample problem; original teaching diagram redrawn for this review.</p><svg viewBox="0 0 420 210" role="img" aria-label="Problem-specific diagram"></svg><p class="sample-prompt"></p><details><summary>Show step-by-step reasoning and answer</summary><p class="sample-solution"></p></details>';
+const practice=document.getElementById('optional-practice');(practice||document.getElementById('check')).before(sample);
+const count=document.getElementById('stepcount');new MutationObserver(render).observe(count,{childList:true,subtree:true});render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
 </script></body></html>

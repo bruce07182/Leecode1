@@ -14,4 +14,35 @@
 <details><summary>Worked example · uniform field through a flat patch</summary><p>Take E = 6 N/C, area A = 2 m², and θ = 60° between the field and normal. The flux is Φ = EA cosθ = 6 × 2 × 0.5 = <strong>6 N·m²/C</strong>.</p></details>
 <details><summary>Worked example · why net flux through an empty box can be zero</summary><p>Imagine a uniform field passing straight through a sealed box. Flux through the entry face is negative because the field points inward there. Flux through the exit face is equally positive. On the four side faces, the field is parallel to the surface, so flux is zero. Total: <strong>−EA + EA = 0</strong>. Field lines still cross the box; zero means zero <em>net</em> flux.</p></details>
 <details><summary>How this becomes Gauss's law</summary><p>Gauss's law states ∮<sub>S</sub> <span class="vec">E</span> · d<span class="vec">A</span> = Q<sub>enc</sub>/ε₀. The left side adds outward electric flux across every patch of the closed surface. The right side depends only on the net charge enclosed. If the surface encloses positive charge, net outward flux is positive; for negative charge, negative.</p></details>
-</details><p class="hint">Notation note: ordinary integrals ∫, surface integrals ∫ₛ, and closed-surface integrals ∮ₛ are related ideas, but they sum over different geometric objects.</p><div class="next"><a href="review.html">← Return to guided Physics C</a><a href="review.html#theory-6">Go to Gauss's law →</a></div></main></body></html>
+</details><p class="hint">Notation note: ordinary integrals ∫, surface integrals ∫ₛ, and closed-surface integrals ∮ₛ are related ideas, but they sum over different geometric objects.</p><div class="next"><a href="review.html">← Return to guided Physics C</a><a href="review.html#theory-6">Go to Gauss's law →</a></div></main><style>.math-group{background:#eaf1fb;border:1px solid #cad9ed;border-radius:14px;padding:15px;margin:18px 0}.math-group>summary{font-size:21px;font-weight:750;cursor:pointer;color:#172b49}.math-group .topic{margin:12px 0;background:#fff}.math-group .topic>summary{font-size:17px}.math-group .topic[open]{border-color:#adc8e9}.math-group-note{color:#536983;font-size:14px;margin:9px 0}.vector-example{font:normal 22px Georgia,serif;text-align:center;background:#f3f7ff;padding:15px;border-radius:9px}</style><script>
+(function(){
+function setup(){
+const main=document.querySelector('main'), topics=Array.from(main.querySelectorAll('details.topic'));
+if(topics.length<7)return;
+const groups=[
+['Vectors and vector operations','Direction, components, and how two vectors interact.',[2]],
+['Calculus: rates and accumulated change','Derivatives, integrals, and spatial gradients.',[0,1,6]],
+['Surface integrals and electric flux','Adding field contributions across open and closed surfaces.',[3,4,5]]
+];
+const anchor=topics[0];
+for(const [title,description,indices] of groups){
+const group=document.createElement('details');group.className='math-group';group.open=true;
+const heading=document.createElement('summary');heading.textContent=title;
+const note=document.createElement('p');note.className='math-group-note';note.textContent=description;
+group.append(heading,note);
+if(title.startsWith('Vectors')){
+const v=document.createElement('details');v.className='topic';
+const sum=document.createElement('summary');sum.textContent='1 · Vectors and components';
+const para=document.createElement('p');para.textContent='A vector has magnitude and direction. Split it into horizontal and vertical components before adding vectors.';
+const formula=document.createElement('div');formula.className='vector-example';formula.textContent='A⃗ = Aₓ î + Aᵧ ĵ';
+const eg=document.createElement('p');eg.textContent='Physics: the electric field is a vector, so fields from different charges add by components.';
+v.append(sum,para,formula,eg);group.append(v)
+}
+for(const i of indices){topics[i].open=false;group.append(topics[i])}
+anchor.parentNode.insertBefore(group,anchor)
+}
+const header=main.querySelector('h2');if(header&&header.textContent.includes('From basic'))header.textContent='Math topics';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
+</script></body></html>

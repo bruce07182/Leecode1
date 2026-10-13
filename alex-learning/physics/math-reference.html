@@ -50,6 +50,11 @@ applications.append(topics[5]);topics[5].querySelector('summary').textContent="G
 for(const g of [vectors,calculus,applications])parent.insertBefore(g,marker);
 marker.remove();
 for(const t of topics)t.open=false;
+const targets=[['vectors',vec],['dot-product',topics[2]],['derivatives',topics[0]],['gradient',topics[6]],['integrals',integrals],['ordinary-integral',topics[1]],['line-integral',line],['surface-integral',topics[3]],['closed-surface-integral',topics[4]],['gauss-law',topics[5]]];
+for(const [id,node] of targets)node.id=id;
+function revealMathTarget(){const id=decodeURIComponent(location.hash.slice(1));const target=document.getElementById(id);if(!target)return;let node=target;while(node&&node!==main){if(node.tagName==='DETAILS')node.open=true;node=node.parentElement}target.scrollIntoView({block:'start'});}
+window.addEventListener('hashchange',revealMathTarget);setTimeout(revealMathTarget,0);
+
 const header=main.querySelector('h2');if(header&&header.textContent.includes('From basic'))header.textContent='Math topics';
 const deep=Array.from(main.querySelectorAll('details')).find(d=>d.querySelector(':scope > summary')?.textContent?.includes('Deep dive · Understanding every part'));
 if(deep){topics[3].append(deep);deep.querySelector('summary').textContent='Deep dive · surface and closed-surface integrals'}
